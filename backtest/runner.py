@@ -21,7 +21,7 @@ from backtest.metrics import print_summary, summarize
 from data.loader import load_pool_data
 from models.fees import fee_yield_annualized, fees_earned_usdc, is_in_range
 from models.il import il_cost_from_vol
-from models.position import liquidity_from_deposit, position_value_usdc
+from models.position import liquidity_from_deposit, position_value_usdc, token_amounts
 from models.vol import realized_vol_ewma, realized_vol_with_shock
 from strategy.engine import Signal, evaluate
 
@@ -38,6 +38,7 @@ def run_backtest(
     shock_decay: int = 12,
     fee_il_threshold: float = 1.0,
     fee_share: float = 0.001,
+    slippage_bps: float = 30.0,
 ) -> tuple[pd.DataFrame, list[Signal]]:
     """Run the backtest.
 
@@ -53,6 +54,7 @@ def run_backtest(
         shock_decay: Shock detector decay hours.
         fee_il_threshold: Required fee/IL edge ratio.
         fee_share: Position's share of total pool fees (e.g., 0.001 = 0.1%).
+        slippage_bps: Round-trip slippage cost in basis points per LP enter/exit (default 30 = 0.3%).
 
     Returns:
         (results_df, signals) — full time series and signal list.
@@ -92,7 +94,6 @@ def run_backtest(
     signals = []
 
     # HODL baseline: hold the initial token split at entry
-    from models.position import token_amounts
     if can_deposit:
         init_usdc, init_eth = token_amounts(
             liquidity, entry_price, price_lower, price_upper
@@ -111,6 +112,8 @@ def run_backtest(
     # When out of LP, track held token amounts
     held_usdc = 0.0
     held_eth = 0.0
+    slippage_rate = slippage_bps / 10_000  # e.g., 30 bps = 0.003
+    cumulative_slippage = 0.0
 
     for i in range(len(df)):
         price = prices.iloc[i]
@@ -192,15 +195,24 @@ def run_backtest(
         )
         signals.append(signal)
 
-        # --- State transitions ---
+        # --- State transitions (with slippage) ---
         if lp_active and not should_lp:
-            # Withdrawing: receive tokens from LP position
-            held_usdc, held_eth = token_amounts(
+            # Withdrawing: receive tokens from LP position, minus slippage
+            raw_usdc, raw_eth = token_amounts(
                 liquidity, price, price_lower, price_upper
             )
+            slip_cost = (raw_usdc + raw_eth * price) * slippage_rate
+            cumulative_slippage += slip_cost
+            # Apply slippage proportionally to both tokens
+            slip_frac = 1.0 - slippage_rate
+            held_usdc = raw_usdc * slip_frac
+            held_eth = raw_eth * slip_frac
         elif not lp_active and should_lp and in_range:
-            # Re-entering: deposit held tokens back into LP
+            # Re-entering: deposit held tokens back into LP, minus slippage
             redeposit_value = held_usdc + held_eth * price
+            slip_cost = redeposit_value * slippage_rate
+            cumulative_slippage += slip_cost
+            redeposit_value -= slip_cost
             if redeposit_value > 0:
                 liquidity = liquidity_from_deposit(
                     redeposit_value, price, price_lower, price_upper
@@ -241,6 +253,7 @@ def main():
     parser.add_argument("--halflife", type=int, default=24, help="EWMA half-life hours")
     parser.add_argument("--threshold", type=float, default=1.0, help="Fee/IL edge threshold")
     parser.add_argument("--fee-share", type=float, default=0.001, help="Position share of pool fees")
+    parser.add_argument("--slippage-bps", type=float, default=30, help="Slippage cost in bps per enter/exit (default: 30)")
     parser.add_argument("--compare", action="store_true", help="Run both methods and compare")
     parser.add_argument("--output", default=None, help="Save results CSV to path")
     args = parser.parse_args()
@@ -259,6 +272,7 @@ def main():
                 ewma_halflife=args.halflife,
                 fee_il_threshold=args.threshold,
                 fee_share=args.fee_share,
+                slippage_bps=args.slippage_bps,
             )
             summary = summarize(
                 pd.Series(results["strategy_equity"]),
@@ -281,7 +295,8 @@ def main():
             vol_method=args.vol_method,
             ewma_halflife=args.halflife,
             fee_il_threshold=args.threshold,
-            liquidity_share=args.liquidity_share,
+            fee_share=args.fee_share,
+            slippage_bps=args.slippage_bps,
         )
         summary = summarize(
             pd.Series(results["strategy_equity"]),

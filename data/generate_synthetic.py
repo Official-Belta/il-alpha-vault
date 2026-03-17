@@ -117,7 +117,7 @@ def generate(
     volume_usd = base_hourly_volume * vol_multiplier * volume_noise
 
     # --- Fees: volume * fee_tier ---
-    fee_rate = fee_tier_bps / 1_000_000  # 5 bps = 0.00005
+    fee_rate = fee_tier_bps / 10_000  # 5 bps = 0.0005
     fees_usd = volume_usd * fee_rate
 
     # --- Liquidity: slow random walk around initial TVL ---

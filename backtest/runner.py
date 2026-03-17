@@ -38,7 +38,8 @@ def run_backtest(
     shock_decay: int = 12,
     fee_il_threshold: float = 1.0,
     fee_share: float = 0.001,
-    slippage_bps: float = 30.0,
+    slippage_bps: float = 10.0,
+    cooldown_hours: int = 24,
 ) -> tuple[pd.DataFrame, list[Signal]]:
     """Run the backtest.
 
@@ -54,7 +55,8 @@ def run_backtest(
         shock_decay: Shock detector decay hours.
         fee_il_threshold: Required fee/IL edge ratio.
         fee_share: Position's share of total pool fees (e.g., 0.001 = 0.1%).
-        slippage_bps: Round-trip slippage cost in basis points per LP enter/exit (default 30 = 0.3%).
+        slippage_bps: Round-trip slippage cost in basis points per LP enter/exit (default 10 = 0.1%).
+        cooldown_hours: Minimum hours between position changes to avoid churn (default 24).
 
     Returns:
         (results_df, signals) — full time series and signal list.
@@ -112,8 +114,9 @@ def run_backtest(
     # When out of LP, track held token amounts
     held_usdc = 0.0
     held_eth = 0.0
-    slippage_rate = slippage_bps / 10_000  # e.g., 30 bps = 0.003
+    slippage_rate = slippage_bps / 10_000  # e.g., 10 bps = 0.001
     cumulative_slippage = 0.0
+    hours_since_last_change = cooldown_hours  # allow immediate first action
 
     for i in range(len(df)):
         price = prices.iloc[i]
@@ -195,19 +198,23 @@ def run_backtest(
         )
         signals.append(signal)
 
-        # --- State transitions (with slippage) ---
-        if lp_active and not should_lp:
+        # --- State transitions (with slippage + cooldown) ---
+        # Only allow state change if cooldown has elapsed
+        can_change = hours_since_last_change >= cooldown_hours
+
+        if can_change and lp_active and not should_lp:
             # Withdrawing: receive tokens from LP position, minus slippage
             raw_usdc, raw_eth = token_amounts(
                 liquidity, price, price_lower, price_upper
             )
             slip_cost = (raw_usdc + raw_eth * price) * slippage_rate
             cumulative_slippage += slip_cost
-            # Apply slippage proportionally to both tokens
             slip_frac = 1.0 - slippage_rate
             held_usdc = raw_usdc * slip_frac
             held_eth = raw_eth * slip_frac
-        elif not lp_active and should_lp and in_range:
+            lp_active = False
+            hours_since_last_change = 0
+        elif can_change and not lp_active and should_lp and in_range:
             # Re-entering: deposit held tokens back into LP, minus slippage
             redeposit_value = held_usdc + held_eth * price
             slip_cost = redeposit_value * slippage_rate
@@ -219,8 +226,10 @@ def run_backtest(
                 )
             held_usdc = 0.0
             held_eth = 0.0
-
-        lp_active = should_lp
+            lp_active = True
+            hours_since_last_change = 0
+        else:
+            hours_since_last_change += 1
 
     # --- Build results DataFrame ---
     results = pd.DataFrame({
@@ -253,7 +262,8 @@ def main():
     parser.add_argument("--halflife", type=int, default=24, help="EWMA half-life hours")
     parser.add_argument("--threshold", type=float, default=1.0, help="Fee/IL edge threshold")
     parser.add_argument("--fee-share", type=float, default=0.001, help="Position share of pool fees")
-    parser.add_argument("--slippage-bps", type=float, default=30, help="Slippage cost in bps per enter/exit (default: 30)")
+    parser.add_argument("--slippage-bps", type=float, default=10, help="Slippage cost in bps per enter/exit (default: 10)")
+    parser.add_argument("--cooldown", type=int, default=24, help="Min hours between position changes (default: 24)")
     parser.add_argument("--compare", action="store_true", help="Run both methods and compare")
     parser.add_argument("--output", default=None, help="Save results CSV to path")
     args = parser.parse_args()
@@ -273,6 +283,7 @@ def main():
                 fee_il_threshold=args.threshold,
                 fee_share=args.fee_share,
                 slippage_bps=args.slippage_bps,
+                cooldown_hours=args.cooldown,
             )
             summary = summarize(
                 pd.Series(results["strategy_equity"]),

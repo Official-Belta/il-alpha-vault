@@ -120,6 +120,26 @@ HOOK_ABI = [
     },
 ]
 
+SWAP_HELPER_ABI = [
+    {
+        "inputs": [
+            {"components": [
+                {"name": "currency0", "type": "address"},
+                {"name": "currency1", "type": "address"},
+                {"name": "fee", "type": "uint24"},
+                {"name": "tickSpacing", "type": "int24"},
+                {"name": "hooks", "type": "address"},
+            ], "name": "key", "type": "tuple"},
+            {"name": "zeroForOne", "type": "bool"},
+            {"name": "amountSpecified", "type": "int256"},
+        ],
+        "name": "swap",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function",
+    },
+]
+
 VAULT_ABI = [
     {
         "inputs": [],
@@ -204,8 +224,24 @@ def run_keeper_cycle(
     vault_contract,
     pool_key_tuple: tuple,
     symbol: str = "ETHUSDC",
+    swap_helper_contract=None,
 ):
-    """Execute one keeper cycle: fetch vol → push → trigger → rebalance."""
+    """Execute one keeper cycle: swap (volume) → fetch vol → push → trigger → rebalance."""
+
+    # 0. Generate volume with a small swap (testnet only)
+    if swap_helper_contract is not None:
+        log.info("Executing testnet swap to generate volume...")
+        try:
+            # Alternate direction each cycle based on timestamp
+            zero_for_one = int(time.time()) % 2 == 0
+            # Small swap: 100 token units (exact input = negative)
+            amount = -100_000_000  # 100 tUSDC (6 decimals)
+            tx = swap_helper_contract.functions.swap(pool_key_tuple, zero_for_one, amount)
+            tx_hash = _send_tx(w3, tx)
+            direction = "token0→token1" if zero_for_one else "token1→token0"
+            log.info(f"Swap tx ({direction}): {tx_hash}")
+        except Exception as e:
+            log.warning(f"Testnet swap failed (non-critical): {e}")
 
     # 1. Fetch recent hourly prices from Binance
     log.info(f"Fetching recent prices for {symbol}...")
@@ -300,6 +336,7 @@ def main():
     parser.add_argument("--vault-address", required=True, help="ILAlphaVault contract address")
     parser.add_argument("--pool-key", required=True, help="JSON file with pool key params")
     parser.add_argument("--symbol", default="ETHUSDC", help="Binance trading pair symbol")
+    parser.add_argument("--swap-helper", default=None, help="SwapHelper contract address (testnet volume generation)")
     parser.add_argument("--interval", type=int, default=3600, help="Seconds between keeper cycles")
     parser.add_argument("--once", action="store_true", help="Run once and exit")
     args = parser.parse_args()
@@ -343,6 +380,15 @@ def main():
         w3.to_checksum_address(pk["hooks"]),
     )
 
+    # Load swap helper (optional, testnet only)
+    swap_helper_contract = None
+    if args.swap_helper:
+        swap_helper_contract = w3.eth.contract(
+            address=w3.to_checksum_address(args.swap_helper),
+            abi=SWAP_HELPER_ABI,
+        )
+        log.info(f"SwapHelper: {args.swap_helper}")
+
     log.info(f"Hook: {args.hook_address}")
     log.info(f"Vault: {args.vault_address}")
     log.info(f"Pool: fee={pk['fee']}, tickSpacing={pk['tickSpacing']}")
@@ -351,7 +397,7 @@ def main():
     # Run loop
     while True:
         try:
-            run_keeper_cycle(w3, hook_contract, vault_contract, pool_key_tuple, args.symbol)
+            run_keeper_cycle(w3, hook_contract, vault_contract, pool_key_tuple, args.symbol, swap_helper_contract)
         except Exception as e:
             log.error(f"Keeper cycle failed: {e}", exc_info=True)
 

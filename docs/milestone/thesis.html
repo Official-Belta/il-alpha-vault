@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IL Alpha — Thesis</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet">
+<style>
+  :root { --black:#0C0C0C; --white:#FAFAF9; --gray-100:#F5F5F4; --gray-200:#E7E5E4; --gray-400:#A8A29E; --gray-500:#78716C; --gray-600:#57534E; --gray-700:#44403C; --gray-900:#1C1917; --accent:#1A7F64; --serif:'Playfair Display',Georgia,serif; --sans:'Satoshi',system-ui,sans-serif; --mono:'Geist Mono','SF Mono',monospace; --ease:cubic-bezier(0.25,0.46,0.45,0.94); }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:var(--sans); background:var(--white); color:var(--black); -webkit-font-smoothing:antialiased; }
+  ::selection { background:var(--black); color:var(--white); }
+
+  nav { position:sticky; top:0; z-index:100; padding:0 48px; height:64px; display:flex; align-items:center; justify-content:space-between; background:rgba(250,250,249,0.92); backdrop-filter:blur(20px); border-bottom:1px solid var(--gray-200); }
+  .logo { font-family:var(--sans); font-weight:700; font-size:18px; letter-spacing:-0.03em; color:var(--black); text-decoration:none; }
+  .nav-links { display:flex; align-items:center; gap:28px; }
+  .nav-links a { font-size:15px; font-weight:500; color:var(--gray-600); text-decoration:none; transition:color 300ms var(--ease); }
+  .nav-links a:hover { color:var(--black); }
+  .nav-links a.active { color:var(--black); font-weight:700; border-bottom:2px solid var(--accent); padding-bottom:2px; }
+  .hamburger { display:none; background:none; border:none; cursor:pointer; padding:8px; color:var(--gray-600); }
+  .hamburger svg { width:24px; height:24px; }
+  .mobile-menu { display:none; position:fixed; top:64px; left:0; right:0; background:var(--white); border-bottom:1px solid var(--gray-200); padding:16px 24px; z-index:99; flex-direction:column; gap:16px; }
+  .mobile-menu.open { display:flex; }
+  .mobile-menu a { font-size:16px; font-weight:500; color:var(--gray-600); text-decoration:none; padding:8px 0; }
+  .mobile-menu a.active { color:var(--accent); }
+  @media (max-width:640px) { .nav-links a.hm { display:none; } .hamburger { display:block; } }
+  .lang-btn { position:relative; display:flex; align-items:center; gap:6px; font-family:var(--sans); font-size:14px; font-weight:500; color:var(--gray-500); background:transparent; border:1px solid var(--gray-200); border-radius:100px; padding:6px 14px; cursor:pointer; transition:all 200ms var(--ease); }
+  .lang-btn:hover { color:var(--black); border-color:var(--gray-400); }
+  .lang-btn svg { width:16px; height:16px; }
+  .lang-dropdown { position:absolute; top:calc(100% + 8px); right:0; background:var(--white); border:1px solid var(--gray-200); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); overflow:hidden; opacity:0; transform:translateY(-4px); pointer-events:none; transition:all 200ms var(--ease); min-width:140px; z-index:200; }
+  .lang-dropdown.open { opacity:1; transform:translateY(0); pointer-events:auto; }
+  .lang-option { display:flex; align-items:center; gap:10px; padding:12px 16px; font-size:14px; font-weight:500; color:var(--gray-600); cursor:pointer; transition:background 150ms var(--ease); }
+  .lang-option:hover { background:var(--gray-200); }
+  .lang-option.active { color:var(--accent); }
+  @media (max-width:640px) { nav { padding:0 24px; } .nav-links a.hm { display:none; } }
+
+  .container { max-width:760px; margin:0 auto; padding:0 48px; }
+  @media (max-width:640px) { .container { padding:0 24px; } }
+
+  .hero { padding:100px 48px 64px; }
+  @media (max-width:640px) { .hero { padding:80px 24px 48px; } }
+  .hero-eyebrow { font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:20px; }
+  .hero h1 { font-family:var(--serif); font-size:clamp(40px,6vw,64px); font-weight:400; letter-spacing:-0.025em; line-height:1.12; margin-bottom:24px; }
+  .hero h1 em { font-style:italic; }
+  .hero-sub { font-size:18px; color:var(--gray-600); line-height:1.7; max-width:560px; }
+
+  .section { padding:64px 48px; border-top:1px solid var(--gray-200); }
+  @media (max-width:640px) { .section { padding:48px 24px; } }
+  .section-dark { background:var(--black); color:var(--white); border-top:none; }
+  .section-label { font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:14px; display:flex; align-items:center; gap:16px; }
+  .section-label::after { content:''; flex:1; max-width:48px; height:1px; background:var(--gray-300); }
+  .section-dark .section-label::after { background:var(--gray-700); }
+  .section h2 { font-family:var(--serif); font-size:clamp(28px,4vw,40px); font-weight:400; letter-spacing:-0.02em; margin-bottom:32px; line-height:1.2; }
+
+  .big-number { font-family:var(--serif); font-size:clamp(48px,8vw,80px); font-weight:400; letter-spacing:-0.03em; line-height:1; margin-bottom:12px; }
+  .big-label { font-family:var(--mono); font-size:12px; color:var(--gray-500); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:8px; }
+  .big-desc { font-size:16px; color:var(--gray-600); line-height:1.7; max-width:480px; }
+  .section-dark .big-desc { color:var(--gray-400); }
+
+  .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--gray-200); border:1px solid var(--gray-200); border-radius:8px; overflow:hidden; margin-bottom:40px; }
+  @media (max-width:640px) { .stats-grid { grid-template-columns:1fr; } }
+  .stat-cell { background:var(--white); padding:32px; }
+  .stat-value { font-family:var(--serif); font-size:32px; font-weight:400; letter-spacing:-0.02em; margin-bottom:6px; }
+  .stat-label { font-size:14px; color:var(--gray-500); }
+
+  .fee-table { width:100%; border-collapse:collapse; margin-bottom:24px; }
+  .fee-table th { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); text-align:left; padding:14px 0; border-bottom:1px solid var(--gray-200); font-weight:500; }
+  .fee-table td { font-size:16px; padding:16px 0; border-bottom:1px solid var(--gray-200); }
+  .fee-table tr:last-child td { border-bottom:none; }
+  .fee-table .stage-active td { color:var(--accent); font-weight:600; }
+
+  .comp-row { display:grid; grid-template-columns:180px 1fr 120px; gap:0; padding:20px 0; border-bottom:1px solid var(--gray-200); align-items:center; }
+  @media (max-width:640px) { .comp-row { grid-template-columns:1fr; gap:8px; } }
+  .comp-name { font-weight:600; font-size:16px; }
+  .comp-action { font-family:var(--mono); font-size:14px; color:var(--gray-500); }
+  .comp-result { font-size:15px; }
+  .comp-result.exposed { color:var(--gray-400); }
+  .comp-result.protected { color:var(--accent); font-weight:700; }
+  .comp-row.ours { background:rgba(26,127,100,0.04); margin:0 -24px; padding:20px 24px; border-radius:8px; border-bottom:none; }
+
+  p.body { font-size:17px; color:var(--gray-600); line-height:1.75; margin-bottom:20px; max-width:600px; }
+  .section-dark p.body { color:var(--gray-400); }
+  .highlight { color:var(--accent); font-weight:600; }
+
+  .timeline-bar { display:flex; gap:2px; border-radius:6px; overflow:hidden; margin:32px 0; height:40px; }
+  .timeline-bar > div { display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:10px; letter-spacing:0.04em; color:var(--white); }
+
+  footer { padding:32px 48px; border-top:1px solid var(--gray-200); }
+  footer span { font-family:var(--mono); font-size:11px; color:var(--gray-500); }
+
+  .reveal { opacity:0; transform:translateY(16px); transition:opacity 600ms var(--ease), transform 600ms var(--ease); }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+  @media (prefers-reduced-motion:reduce) { .reveal { opacity:1; transform:none; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">IL Alpha</a>
+  <div class="nav-links">
+    <a href="index.html#roadmap" class="hm" data-ko="로드맵">Roadmap</a>
+    <a href="index.html#contracts" class="hm" data-ko="컨트랙트">Contracts</a>
+    <a href="index.html#log" class="hm" data-ko="빌드 로그">Log</a>
+    <a href="thesis.html" class="hm active" data-ko="투자 논문">Thesis</a>
+    <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div style="position:relative;">
+      <button class="lang-btn" onclick="document.querySelector('.lang-dropdown').classList.toggle('open')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span id="langLabel">EN</span>
+      </button>
+      <div class="lang-dropdown">
+        <div class="lang-option active" data-lang="en" onclick="setLang('en')">English</div>
+        <div class="lang-option" data-lang="ko" onclick="setLang('ko')">한국어</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-menu">
+  <a href="index.html#roadmap" data-ko="로드맵" onclick="this.parentElement.classList.remove('open')">Roadmap</a>
+  <a href="index.html#contracts" data-ko="컨트랙트" onclick="this.parentElement.classList.remove('open')">Contracts</a>
+  <a href="index.html#log" data-ko="빌드 로그" onclick="this.parentElement.classList.remove('open')">Log</a>
+  <a href="thesis.html" class="active" data-ko="투자 논문">Thesis</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow" data-ko="투자 논문">Investment Thesis</div>
+  <h1 class="reveal" data-ko="LP 수수료는 원하지만, 비영구적 손실은 원하지 않는 자본을 위해">For capital that wants LP fees, <em>without the impermanent loss</em></h1>
+  <p class="hero-sub reveal" data-ko="Uniswap LP의 49.5%가 돈을 잃고 있습니다. 수수료로 $199M을 벌었지만, IL로 $260M을 잃었습니다. IL Alpha는 위험할 때 LP를 끕니다.">49.5% of Uniswap LPs lose money. They earned $199M in fees but lost $260M to impermanent loss. IL Alpha turns LP off when it's dangerous.</p>
+</section>
+
+<!-- THE PROBLEM -->
+<section class="section reveal">
+  <div class="section-label" data-ko="문제">The Problem</div>
+  <h2 data-ko="대부분의 LP는 돈을 잃고 있습니다">Most LPs are losing money</h2>
+  <div class="stats-grid">
+    <div class="stat-cell">
+      <div class="stat-value" data-ko="49.5%">49.5%</div>
+      <div class="stat-label" data-ko="수익보다 IL이 큰 LP 비율">of LPs lose more to IL than they earn in fees</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-value" data-ko="-$61M">-$61M</div>
+      <div class="stat-label" data-ko="V3 LP 순손실 (수수료 $199M - IL $260M)">net loss across V3 LPs (fees $199M − IL $260M)</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-value" data-ko="80%">80%</div>
+      <div class="stat-label" data-ko="IL이 수수료를 초과하는 풀 비율">of pools where IL exceeds fee revenue</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-value" data-ko="4배">4×</div>
+      <div class="stat-label" data-ko="V3 집중 유동성으로 인한 IL 증폭">IL amplification from V3 concentrated liquidity</div>
+    </div>
+  </div>
+  <p class="body" data-ko="V3의 집중 유동성은 수수료를 증가시켰지만, 동시에 비영구적 손실도 4배 증폭시켰습니다. V4도 마찬가지입니다. 모든 경쟁 LP 매니저는 변동성이 높을 때 LP를 풀에 유지합니다. 우리만 완전히 제거합니다.">V3 concentrated liquidity increased fees but also amplified impermanent loss by 4×. V4 is no different. Every competing LP manager keeps your position in the pool during volatility. We remove it entirely.</p>
+</section>
+
+<!-- OUR SOLUTION -->
+<section class="section section-dark reveal">
+  <div class="section-label" data-ko="솔루션">Our Solution</div>
+  <h2 data-ko="변동성이 높을 때, LP를 끕니다" style="color:var(--white);">When volatility spikes, we turn LP off</h2>
+  <p class="body" data-ko="온체인 EWMA 변동성 오라클이 모든 스왑에서 분산을 추적합니다. 임계값을 초과하면 키퍼 봇이 LP를 완전히 제거합니다. 조건이 정상화되면 재진입합니다. 오프체인 의존성 제로.">On-chain EWMA volatility oracle tracks variance on every swap. When it exceeds the threshold, the keeper bot removes LP entirely. Re-enters when conditions normalize. Zero off-chain dependencies.</p>
+
+  <div style="margin:40px 0;">
+    <div class="comp-row" style="border-color:rgba(255,255,255,0.06);">
+      <div class="comp-name" style="color:var(--gray-400);">Arrakis</div>
+      <div class="comp-action" data-ko="스왑 수수료 인상">Raise swap fees</div>
+      <div class="comp-result exposed" data-ko="노출">Exposed</div>
+    </div>
+    <div class="comp-row" style="border-color:rgba(255,255,255,0.06);">
+      <div class="comp-name" style="color:var(--gray-400);">Gamma</div>
+      <div class="comp-action" data-ko="범위 확대">Widen range</div>
+      <div class="comp-result exposed" data-ko="노출">Exposed</div>
+    </div>
+    <div class="comp-row" style="border-color:rgba(255,255,255,0.06);">
+      <div class="comp-name" style="color:var(--gray-400);">Charm</div>
+      <div class="comp-action" data-ko="범위 리밸런싱">Rebalance range</div>
+      <div class="comp-result exposed" data-ko="노출">Exposed</div>
+    </div>
+    <div class="comp-row ours" style="border:1px solid rgba(26,127,100,0.2); background:rgba(26,127,100,0.06);">
+      <div class="comp-name" style="color:var(--accent);">IL Alpha</div>
+      <div class="comp-action" style="color:var(--accent);" data-ko="LP 완전 제거">Remove LP entirely</div>
+      <div class="comp-result protected" data-ko="제로">Zero</div>
+    </div>
+  </div>
+</section>
+
+<!-- BACKTEST -->
+<section class="section reveal">
+  <div class="section-label" data-ko="백테스트 결과">Backtest Results</div>
+  <h2 data-ko="실제 데이터로 검증됨">Validated on real data</h2>
+  <p class="body" data-ko="2024년 1월부터 2026년 3월까지 실제 ETH/USDC 가격 데이터. 상승장과 하락장을 모두 포함한 전체 시장 사이클.">Real ETH/USDC price data from January 2024 to March 2026. Full market cycle covering both bull and bear regimes.</p>
+  <div class="stats-grid">
+    <div class="stat-cell">
+      <div class="stat-value" style="color:var(--accent);" data-ko="+231%">+231%</div>
+      <div class="stat-label" data-ko="IL Alpha 수익률 (EWMA, fee_share 0.5%)">IL Alpha return (EWMA, fee_share 0.5%)</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-value" data-ko="3.66">3.66</div>
+      <div class="stat-label" data-ko="샤프 비율">Sharpe ratio</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-value" data-ko="-12%">-12%</div>
+      <div class="stat-label" data-ko="최대 낙폭 (IL Alpha)">max drawdown (IL Alpha)</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-value" style="color:var(--gray-400);" data-ko="-45%">-45%</div>
+      <div class="stat-label" data-ko="최대 낙폭 (HODL)">max drawdown (HODL)</div>
+    </div>
+  </div>
+  <p class="body" style="font-size:14px; color:var(--gray-500);" data-ko="⚠️ 주의: 백테스트 결과이며 실전 성과를 보장하지 않습니다. fee_share 0.5%는 가정치이며, 실제 비율은 TVL에 따라 달라집니다. 테스트넷 대조군 데이터가 실전 검증을 제공할 것입니다.">⚠️ Caveat: backtest results, not guaranteed. fee_share 0.5% is assumed — real ratio depends on TVL. Testnet control group data will provide real-world validation.</p>
+</section>
+
+<!-- MARKET -->
+<section class="section section-dark reveal">
+  <div class="section-label" data-ko="시장 기회">Market Opportunity</div>
+  <h2 style="color:var(--white);" data-ko="$24.5B의 DAO 트레저리, 67%가 유휴 상태">$24.5B in DAO treasuries, 67% sitting idle</h2>
+  <div style="display:flex; gap:64px; flex-wrap:wrap; margin-bottom:32px;">
+    <div>
+      <div class="big-label" data-ko="총 DAO 트레저리">Total DAO Treasuries</div>
+      <div class="big-number" style="color:var(--white);">$24.5B</div>
+    </div>
+    <div>
+      <div class="big-label" data-ko="$10M+ 트레저리 DAO">DAOs with $10M+</div>
+      <div class="big-number" style="color:var(--white);">1,300+</div>
+    </div>
+    <div>
+      <div class="big-label" data-ko="유휴 비율">Idle Rate</div>
+      <div class="big-number" style="color:var(--white);">67%</div>
+    </div>
+  </div>
+  <p class="body" data-ko="DAO들이 LP를 하지 않는 이유: 비영구적 손실. 우리는 그 문제를 해결합니다. '트레저리가 LP 수수료를 벌면서, 최악의 손실이 1/4' — 거버넌스 투표를 통과할 수 있는 제안.">DAOs don't LP because of impermanent loss. We solve that. "Your treasury earns LP fees with 1/4 the worst-case loss" — a proposal that passes governance votes.</p>
+</section>
+
+<!-- REVENUE -->
+<section class="section reveal">
+  <div class="section-label" data-ko="수익 모델">Revenue Model</div>
+  <h2 data-ko="수익 없으면 수수료 없음">No profit, no fee</h2>
+  <table class="fee-table">
+    <thead>
+      <tr>
+        <th data-ko="단계">Stage</th>
+        <th data-ko="TVL">TVL</th>
+        <th data-ko="성과보수">Perf. Fee</th>
+        <th data-ko="관리보수">Mgmt. Fee</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="stage-active">
+        <td data-ko="1. 런칭">1. Launch</td>
+        <td>&lt; $5M</td>
+        <td>10%</td>
+        <td data-ko="0%">0%</td>
+      </tr>
+      <tr>
+        <td data-ko="2. 성장">2. Growth</td>
+        <td>$5–20M</td>
+        <td>15%</td>
+        <td>0.5%/yr</td>
+      </tr>
+      <tr>
+        <td data-ko="3. 안정">3. Established</td>
+        <td>&gt; $20M</td>
+        <td>15–20%</td>
+        <td>1%/yr</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="body" data-ko="Stage 1: 성과보수만. 수익이 없으면 수수료 0원. 신뢰를 데이터로 증명합니다.">Stage 1: performance fee only. If we don't make money, you don't pay. Trust is earned through data.</p>
+
+  <h3 style="font-family:var(--serif); font-size:24px; font-weight:400; margin:40px 0 24px;" data-ko="보수적 전망 (Year 3)">Conservative Projection (Year 3)</h3>
+  <div class="stats-grid">
+    <div class="stat-cell">
+      <div class="stat-value" data-ko="$15M">$15M</div>
+      <div class="stat-label" data-ko="목표 TVL">target TVL</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-value" data-ko="$36K/mo">$36K/mo</div>
+      <div class="stat-label" data-ko="월 수익">monthly revenue</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-value" data-ko="~70%">~70%</div>
+      <div class="stat-label" data-ko="마진">margin</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-value" data-ko="$300K/yr">$300K/yr</div>
+      <div class="stat-label" data-ko="연 순이익">annual net profit</div>
+    </div>
+  </div>
+</section>
+
+<!-- VACANT SLOT -->
+<section class="section section-dark reveal">
+  <div class="section-label" data-ko="타이밍">Timing</div>
+  <h2 style="color:var(--white);" data-ko="V4 LP 리더 자리가 비어 있습니다">The V4 LP leader slot is vacant</h2>
+  <p class="body" data-ko="Bunni — 이전 V4 hook LP 리더 — 가 2025년 9월 $8.4M 해킹으로 사망했습니다. 재출시 비용(감사/모니터링)을 감당할 수 없었습니다. 그 자리가 비어 있습니다.">Bunni — the previous V4 hook LP leader — died in September 2025 after an $8.4M exploit. They couldn't afford audit and monitoring costs to relaunch. The slot is open.</p>
+  <p class="body" data-ko="교훈: (1) 유동성 회계의 반올림 오류는 실제 위협 (2) 감사 예산 $50-150K 필수 (3) 단순한 설계 = 작은 공격 표면">Lesson: (1) rounding errors in liquidity accounting are real threats (2) audit budget $50–150K is non-negotiable (3) simpler design = smaller attack surface.</p>
+</section>
+
+<!-- CTA -->
+<section class="section" style="padding:96px 48px; text-align:center;">
+  <h2 style="font-family:var(--serif); font-size:clamp(32px,4vw,48px); font-weight:400; margin-bottom:24px;" data-ko="테스트넷에서 검증 중">Verifying on testnet</h2>
+  <p style="font-size:17px; color:var(--gray-500); margin:0 auto 40px; max-width:480px; line-height:1.7;" data-ko="3개 볼트를 동일 조건으로 비교 중입니다. 결과는 공개됩니다.">Three vaults running head-to-head under identical conditions. Results will be published publicly.</p>
+  <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+    <a href="https://sepolia.etherscan.io/address/0xb3150d39893dc6842bd4c0eb6d0fdab4a6211040" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:8px; font-family:var(--sans); font-weight:600; font-size:15px; background:var(--black); color:var(--white); padding:14px 28px; border-radius:4px; text-decoration:none; transition:opacity 300ms;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'" data-ko="Etherscan에서 보기 →">View on Etherscan →</a>
+    <a href="index.html" style="display:inline-flex; align-items:center; gap:8px; font-family:var(--sans); font-weight:500; font-size:15px; color:var(--gray-500); padding:14px 28px; border-radius:4px; border:1px solid var(--gray-200); text-decoration:none; transition:all 300ms;" onmouseover="this.style.borderColor='var(--gray-400)'; this.style.color='var(--black)'" onmouseout="this.style.borderColor='var(--gray-200)'; this.style.color='var(--gray-500)'" data-ko="로드맵 보기">View Roadmap</a>
+  </div>
+</section>
+
+<footer><span>&copy; 2026 IL Alpha</span></footer>
+
+<script>
+  // Reveal
+  const obs = new IntersectionObserver(e => e.forEach(x => { if (x.isIntersecting) x.target.classList.add('visible'); }), { threshold:0.08 });
+  document.querySelectorAll('.reveal').forEach((el,i) => { el.style.transitionDelay = `${Math.min(i*50,300)}ms`; obs.observe(el); });
+  setTimeout(() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible')), 2000);
+
+  // i18n
+  let currentLang = localStorage.getItem('lang') || 'en';
+  const langLabel = document.getElementById('langLabel');
+  const dropdown = document.querySelector('.lang-dropdown');
+  function setLang(lang) { currentLang = lang; localStorage.setItem('lang', lang); dropdown.classList.remove('open'); applyLang(); }
+  function applyLang() {
+    langLabel.textContent = currentLang === 'en' ? 'EN' : 'KR';
+    document.documentElement.lang = currentLang === 'ko' ? 'ko' : 'en';
+    document.querySelectorAll('.lang-option').forEach(o => o.classList.toggle('active', o.dataset.lang === currentLang));
+    document.querySelectorAll('[data-ko]').forEach(el => {
+      if (!el.dataset.en) el.dataset.en = el.innerHTML;
+      if (currentLang === 'ko' && el.dataset.ko) el.textContent = el.dataset.ko;
+      else if (el.dataset.en) el.innerHTML = el.dataset.en;
+    });
+  }
+  document.addEventListener('click', e => { if (!e.target.closest('.lang-btn') && !e.target.closest('.lang-dropdown')) dropdown.classList.remove('open'); });
+  if (currentLang === 'ko') applyLang();
+</script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IL Alpha — 2026-03-19</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet">
+<style>
+  :root { --black:#0C0C0C; --white:#FAFAF9; --gray-200:#E7E5E4; --gray-400:#A8A29E; --gray-500:#78716C; --gray-600:#57534E; --gray-700:#44403C; --gray-900:#1C1917; --accent:#1A7F64; --serif:'Playfair Display',Georgia,serif; --sans:'Satoshi',system-ui,sans-serif; --mono:'Geist Mono','SF Mono',monospace; --ease:cubic-bezier(0.25,0.46,0.45,0.94); }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:var(--sans); background:var(--white); color:var(--black); -webkit-font-smoothing:antialiased; }
+  ::selection { background:var(--black); color:var(--white); }
+
+  nav { position:sticky; top:0; z-index:100; padding:0 48px; height:64px; display:flex; align-items:center; justify-content:space-between; background:rgba(250,250,249,0.92); backdrop-filter:blur(20px); border-bottom:1px solid var(--gray-200); }
+  .logo { font-family:var(--sans); font-weight:700; font-size:18px; letter-spacing:-0.03em; color:var(--black); text-decoration:none; }
+  .nav-links { display:flex; align-items:center; gap:28px; }
+  .nav-links a { font-size:15px; font-weight:500; color:var(--gray-600); text-decoration:none; transition:color 300ms var(--ease); }
+  .nav-links a:hover { color:var(--black); }
+  .nav-links a.active { color:var(--black); font-weight:700; border-bottom:2px solid var(--accent); padding-bottom:2px; }
+  .hamburger { display:none; background:none; border:none; cursor:pointer; padding:8px; color:var(--gray-600); }
+  .hamburger svg { width:24px; height:24px; }
+  .mobile-menu { display:none; position:fixed; top:64px; left:0; right:0; background:var(--white); border-bottom:1px solid var(--gray-200); padding:16px 24px; z-index:99; flex-direction:column; gap:16px; }
+  .mobile-menu.open { display:flex; }
+  .mobile-menu a { font-size:16px; font-weight:500; color:var(--gray-600); text-decoration:none; padding:8px 0; }
+  .mobile-menu a.active { color:var(--accent); font-weight:700; }
+  @media (max-width:640px) { .nav-links a.hm { display:none; } .hamburger { display:block; } }
+  .lang-btn { position:relative; display:flex; align-items:center; gap:6px; font-family:var(--sans); font-size:14px; font-weight:500; color:var(--gray-500); background:transparent; border:1px solid var(--gray-200); border-radius:100px; padding:6px 14px; cursor:pointer; transition:all 200ms var(--ease); }
+  .lang-btn:hover { color:var(--black); border-color:var(--gray-400); }
+  .lang-btn svg { width:16px; height:16px; }
+  .lang-dropdown { position:absolute; top:calc(100% + 8px); right:0; background:var(--white); border:1px solid var(--gray-200); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); overflow:hidden; opacity:0; transform:translateY(-4px); pointer-events:none; transition:all 200ms var(--ease); min-width:140px; z-index:200; }
+  .lang-dropdown.open { opacity:1; transform:translateY(0); pointer-events:auto; }
+  .lang-option { display:flex; align-items:center; gap:10px; padding:12px 16px; font-size:14px; font-weight:500; color:var(--gray-600); cursor:pointer; transition:background 150ms var(--ease); }
+  .lang-option:hover { background:var(--gray-200); }
+  .lang-option.active { color:var(--accent); }
+  @media (max-width:640px) { nav { padding:0 24px; } }
+
+  .hero { padding:100px 48px 64px; }
+  @media (max-width:640px) { .hero { padding:80px 24px 48px; } }
+  .hero-date { font-family:var(--serif); font-size:clamp(36px,5vw,56px); font-weight:400; letter-spacing:-0.025em; margin-bottom:16px; }
+  .hero-back { font-family:var(--sans); font-size:20px; font-weight:700; color:var(--white); text-decoration:none; display:inline-flex; align-items:center; gap:12px; margin-bottom:40px; padding:18px 36px; background:var(--accent); border:none; border-radius:8px; transition:all 200ms var(--ease); letter-spacing:-0.01em; }
+  .hero-back:hover { background:var(--gray-700); color:var(--white); transform:translateX(-4px); }
+
+  .detail-section { padding:48px 48px; max-width:820px; }
+  .detail-section + .detail-section { border-top:1px solid var(--gray-200); margin-top:16px; padding-top:48px; }
+  @media (max-width:640px) { .detail-section { padding:32px 24px; } }
+  .detail-card { background:var(--gray-100); border-radius:12px; padding:48px; margin-bottom:0; }
+  .detail-cat { display:inline-block; font-family:var(--sans); font-size:16px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--white); background:var(--accent); padding:8px 20px; border-radius:100px; margin-bottom:24px; }
+  .detail-cat[data-cat="dev"] { background:#1A7F64; }
+  .detail-cat[data-cat="strategy"] { background:#4A6CF7; }
+  .detail-cat[data-cat="design"] { background:#E06B5E; }
+  .detail-title { font-family:var(--serif); font-size:clamp(32px,5vw,48px); font-weight:400; letter-spacing:-0.02em; margin-bottom:36px; line-height:1.2; }
+  .detail-items { padding-left:20px; display:flex; flex-direction:column; gap:24px; }
+  .detail-items li { font-size:18px; color:var(--gray-600); line-height:1.8; }
+
+  footer { padding:32px 48px; border-top:1px solid var(--gray-200); }
+  footer span { font-family:var(--mono); font-size:11px; color:var(--gray-500); }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">IL Alpha</a>
+  <div class="nav-links">
+    <a href="../index.html#roadmap" class="hm" data-ko="로드맵">Roadmap</a>
+    <a href="../index.html#contracts" class="hm" data-ko="컨트랙트">Contracts</a>
+    <a href="../index.html#log" class="hm active" data-ko="빌드 로그">Log</a>
+    <a href="../thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
+    <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div style="position:relative;">
+      <button class="lang-btn" onclick="document.querySelector('.lang-dropdown').classList.toggle('open')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span id="langLabel">EN</span>
+      </button>
+      <div class="lang-dropdown">
+        <div class="lang-option active" data-lang="en" onclick="setLang('en')">English</div>
+        <div class="lang-option" data-lang="ko" onclick="setLang('ko')">한국어</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-menu">
+  <a href="../index.html#roadmap" data-ko="로드맵" onclick="this.parentElement.classList.remove('open')">Roadmap</a>
+  <a href="../index.html#contracts" data-ko="컨트랙트" onclick="this.parentElement.classList.remove('open')">Contracts</a>
+  <a href="../index.html#log" data-ko="빌드 로그" onclick="this.parentElement.classList.remove('open')">Log</a>
+  <a href="../thesis.html" data-ko="투자 논문">Thesis</a>
+</div>
+
+<section class="hero">
+  <a class="hero-back" href="../index.html">&larr; <span data-ko="메인으로 돌아가기">Back to home</span></a>
+  <h1 class="hero-date">2026-03-19</h1>
+</section>
+
+
+    <section class="detail-section" id="dev">
+      <div class="detail-card">
+        <div class="detail-cat" data-cat="dev" data-ko="개발">Development</div>
+        <h2 class="detail-title" data-ko="Phase 2 → 3 완료. LP 활성화 성공.">Phase 2 → 3 Complete. LP Activated.</h2>
+        <ul class="detail-items"><li data-ko="Solidity 컨트랙트 완성: ILAlphaHook (V4 hook + EWMA 변동성 오라클), ILAlphaVault (ERC-4626), BaseVault, 대조군 2개. 44 → 65 테스트 전부 통과.">Solidity contracts complete: ILAlphaHook (V4 hook + EWMA vol oracle), ILAlphaVault (ERC-4626), BaseVault, 2 control vaults. 44 → 65 tests, all passing.</li><li data-ko="Ethereum Sepolia 배포 — 3회 시도. 문제: Sepolia에 V4 PoolManager 미배포. 해결: 자체 PoolManager 배포.">Deployed to Ethereum Sepolia — 3 attempts. Problem: V4 PoolManager not available on Sepolia. Solution: deployed our own PoolManager.</li><li data-ko="CREATE2 hook 배포 실패 — owner가 proxy 주소. 수정: constructor에 owner 파라미터 추가.">CREATE2 hook deployment failed — owner was proxy address. Fix: added explicit owner parameter to constructor.</li><li data-ko="키퍼 봇 가동 (1시간 간격). 첫 사이클: feeYield &gt; ilCost → LP ON. 100K tUSDC가 V4 풀에 배포됨.">Keeper bot live (1hr intervals). First cycle: feeYield &gt; ilCost → LP ON. 100K tUSDC deployed to V4 pool.</li><li data-ko="SwapHelper 배포로 테스트넷 볼륨 생성. CSV 메트릭 로깅 추가.">SwapHelper deployed for testnet volume generation. CSV metrics logging added.</li></ul>
+      </div>
+    </section>
+    <section class="detail-section" id="strategy">
+      <div class="detail-card">
+        <div class="detail-cat" data-cat="strategy" data-ko="전략">Strategy</div>
+        <h2 class="detail-title" data-ko="포지셔닝 확정. Arrakis 분석 완료.">Positioning Locked. Arrakis Analyzed.</h2>
+        <ul class="detail-items"><li data-ko="우리는 아님: 스테이킹 대안, 렌딩 대안, 유동성 보장. 우리임: 15%+ 수익을 원하는 자본을 위한 IL 방어 LP 관리.">We are NOT: staking alt, lending alt, liquidity guarantee. We ARE: IL-defended LP management for capital seeking 15%+ returns.</li><li data-ko="새 토큰 프로젝트 = 최고 ROI 세그먼트. 피치: &#x27;트레저리가 6개월 대신 12개월 유지.&#x27; &#x27;유동성 공급&#x27;이 아님.">New token projects identified as highest ROI segment. Pitch: &#x27;your treasury lasts 12mo instead of 6mo.&#x27; NOT &#x27;we supply liquidity.&#x27;</li><li data-ko="Arrakis 심층 분석: B2B 동적 수수료 (LP 유지) vs 우리 B2C LP 제거 (IL = 0). 시장 안 겹침.">Arrakis deep dive: B2B dynamic fees (keeps LP in) vs our B2C LP removal (IL = 0). Markets don&#x27;t overlap.</li><li data-ko="생존 확률: $10K→$1M 약 17%. 메인넷 Day 1에 첫 고객 확보 필수 (Arrakis 플레이북).">Survival math: $10K→$1M probability ~17%. Must secure Day 1 customer at mainnet launch (Arrakis playbook).</li><li data-ko="수수료 구조 확정: Stage 1 = 성과보수 10%, 관리보수 0%. 수익 없으면 수수료 0원.">Fee structure finalized: Stage 1 = 10% performance, 0% management. No fees if no profit.</li></ul>
+      </div>
+    </section>
+    <section class="detail-section" id="design">
+      <div class="detail-card">
+        <div class="detail-cat" data-cat="design" data-ko="디자인 &amp; 홍보">Design &amp; Marketing</div>
+        <h2 class="detail-title" data-ko="디자인 시스템 + 공개 사이트 라이브.">Design System + Public Site Live.</h2>
+        <ul class="detail-items"><li data-ko="경쟁사 비주얼 리서치: Arrakis, Lido, EigenLayer, Sommelier 스크린샷 + 분석.">Competitive visual research: Arrakis, Lido, EigenLayer, Sommelier screenshotted and analyzed.</li><li data-ko="디자인 시스템 생성 (DESIGN.md). 방향: Blackstone 스타일 기관 금융. Playfair Display + Satoshi + Geist Mono.">Design system created (DESIGN.md). Direction: Blackstone-inspired institutional finance. Playfair Display + Satoshi + Geist Mono.</li><li data-ko="마일스톤 페이지 빌드 파이프라인: roadmap.json → build.py → index.html. 컨트랙트별 Etherscan 실시간 tx count.">Milestone page built with build.py pipeline: roadmap.json → index.html. Live Etherscan tx count per contract.</li><li data-ko="GitHub Pages 배포: official-belta.github.io/il-alpha-site. 지구본 드롭다운으로 한영 전환.">Deployed to GitHub Pages: official-belta.github.io/il-alpha-site. English/Korean toggle with globe dropdown.</li><li data-ko="이름 변경: &#x27;IL Alpha Vault&#x27; → &#x27;IL Alpha&#x27;. Vault는 너무 일반적 — 우리는 프로토콜.">Name changed: &#x27;IL Alpha Vault&#x27; → &#x27;IL Alpha&#x27;. Vault is generic — we&#x27;re a protocol, not a container.</li></ul>
+      </div>
+    </section>
+
+<footer><span>&copy; 2026 IL Alpha</span></footer>
+
+<script>
+  let currentLang = localStorage.getItem('lang') || 'en';
+  const langLabel = document.getElementById('langLabel');
+  const dropdown = document.querySelector('.lang-dropdown');
+  function setLang(lang) { currentLang = lang; localStorage.setItem('lang', lang); dropdown.classList.remove('open'); applyLang(); }
+  function applyLang() {
+    langLabel.textContent = currentLang === 'en' ? 'EN' : 'KR';
+    document.documentElement.lang = currentLang === 'ko' ? 'ko' : 'en';
+    document.querySelectorAll('.lang-option').forEach(o => o.classList.toggle('active', o.dataset.lang === currentLang));
+    document.querySelectorAll('[data-ko]').forEach(el => {
+      if (!el.dataset.en) el.dataset.en = el.innerHTML;
+      if (currentLang === 'ko' && el.dataset.ko) el.textContent = el.dataset.ko;
+      else if (el.dataset.en) el.innerHTML = el.dataset.en;
+    });
+  }
+  document.addEventListener('click', e => { if (!e.target.closest('.lang-btn') && !e.target.closest('.lang-dropdown')) dropdown.classList.remove('open'); });
+  if (currentLang === 'ko') applyLang();
+</script>
+</body>
+</html>

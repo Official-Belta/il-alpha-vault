@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.26;
 
-import {ERC4626} from "solmate/src/mixins/ERC4626.sol";
 import {ERC20} from "solmate/src/tokens/ERC20.sol";
 import {SafeTransferLib} from "solmate/src/utils/SafeTransferLib.sol";
 import {FixedPointMathLib} from "solmate/src/utils/FixedPointMathLib.sol";
+import {BaseVault} from "./BaseVault.sol";
 import {IPoolManager} from "v4-core/src/interfaces/IPoolManager.sol";
 import {PoolKey} from "v4-core/src/types/PoolKey.sol";
 import {PoolId, PoolIdLibrary} from "v4-core/src/types/PoolId.sol";
@@ -27,7 +27,7 @@ import {LiquidityAmounts} from "v4-core/test/utils/LiquidityAmounts.sol";
 ///                              → if active:  unlock → addLiquidity
 ///                              → if inactive: unlock → removeLiquidity
 ///   Withdrawer → withdraw()   → pull from LP if needed → send USDC
-contract ILAlphaVault is ERC4626, IUnlockCallback {
+contract ILAlphaVault is BaseVault, IUnlockCallback {
     using SafeTransferLib for ERC20;
     using FixedPointMathLib for uint256;
     using PoolIdLibrary for PoolKey;
@@ -53,10 +53,6 @@ contract ILAlphaVault is ERC4626, IUnlockCallback {
     event EmergencyWithdraw(uint256 amount);
     event OwnershipTransferStarted(address indexed currentOwner, address indexed pendingOwner);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-
-    // ─── Constants ───────────────────────────────────────────────────
-    uint256 internal constant VIRTUAL_SHARES = 1e6;
-    uint256 internal constant VIRTUAL_ASSETS = 1e6;
 
     // ─── Storage ─────────────────────────────────────────────────────
     IPoolManager public immutable poolManager;
@@ -85,7 +81,7 @@ contract ILAlphaVault is ERC4626, IUnlockCallback {
         ILAlphaHook _hook,
         string memory _name,
         string memory _symbol
-    ) ERC4626(_asset, _name, _symbol) {
+    ) BaseVault(_asset, _name, _symbol) {
         poolManager = _poolManager;
         hook = _hook;
         owner = msg.sender;
@@ -113,38 +109,6 @@ contract ILAlphaVault is ERC4626, IUnlockCallback {
 
     function totalAssets() public view override returns (uint256) {
         return asset.balanceOf(address(this)) + deployedAssets;
-    }
-
-    function convertToShares(uint256 assets) public view override returns (uint256) {
-        uint256 supply = totalSupply + VIRTUAL_SHARES;
-        uint256 total = totalAssets() + VIRTUAL_ASSETS;
-        return assets.mulDivDown(supply, total);
-    }
-
-    function convertToAssets(uint256 shares) public view override returns (uint256) {
-        uint256 supply = totalSupply + VIRTUAL_SHARES;
-        uint256 total = totalAssets() + VIRTUAL_ASSETS;
-        return shares.mulDivDown(total, supply);
-    }
-
-    function previewDeposit(uint256 assets) public view override returns (uint256) {
-        return convertToShares(assets);
-    }
-
-    function previewMint(uint256 shares) public view override returns (uint256) {
-        uint256 supply = totalSupply + VIRTUAL_SHARES;
-        uint256 total = totalAssets() + VIRTUAL_ASSETS;
-        return shares.mulDivUp(total, supply);
-    }
-
-    function previewWithdraw(uint256 assets) public view override returns (uint256) {
-        uint256 supply = totalSupply + VIRTUAL_SHARES;
-        uint256 total = totalAssets() + VIRTUAL_ASSETS;
-        return assets.mulDivUp(supply, total);
-    }
-
-    function previewRedeem(uint256 shares) public view override returns (uint256) {
-        return convertToAssets(shares);
     }
 
     function deposit(uint256 assets, address receiver)

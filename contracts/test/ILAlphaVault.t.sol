@@ -275,5 +275,135 @@ contract ILAlphaVaultTest is Test {
         vault.unlockCallback("");
     }
 
+    // ─── setPoolKey Currency Validation ──────────────────────────────
+
+    function test_setPoolKey_validatesAssetCurrency() public {
+        // Create a pool key where neither currency is the vault asset
+        MockERC20 fakeToken0 = new MockERC20("Fake0", "FK0", 18);
+        MockERC20 fakeToken1 = new MockERC20("Fake1", "FK1", 18);
+
+        PoolKey memory badKey = PoolKey({
+            currency0: Currency.wrap(address(fakeToken0)),
+            currency1: Currency.wrap(address(fakeToken1)),
+            fee: 3000,
+            tickSpacing: 60,
+            hooks: IHooks(address(hook))
+        });
+
+        vm.expectRevert(ILAlphaVault.InvalidPoolKey.selector);
+        vault.setPoolKey(badKey);
+    }
+
+    function test_setPoolKey_acceptsValidCurrency() public {
+        // poolKey has token0 which is the vault asset — should succeed
+        vault.setPoolKey(poolKey);
+        // No revert = success
+    }
+
+    // ─── getVaultMetrics ─────────────────────────────────────────────
+
+    function test_getVaultMetrics_initial() public {
+        (
+            uint256 totalAssetsVal,
+            uint256 idleAssets,
+            uint256 deployedAssetsVal,
+            uint128 deployedLiquidityVal,
+            uint256 sharePrice,
+            bool lpActive,
+            bool isPaused
+        ) = vault.getVaultMetrics();
+
+        assertEq(totalAssetsVal, 0);
+        assertEq(idleAssets, 0);
+        assertEq(deployedAssetsVal, 0);
+        assertEq(deployedLiquidityVal, 0);
+        assertTrue(sharePrice > 0, "Share price should be non-zero (virtual assets)");
+        assertFalse(lpActive);
+        assertFalse(isPaused);
+    }
+
+    function test_getVaultMetrics_afterDeposit() public {
+        token0.approve(address(vault), 100 ether);
+        vault.deposit(100 ether, address(this));
+
+        (
+            uint256 totalAssetsVal,
+            uint256 idleAssets,
+            uint256 deployedAssetsVal,
+            ,,,
+        ) = vault.getVaultMetrics();
+
+        assertEq(totalAssetsVal, 100 ether);
+        assertEq(idleAssets, 100 ether);
+        assertEq(deployedAssetsVal, 0);
+    }
+
+    // ─── Fuzz Tests ──────────────────────────────────────────────────
+
+    function testFuzz_deposit_withdraw_roundTrip(uint256 depositAmount) public {
+        // Bound to reasonable range: min deposit to 10M tokens
+        depositAmount = bound(depositAmount, 1e6, 10_000_000 ether);
+
+        token0.mint(address(this), depositAmount);
+        token0.approve(address(vault), depositAmount);
+
+        uint256 shares = vault.deposit(depositAmount, address(this));
+        assertTrue(shares > 0, "Should get shares");
+
+        uint256 balanceBefore = token0.balanceOf(address(this));
+        vault.redeem(shares, address(this), address(this));
+        uint256 received = token0.balanceOf(address(this)) - balanceBefore;
+
+        // Should get back at least 99.9% (rounding loss only)
+        assertApproxEqRel(received, depositAmount, 0.001e18, "Round-trip should preserve ~100%");
+    }
+
+    function testFuzz_convertToShares_monotonic(uint256 a, uint256 b) public view {
+        a = bound(a, 1e6, 1_000_000 ether);
+        b = bound(b, a, 1_000_000 ether);
+
+        uint256 sharesA = vault.convertToShares(a);
+        uint256 sharesB = vault.convertToShares(b);
+
+        assertTrue(sharesB >= sharesA, "More assets should give more or equal shares");
+    }
+
+    function testFuzz_convertToAssets_monotonic(uint256 a, uint256 b) public view {
+        a = bound(a, 1, 1_000_000 ether);
+        b = bound(b, a, 1_000_000 ether);
+
+        uint256 assetsA = vault.convertToAssets(a);
+        uint256 assetsB = vault.convertToAssets(b);
+
+        assertTrue(assetsB >= assetsA, "More shares should give more or equal assets");
+    }
+
+    function testFuzz_multipleDepositors_noLoss(uint256 aliceAmt, uint256 bobAmt) public {
+        aliceAmt = bound(aliceAmt, 1e6, 1_000_000 ether);
+        bobAmt = bound(bobAmt, 1e6, 1_000_000 ether);
+
+        // Alice deposits
+        token0.mint(alice, aliceAmt);
+        vm.startPrank(alice);
+        token0.approve(address(vault), aliceAmt);
+        uint256 aliceShares = vault.deposit(aliceAmt, alice);
+        vm.stopPrank();
+
+        // Bob deposits
+        token0.mint(bob, bobAmt);
+        vm.startPrank(bob);
+        token0.approve(address(vault), bobAmt);
+        uint256 bobShares = vault.deposit(bobAmt, bob);
+        vm.stopPrank();
+
+        // Both withdraw — total received should be >= total deposited - rounding
+        uint256 aliceAssets = vault.convertToAssets(aliceShares);
+        uint256 bobAssets = vault.convertToAssets(bobShares);
+
+        // Each depositor should get back at least 99% of their deposit
+        assertTrue(aliceAssets >= aliceAmt * 99 / 100, "Alice should recover 99%+");
+        assertTrue(bobAssets >= bobAmt * 99 / 100, "Bob should recover 99%+");
+    }
+
     receive() external payable {}
 }

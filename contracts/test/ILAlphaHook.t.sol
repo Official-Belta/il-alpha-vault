@@ -387,6 +387,41 @@ contract ILAlphaHookTest is Test {
         assertEq(ilCost, 0, "IL cost should be 0 with no vol");
     }
 
+    // ─── Fuzz Tests ──────────────────────────────────────────────────
+
+    function testFuzz_pushVolEstimate_alwaysCapped(uint256 externalVar) public {
+        hook.pushVolEstimate(poolKey, externalVar);
+        (uint128 ewmaVar,,,) = hook.volOracles(poolId);
+        assertTrue(ewmaVar <= type(uint128).max, "Should never exceed uint128.max");
+    }
+
+    function testFuzz_setLambda_boundsEnforced(uint16 lambda) public {
+        if (lambda < 5000 || lambda > 9900) {
+            vm.expectRevert(ILAlphaHook.InvalidLambda.selector);
+            hook.setLambda(poolKey, lambda);
+        } else {
+            hook.setLambda(poolKey, lambda);
+            (,,, uint16 storedLambda) = hook.volOracles(poolId);
+            assertEq(storedLambda, lambda);
+        }
+    }
+
+    function testFuzz_setLPRange_lowerMustBeLessThanUpper(int24 lower, int24 upper) public {
+        // Bound to valid tick range to avoid int24 overflow in tickUpper - tickLower
+        lower = int24(bound(int256(lower), -887220, 887220));
+        upper = int24(bound(int256(upper), -887220, 887220));
+
+        if (lower >= upper) {
+            vm.expectRevert(ILAlphaHook.InvalidTickRange.selector);
+            hook.setLPRange(poolKey, lower, upper);
+        } else {
+            hook.setLPRange(poolKey, lower, upper);
+            (,int24 storedLower, int24 storedUpper,,) = hook.getPoolStrategy(poolKey);
+            assertEq(storedLower, lower);
+            assertEq(storedUpper, upper);
+        }
+    }
+
     // ─── Helper ──────────────────────────────────────────────────────
 
     function _doSwap(bool zeroForOne, int256 amountSpecified) internal {

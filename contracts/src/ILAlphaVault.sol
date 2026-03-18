@@ -40,9 +40,16 @@ contract ILAlphaVault is ERC4626, IUnlockCallback {
     error Paused();
     error DepositTooSmall();
     error Reentrancy();
+    error InvalidPoolKey();
 
     // ─── Events ──────────────────────────────────────────────────────
-    event Rebalanced(bool lpActive, uint256 totalAssetsBefore, uint256 totalAssetsAfter);
+    event Rebalanced(
+        bool lpActive,
+        uint256 totalAssetsBefore,
+        uint256 totalAssetsAfter,
+        uint128 liquidityDelta,
+        uint256 timestamp
+    );
     event EmergencyWithdraw(uint256 amount);
     event OwnershipTransferStarted(address indexed currentOwner, address indexed pendingOwner);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -157,6 +164,7 @@ contract ILAlphaVault is ERC4626, IUnlockCallback {
     function rebalance() external whenNotPaused nonReentrant {
         bool shouldLP = hook.isLPActive(poolKey);
         uint256 totalBefore = totalAssets();
+        uint128 liquidityBefore = deployedLiquidity;
 
         if (shouldLP && deployedLiquidity == 0) {
             uint256 idleAssets = asset.balanceOf(address(this));
@@ -167,7 +175,12 @@ contract ILAlphaVault is ERC4626, IUnlockCallback {
             _removeLiquidity();
         }
 
-        emit Rebalanced(shouldLP, totalBefore, totalAssets());
+        uint128 liquidityAfter = deployedLiquidity;
+        uint128 liqDelta = liquidityAfter > liquidityBefore
+            ? liquidityAfter - liquidityBefore
+            : liquidityBefore - liquidityAfter;
+
+        emit Rebalanced(shouldLP, totalBefore, totalAssets(), liqDelta, block.timestamp);
     }
 
     function _addLiquidity(uint256 assets) internal {
@@ -272,6 +285,35 @@ contract ILAlphaVault is ERC4626, IUnlockCallback {
         }
     }
 
+    // ─── View Functions ────────────────────────────────────────────────
+
+    /// @notice Get comprehensive vault metrics for off-chain monitoring
+    function getVaultMetrics()
+        external
+        view
+        returns (
+            uint256 totalAssetsVal,
+            uint256 idleAssets,
+            uint256 deployedAssetsVal,
+            uint128 deployedLiquidityVal,
+            uint256 sharePrice,
+            bool lpActive,
+            bool isPaused
+        )
+    {
+        totalAssetsVal = totalAssets();
+        idleAssets = asset.balanceOf(address(this));
+        deployedAssetsVal = deployedAssets;
+        deployedLiquidityVal = deployedLiquidity;
+        // Share price: assets per 1 full share (1e decimals)
+        uint256 oneShare = 10 ** decimals;
+        sharePrice = convertToAssets(oneShare);
+        lpActive = address(poolKey.hooks) != address(0)
+            ? hook.isLPActive(poolKey)
+            : false;
+        isPaused = paused;
+    }
+
     // ─── Admin: Two-Step Ownership ───────────────────────────────────
 
     function transferOwnership(address newOwner) external onlyOwner {
@@ -287,6 +329,12 @@ contract ILAlphaVault is ERC4626, IUnlockCallback {
     }
 
     function setPoolKey(PoolKey calldata _poolKey) external onlyOwner {
+        // Validate that the asset token is one of the pool currencies
+        address assetAddr = address(asset);
+        if (
+            Currency.unwrap(_poolKey.currency0) != assetAddr &&
+            Currency.unwrap(_poolKey.currency1) != assetAddr
+        ) revert InvalidPoolKey();
         poolKey = _poolKey;
     }
 

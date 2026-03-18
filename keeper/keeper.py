@@ -295,7 +295,7 @@ def run_keeper_cycle(
     except Exception as e:
         log.error(f"rebalance failed: {e}")
 
-    # 7. Report vault metrics
+    # 7. Report vault metrics + save to CSV
     try:
         metrics = vault_contract.functions.getVaultMetrics().call()
         log.info(
@@ -303,6 +303,31 @@ def run_keeper_cycle(
             f"deployed={metrics[2]}, liquidity={metrics[3]}, "
             f"sharePrice={metrics[4]}, lpActive={metrics[5]}, paused={metrics[6]}"
         )
+
+        # Append to CSV for analysis
+        import csv
+        csv_path = PROJECT_ROOT / "keeper" / "metrics.csv"
+        write_header = not csv_path.exists()
+        with open(csv_path, "a", newline="") as f:
+            writer = csv.writer(f)
+            if write_header:
+                writer.writerow([
+                    "timestamp", "eth_price", "tick_variance", "on_chain_var",
+                    "lp_active", "total_assets", "idle", "deployed",
+                    "liquidity", "share_price",
+                ])
+            writer.writerow([
+                time.strftime("%Y-%m-%d %H:%M:%S"),
+                prices[-1] if prices else "",
+                variance,
+                on_chain_var if 'on_chain_var' in dir() else "",
+                metrics[5],  # lpActive
+                metrics[0],  # totalAssets
+                metrics[1],  # idle
+                metrics[2],  # deployed
+                metrics[3],  # liquidity
+                metrics[4],  # sharePrice
+            ])
     except Exception as e:
         log.warning(f"Failed to read vault metrics: {e}")
 

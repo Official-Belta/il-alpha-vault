@@ -42,7 +42,7 @@ contract DeployAll is Script {
         uint160 flags = uint160(Hooks.AFTER_INITIALIZE_FLAG | Hooks.AFTER_SWAP_FLAG);
 
         address create2Deployer = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
-        bytes memory constructorArgs = abi.encode(IPoolManager(POOL_MANAGER));
+        bytes memory constructorArgs = abi.encode(IPoolManager(POOL_MANAGER), deployer);
         (bytes32 salt, address expectedHookAddr) = HookMiner.find(
             create2Deployer,
             flags,
@@ -54,7 +54,7 @@ contract DeployAll is Script {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        ILAlphaHook hook = new ILAlphaHook{salt: salt}(IPoolManager(POOL_MANAGER));
+        ILAlphaHook hook = new ILAlphaHook{salt: salt}(IPoolManager(POOL_MANAGER), deployer);
         console.log("ILAlphaHook deployed:", address(hook));
         require(
             uint160(address(hook)) & uint160((1 << 14) - 1) == flags,

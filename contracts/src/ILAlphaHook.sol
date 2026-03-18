@@ -110,10 +110,10 @@ contract ILAlphaHook is IHooks {
     }
 
     // ─── Constructor ─────────────────────────────────────────────────
-    constructor(IPoolManager _poolManager) {
+    constructor(IPoolManager _poolManager, address _owner) {
         poolManager = _poolManager;
-        owner = msg.sender;
-        keeper = msg.sender;
+        owner = _owner;
+        keeper = _owner;
 
         Hooks.validateHookPermissions(
             IHooks(address(this)),

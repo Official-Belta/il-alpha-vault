@@ -59,7 +59,7 @@ contract ILAlphaHookTest is Test {
         // afterInitialize (bit 12) + afterSwap (bit 6)
         uint160 flags = uint160(Hooks.AFTER_INITIALIZE_FLAG | Hooks.AFTER_SWAP_FLAG);
         address hookAddr = address(flags);
-        deployCodeTo("ILAlphaHook.sol", abi.encode(manager), hookAddr);
+        deployCodeTo("ILAlphaHook.sol", abi.encode(manager, address(this)), hookAddr);
         hook = ILAlphaHook(hookAddr);
 
         poolKey = PoolKey({

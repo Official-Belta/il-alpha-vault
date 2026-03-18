@@ -52,8 +52,8 @@ contract ILAlphaVaultTest is Test {
         }
 
         // Mint tokens to test contract and users
-        token0.mint(address(this), 10000 ether);
-        token1.mint(address(this), 10000 ether);
+        token0.mint(address(this), 100000 ether);
+        token1.mint(address(this), 100000 ether);
         token0.mint(alice, 1000 ether);
         token1.mint(alice, 1000 ether);
         token0.mint(bob, 1000 ether);
@@ -213,6 +213,70 @@ contract ILAlphaVaultTest is Test {
         vault.setPaused(true);
         vm.expectRevert(ILAlphaVault.Paused.selector);
         vault.rebalance();
+    }
+
+    function test_rebalance_integration_deployAndRemoveLP() public {
+        // 1. Deposit into vault
+        uint256 depositAmount = 100 ether;
+        token0.approve(address(vault), depositAmount);
+        vault.deposit(depositAmount, address(this));
+
+        // Fund vault with token1 for two-sided LP (simplified: direct transfer)
+        token1.transfer(address(vault), 100 ether);
+
+        // 2. Activate LP on the hook
+        // Add deep liquidity so swaps don't move tick much
+        modifyLiquidityRouter.modifyLiquidity(
+            poolKey,
+            IPoolManager.ModifyLiquidityParams({
+                tickLower: -887220,
+                tickUpper: 887220,
+                liquidityDelta: 10000 ether,
+                salt: bytes32(uint256(99))
+            }),
+            ""
+        );
+        vm.warp(block.timestamp + 1 hours);
+        swapRouter.swap(
+            poolKey,
+            IPoolManager.SwapParams({
+                zeroForOne: true,
+                amountSpecified: -10 ether,
+                sqrtPriceLimitX96: TickMath.MIN_SQRT_PRICE + 1
+            }),
+            PoolSwapTest.TestSettings({ takeClaims: false, settleUsingBurn: false }),
+            ""
+        );
+        // Zero vol so feeYield > ilCost
+        for (uint256 i = 0; i < 80; i++) {
+            hook.pushVolEstimate(poolKey, 0);
+        }
+        vm.warp(block.timestamp + 25 hours);
+        hook.triggerEvaluation(poolKey);
+        assertTrue(hook.isLPActive(poolKey), "LP should be active");
+
+        // 3. Rebalance — should deploy LP
+        uint256 totalBefore = vault.totalAssets();
+        vault.rebalance();
+
+        assertTrue(vault.deployedLiquidity() > 0, "Should have deployed liquidity");
+        assertTrue(vault.deployedAssets() > 0, "Should track deployed assets");
+
+        // 4. Deactivate LP
+        hook.pushVolEstimate(poolKey, 10000e18); // huge vol
+        vm.warp(block.timestamp + 25 hours);
+        hook.triggerEvaluation(poolKey);
+        assertFalse(hook.isLPActive(poolKey), "LP should be inactive");
+
+        // 5. Rebalance — should remove LP
+        vault.rebalance();
+
+        assertEq(vault.deployedLiquidity(), 0, "Liquidity should be 0 after removal");
+        assertEq(vault.deployedAssets(), 0, "Deployed assets should be 0");
+
+        // 6. Vault should still have tokens (recovered from LP)
+        uint256 token0Balance = token0.balanceOf(address(vault));
+        assertTrue(token0Balance > 0, "Vault should have token0 after LP removal");
     }
 
     // ─── Emergency ───────────────────────────────────────────────────

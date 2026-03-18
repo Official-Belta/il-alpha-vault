@@ -236,21 +236,29 @@ contract ILAlphaVault is ERC4626, IUnlockCallback {
             salt: bytes32(0)
         });
 
-        // Sync both currencies before modifying liquidity
-        poolManager.sync(poolKey.currency0);
-        poolManager.sync(poolKey.currency1);
+        (BalanceDelta delta,) = poolManager.modifyLiquidity(poolKey, params, "");
 
-        // Approve both tokens
-        ERC20(Currency.unwrap(poolKey.currency0)).approve(address(poolManager), amount0);
-        ERC20(Currency.unwrap(poolKey.currency1)).approve(address(poolManager), amount1);
+        // Settle negative deltas (vault owes tokens to pool)
+        // Negative amount in delta = vault must pay that amount
+        int128 d0 = delta.amount0();
+        int128 d1 = delta.amount1();
 
-        poolManager.modifyLiquidity(poolKey, params, "");
+        if (d0 < 0) _settleCurrency(poolKey.currency0, uint256(uint128(-d0)));
+        if (d1 < 0) _settleCurrency(poolKey.currency1, uint256(uint128(-d1)));
 
-        // Settle both currencies
-        poolManager.settle();
+        // Take positive deltas (pool owes tokens to vault) — e.g., fee credits
+        if (d0 > 0) poolManager.take(poolKey.currency0, address(this), uint256(uint128(d0)));
+        if (d1 > 0) poolManager.take(poolKey.currency1, address(this), uint256(uint128(d1)));
 
         deployedLiquidity += liquidity;
         deployedAssets += assets;
+    }
+
+    /// @dev Settle a currency debt: sync, transfer tokens to PoolManager, then settle
+    function _settleCurrency(Currency currency, uint256 amount) internal {
+        poolManager.sync(currency);
+        ERC20(Currency.unwrap(currency)).safeTransfer(address(poolManager), amount);
+        poolManager.settle();
     }
 
     function _executeRemoveLiquidity() internal {

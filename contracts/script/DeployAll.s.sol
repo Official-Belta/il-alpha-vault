@@ -8,6 +8,7 @@ import {Hooks} from "v4-core/src/libraries/Hooks.sol";
 import {PoolKey} from "v4-core/src/types/PoolKey.sol";
 import {Currency} from "v4-core/src/types/Currency.sol";
 import {ERC20} from "solmate/src/tokens/ERC20.sol";
+import {PoolManager} from "v4-core/src/PoolManager.sol";
 import {ILAlphaHook} from "../src/ILAlphaHook.sol";
 import {ILAlphaVault} from "../src/ILAlphaVault.sol";
 import {AlwaysLPVault} from "../src/controls/AlwaysLPVault.sol";
@@ -15,11 +16,10 @@ import {HODLVault} from "../src/controls/HODLVault.sol";
 import {HookMiner} from "./HookMiner.sol";
 
 /// @notice Deploy all IL Alpha Vault contracts to testnet
-/// @dev Usage: source .env && forge script script/DeployAll.s.sol \
-///       --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast -vvvv
+/// @dev Deploys its own PoolManager for testnet (V4 not yet on Sepolia).
+///      Usage: source .env && forge script script/DeployAll.s.sol \
+///        --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
 contract DeployAll is Script {
-    // Ethereum Sepolia V4 PoolManager
-    address constant POOL_MANAGER = 0x000000000004444c5dc75cB358380D2e3dE08A90;
 
     function run() public {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
@@ -28,12 +28,19 @@ contract DeployAll is Script {
         console.log("Deployer:", deployer);
         console.log("Balance:", deployer.balance);
 
+        vm.startBroadcast(deployerPrivateKey);
+
+        // ── Step 0: Deploy PoolManager ──
+        // V4 is not yet deployed on Sepolia, so we deploy our own
+        PoolManager pm = new PoolManager(deployer);
+        address POOL_MANAGER = address(pm);
+        console.log("PoolManager deployed:", POOL_MANAGER);
+
+        vm.stopBroadcast();
+
         // ── Step 1: Mine and deploy Hook via CREATE2 ──
-        // V4 hooks MUST have permission flags in address lower bits
         uint160 flags = uint160(Hooks.AFTER_INITIALIZE_FLAG | Hooks.AFTER_SWAP_FLAG);
 
-        // Forge routes CREATE2 through the deterministic deployer proxy
-        // The actual CREATE2 sender is this well-known address:
         address create2Deployer = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
         bytes memory constructorArgs = abi.encode(IPoolManager(POOL_MANAGER));
         (bytes32 salt, address expectedHookAddr) = HookMiner.find(
@@ -114,17 +121,7 @@ contract DeployAll is Script {
         vm.stopBroadcast();
 
         // ── Summary ──
-        console.log("");
-        console.log("=== DEPLOYMENT SUMMARY ===");
-        console.log("Network: Ethereum Sepolia");
-        console.log("PoolManager:", POOL_MANAGER);
-        console.log("ILAlphaHook:", address(hook));
-        console.log("ILAlphaVault:", address(vault));
-        console.log("AlwaysLPVault:", address(alwaysLPVault));
-        console.log("HODLVault:", address(hodlVault));
-        console.log("Token0:", token0Addr);
-        console.log("Token1:", token1Addr);
-        console.log("==========================");
+        console.log("=== DEPLOYMENT COMPLETE ===");
     }
 }
 

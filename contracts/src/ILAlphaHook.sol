@@ -47,6 +47,7 @@ contract ILAlphaHook is IHooks {
     event LPToggled(PoolId indexed poolId, bool isActive, uint256 feeYield, uint256 ilCost);
     event KeeperVolPushed(PoolId indexed poolId, uint256 externalVol);
     event PoolRegistered(PoolId indexed poolId, int24 tickLower, int24 tickUpper);
+    event VolumeSpikeDetected(PoolId indexed poolId, uint256 swapVolume, uint128 ewmaVolume);
     event OwnershipTransferStarted(address indexed currentOwner, address indexed pendingOwner);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
@@ -83,6 +84,9 @@ contract ILAlphaHook is IHooks {
 
     /// @dev Volume EWMA decay (same lambda as vol by default)
     uint16 public constant VOLUME_LAMBDA = 9400;
+
+    /// @dev Volume spike multiplier: if single swap volume > SPIKE_MULTIPLIER * ewmaVolume → emergency LP off
+    uint16 public constant SPIKE_MULTIPLIER = 3; // 3x average = spike
 
     // ─── Storage ─────────────────────────────────────────────────────
     IPoolManager public immutable poolManager;
@@ -226,14 +230,27 @@ contract ILAlphaHook is IHooks {
             return (IHooks.afterSwap.selector, 0);
         }
 
+        // ── Check volume spike BEFORE updating EWMA (compare against current average) ──
+        uint256 absAmount = params.amountSpecified < 0
+            ? uint256(-params.amountSpecified)
+            : uint256(params.amountSpecified);
+        bool isSpike = ps.ewmaVolume > 0 && absAmount > uint256(ps.ewmaVolume) * SPIKE_MULTIPLIER;
+
         // ── Update volume EWMA ──
         _updateVolumeEwma(ps, params.amountSpecified);
 
         // ── Update EWMA vol oracle ──
         _updateVolOracle(vo, currentTick, poolId);
 
-        // ── Evaluate LP toggle (respecting cooldown) ──
-        if (block.timestamp >= ps.lastToggleTime + COOLDOWN_SECONDS) {
+        // ── Volume spike: emergency LP off (bypasses cooldown) ──
+        if (isSpike && ps.isLPActive) {
+            ps.isLPActive = false;
+            ps.lastToggleTime = uint40(block.timestamp);
+            emit VolumeSpikeDetected(poolId, absAmount, ps.ewmaVolume);
+            emit LPToggled(poolId, false, 0, 0);
+        }
+        // ── Normal evaluation (respecting cooldown) ──
+        else if (block.timestamp >= ps.lastToggleTime + COOLDOWN_SECONDS) {
             _evaluateLPToggle(poolId, ps, vo);
         }
 

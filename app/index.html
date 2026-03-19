@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IL Alpha — Vault</title>
+<meta name="description" content="Volatility-aware LP management. Deposit USDC, earn LP fees with IL protection.">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet">
+
+<!-- Security: single dependency, pinned version, SRI hash -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"
+        integrity="sha512-Iq3ynvpB77LRPCBm0GsTaL4ZlYO1S0DjsGvJGfN41KEen78Mh+n/a6u20TkcpuYxVXZdIlUfm0y8kLXW7JhPA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<style>
+  :root {
+    --bg:#0A0E14; --surface:#111620; --card:#1A1F2B; --card-hover:#222838;
+    --border:#2A3040; --border-light:#353D50;
+    --text:#F3F4F6; --text-sec:#9CA3AF; --text-ter:#6B7280;
+    --accent:#00E5A0; --accent-dim:#00B87D;
+    --warning:#F5A623; --error:#EF4444; --success:#34D399;
+    --sans:'Geist Sans','Satoshi',system-ui,sans-serif;
+    --mono:'Geist Mono','SF Mono',monospace;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:var(--sans); background:var(--bg); color:var(--text); min-height:100vh; }
+
+  /* UNAUDITED BANNER — cannot be dismissed */
+  .audit-banner {
+    background:#EF444420; border-bottom:1px solid #EF4444;
+    padding:12px 24px; text-align:center;
+    font-family:var(--mono); font-size:13px; color:#EF4444; font-weight:600;
+    letter-spacing:0.05em;
+  }
+
+  nav {
+    padding:0 48px; height:64px; display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid var(--border);
+  }
+  .logo { font-weight:700; font-size:18px; letter-spacing:-0.03em; color:var(--text); text-decoration:none; }
+  .connect-btn {
+    font-family:var(--mono); font-size:13px; font-weight:600;
+    padding:10px 20px; border-radius:8px; border:1px solid var(--border);
+    background:transparent; color:var(--text); cursor:pointer;
+    transition:all 200ms;
+  }
+  .connect-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .connect-btn.connected { border-color:var(--accent); color:var(--accent); }
+
+  .container { max-width:520px; margin:0 auto; padding:48px 24px; }
+
+  /* Chain warning */
+  .chain-warning {
+    background:#EF444415; border:1px solid #EF444440; border-radius:12px;
+    padding:16px 20px; margin-bottom:24px; display:none;
+    font-size:14px; color:#EF4444; text-align:center;
+  }
+  .chain-warning button {
+    margin-top:8px; padding:8px 16px; border-radius:6px;
+    background:#EF4444; color:white; border:none; cursor:pointer;
+    font-family:var(--sans); font-weight:600; font-size:13px;
+  }
+
+  /* Stats */
+  .stats {
+    display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;
+  }
+  .stat {
+    background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px;
+  }
+  .stat-label { font-family:var(--mono); font-size:11px; color:var(--text-ter); text-transform:uppercase; letter-spacing:0.08em; }
+  .stat-value { font-family:var(--mono); font-size:20px; font-weight:700; margin-top:4px; }
+  .stat-sub { font-size:12px; color:var(--text-sec); margin-top:2px; }
+
+  /* LP Status pill */
+  .lp-pill {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:4px 10px; border-radius:999px; font-family:var(--mono); font-size:11px; font-weight:600;
+  }
+  .lp-pill .dot { width:6px; height:6px; border-radius:50%; animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+  .lp-active { background:#00E5A015; border:1px solid #00E5A030; color:var(--accent); }
+  .lp-active .dot { background:var(--accent); }
+  .lp-removed { background:#F5A62315; border:1px solid #F5A62330; color:var(--warning); }
+  .lp-removed .dot { background:var(--warning); }
+
+  /* Action card */
+  .action-card {
+    background:var(--card); border:1px solid var(--border); border-radius:16px;
+    padding:24px; margin-bottom:16px;
+  }
+  .action-tabs { display:flex; gap:0; margin-bottom:20px; }
+  .tab {
+    flex:1; padding:10px; text-align:center; font-weight:600; font-size:14px;
+    border:1px solid var(--border); cursor:pointer; color:var(--text-sec);
+    transition:all 200ms;
+  }
+  .tab:first-child { border-radius:8px 0 0 8px; }
+  .tab:last-child { border-radius:0 8px 8px 0; }
+  .tab.active { background:var(--accent); color:var(--bg); border-color:var(--accent); }
+
+  .input-group { margin-bottom:16px; }
+  .input-label { font-size:13px; color:var(--text-sec); margin-bottom:6px; display:flex; justify-content:space-between; }
+  .input-row { display:flex; gap:8px; }
+  .amount-input {
+    flex:1; padding:14px 16px; border-radius:8px; border:1px solid var(--border);
+    background:var(--surface); color:var(--text); font-family:var(--mono); font-size:18px;
+    outline:none; transition:border-color 200ms;
+  }
+  .amount-input:focus { border-color:var(--accent); }
+  .amount-input::placeholder { color:var(--text-ter); }
+  .max-btn {
+    padding:8px 14px; border-radius:6px; border:1px solid var(--border);
+    background:transparent; color:var(--text-sec); cursor:pointer;
+    font-family:var(--mono); font-size:12px; font-weight:600;
+  }
+  .max-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+  .preview { font-family:var(--mono); font-size:13px; color:var(--text-sec); margin-bottom:16px; padding:12px; background:var(--surface); border-radius:8px; }
+  .preview-row { display:flex; justify-content:space-between; margin-bottom:4px; }
+  .preview-row:last-child { margin-bottom:0; }
+
+  .action-btn {
+    width:100%; padding:16px; border-radius:10px; border:none;
+    font-family:var(--sans); font-size:16px; font-weight:700; cursor:pointer;
+    transition:all 200ms;
+  }
+  .btn-primary { background:var(--accent); color:var(--bg); }
+  .btn-primary:hover { background:var(--accent-dim); }
+  .btn-primary:disabled { background:var(--border); color:var(--text-ter); cursor:not-allowed; }
+  .btn-approve { background:var(--warning); color:var(--bg); }
+
+  .tx-status {
+    margin-top:12px; padding:12px; border-radius:8px; font-size:13px; display:none;
+  }
+  .tx-pending { background:#60A5FA15; border:1px solid #60A5FA30; color:#60A5FA; }
+  .tx-success { background:#34D39915; border:1px solid #34D39930; color:#34D399; }
+  .tx-error { background:#EF444415; border:1px solid #EF444430; color:#EF4444; }
+
+  /* Portfolio */
+  .portfolio {
+    background:var(--card); border:1px solid var(--border); border-radius:16px;
+    padding:24px; margin-bottom:16px;
+  }
+  .portfolio h3 { font-size:14px; color:var(--text-sec); margin-bottom:12px; }
+
+  .footer { text-align:center; padding:24px; font-family:var(--mono); font-size:11px; color:var(--text-ter); }
+  .footer a { color:var(--text-ter); }
+
+  @media(max-width:640px) { nav { padding:0 16px; } .container { padding:32px 16px; } }
+</style>
+</head>
+<body>
+
+<!-- UNAUDITED — PERMANENT BANNER -->
+<div class="audit-banner">⚠ UNAUDITED CONTRACT — USE AT YOUR OWN RISK ⚠</div>
+
+<nav>
+  <a class="logo" href="#">IL Alpha</a>
+  <button class="connect-btn" id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+</nav>
+
+<div class="container">
+  <!-- Chain warning -->
+  <div class="chain-warning" id="chainWarning">
+    Wrong network. Please switch to <strong>Base</strong>.
+    <br><button onclick="switchToBase()">Switch to Base</button>
+  </div>
+
+  <!-- Vault stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Total Vault Assets</div>
+      <div class="stat-value" id="tvl">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Share Price</div>
+      <div class="stat-value" id="sharePrice">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Deposit Cap</div>
+      <div class="stat-value" id="depositCap">—</div>
+      <div class="stat-sub" id="capRemaining"></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">LP Status</div>
+      <div id="lpStatus" style="margin-top:6px;">—</div>
+    </div>
+  </div>
+
+  <!-- Portfolio (shown when connected) -->
+  <div class="portfolio" id="portfolio" style="display:none;">
+    <h3>Your Position</h3>
+    <div class="preview">
+      <div class="preview-row"><span>Shares</span><span id="userShares">0</span></div>
+      <div class="preview-row"><span>Value</span><span id="userValue">$0</span></div>
+    </div>
+  </div>
+
+  <!-- Action card -->
+  <div class="action-card">
+    <div class="action-tabs">
+      <div class="tab active" onclick="setTab('deposit')">Deposit</div>
+      <div class="tab" onclick="setTab('withdraw')">Withdraw</div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">
+        <span id="inputLabel">Amount (USDC)</span>
+        <span id="inputBalance">Balance: —</span>
+      </div>
+      <div class="input-row">
+        <input class="amount-input" id="amountInput" type="text" inputmode="decimal"
+               placeholder="0.00" oninput="updatePreview()">
+        <button class="max-btn" onclick="setMax()">MAX</button>
+      </div>
+    </div>
+
+    <div class="preview" id="previewBox" style="display:none;">
+      <div class="preview-row"><span id="previewLabel">You receive</span><span id="previewValue">—</span></div>
+      <div class="preview-row"><span>Share price</span><span id="previewSharePrice">—</span></div>
+      <div class="preview-row" id="previewFeeRow" style="display:none;"><span>Withdrawal fee (0.1%)</span><span id="previewFee">—</span></div>
+    </div>
+
+    <button class="action-btn btn-primary" id="actionBtn" disabled onclick="executeAction()">
+      Connect Wallet
+    </button>
+
+    <div class="tx-status" id="txStatus"></div>
+  </div>
+
+  <div class="footer">
+    IL Alpha · Base Mainnet · <a href="https://github.com/Official-Belta/il-alpha-vault" target="_blank">GitHub</a>
+    · Contract: <a id="contractLink" href="#" target="_blank" style="color:var(--accent);">View on BaseScan</a>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// SECURITY: All contract addresses hardcoded. Never from URL/input.
+// ═══════════════════════════════════════════════════════════════
+const CONFIG = Object.freeze({
+  CHAIN_ID: 8453,
+  CHAIN_NAME: 'Base',
+  RPC_URL: 'https://mainnet.base.org',
+  VAULT: '0x0000000000000000000000000000000000000000',   // SET AFTER DEPLOY
+  USDC:  '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',  // Base USDC
+  USDC_DECIMALS: 6,
+  EXPLORER: 'https://basescan.org',
+});
+
+// Minimal ABIs — only functions we call
+const VAULT_ABI = [
+  'function deposit(uint256 assets, address receiver) returns (uint256)',
+  'function redeem(uint256 shares, address receiver, address owner) returns (uint256)',
+  'function convertToShares(uint256 assets) view returns (uint256)',
+  'function convertToAssets(uint256 shares) view returns (uint256)',
+  'function totalAssets() view returns (uint256)',
+  'function depositCap() view returns (uint256)',
+  'function maxDeposit(address) view returns (uint256)',
+  'function balanceOf(address) view returns (uint256)',
+  'function decimals() view returns (uint8)',
+  'function withdrawalFeeBps() view returns (uint256)',
+  'function getVaultMetrics() view returns (uint256,uint256,uint256,uint128,uint256,bool,bool)',
+  'function UNAUDITED() view returns (bool)',
+];
+
+const ERC20_ABI = [
+  'function approve(address spender, uint256 amount) returns (bool)',
+  'function allowance(address owner, address spender) view returns (uint256)',
+  'function balanceOf(address) view returns (uint256)',
+  'function decimals() view returns (uint8)',
+];
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let provider = null;
+let signer = null;
+let userAddress = null;
+let currentTab = 'deposit';
+let vaultContract = null;
+let usdcContract = null;
+
+// ═══════════════════════════════════════════════════════════════
+// WALLET CONNECTION
+// ═══════════════════════════════════════════════════════════════
+async function connectWallet() {
+  if (!window.ethereum) {
+    showTx('error', 'No wallet detected. Install Rabby or MetaMask.');
+    return;
+  }
+
+  try {
+    provider = new ethers.BrowserProvider(window.ethereum);
+    const accounts = await provider.send('eth_requestAccounts', []);
+    signer = await provider.getSigner();
+    userAddress = await signer.getAddress();
+
+    // Security: verify chain
+    const network = await provider.getNetwork();
+    if (Number(network.chainId) !== CONFIG.CHAIN_ID) {
+      document.getElementById('chainWarning').style.display = 'block';
+      document.getElementById('connectBtn').textContent = shortAddr(userAddress);
+      document.getElementById('connectBtn').classList.add('connected');
+      return;
+    }
+    document.getElementById('chainWarning').style.display = 'none';
+
+    // Setup contracts
+    vaultContract = new ethers.Contract(CONFIG.VAULT, VAULT_ABI, signer);
+    usdcContract = new ethers.Contract(CONFIG.USDC, ERC20_ABI, signer);
+
+    document.getElementById('connectBtn').textContent = shortAddr(userAddress);
+    document.getElementById('connectBtn').classList.add('connected');
+
+    await refreshAll();
+  } catch (e) {
+    showTx('error', 'Connection failed: ' + e.message);
+  }
+}
+
+async function switchToBase() {
+  try {
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: '0x' + CONFIG.CHAIN_ID.toString(16) }],
+    });
+    document.getElementById('chainWarning').style.display = 'none';
+    await connectWallet();
+  } catch (e) {
+    // Chain not added — add it
+    if (e.code === 4902) {
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{
+          chainId: '0x' + CONFIG.CHAIN_ID.toString(16),
+          chainName: 'Base',
+          rpcUrls: [CONFIG.RPC_URL],
+          nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+          blockExplorerUrls: [CONFIG.EXPLORER],
+        }],
+      });
+    }
+  }
+}
+
+// Listen for chain/account changes
+if (window.ethereum) {
+  window.ethereum.on('chainChanged', () => location.reload());
+  window.ethereum.on('accountsChanged', () => location.reload());
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DATA REFRESH
+// ═══════════════════════════════════════════════════════════════
+async function refreshAll() {
+  await refreshVaultStats();
+  if (userAddress) await refreshUserPosition();
+  updateActionButton();
+}
+
+async function refreshVaultStats() {
+  try {
+    // Use read-only provider if wallet not connected
+    const readProvider = provider || new ethers.JsonRpcProvider(CONFIG.RPC_URL);
+    const vault = new ethers.Contract(CONFIG.VAULT, VAULT_ABI, readProvider);
+
+    const [totalAssets, cap, metrics] = await Promise.all([
+      vault.totalAssets(),
+      vault.depositCap(),
+      vault.getVaultMetrics(),
+    ]);
+
+    const decimals = CONFIG.USDC_DECIMALS;
+    const tvl = Number(ethers.formatUnits(totalAssets, decimals));
+    const capNum = Number(ethers.formatUnits(cap, decimals));
+    const sharePrice = Number(metrics[4]) / 1e18;
+    const lpActive = metrics[5];
+    const isPaused = metrics[6];
+
+    document.getElementById('tvl').textContent = '$' + tvl.toLocaleString(undefined, {maximumFractionDigits:2});
+    document.getElementById('sharePrice').textContent = '$' + sharePrice.toFixed(4);
+    document.getElementById('depositCap').textContent = '$' + capNum.toLocaleString();
+    document.getElementById('capRemaining').textContent = '$' + (capNum - tvl).toLocaleString() + ' remaining';
+
+    const lpEl = document.getElementById('lpStatus');
+    if (lpActive) {
+      lpEl.innerHTML = '<span class="lp-pill lp-active"><span class="dot"></span>LP Active</span>';
+    } else {
+      lpEl.innerHTML = '<span class="lp-pill lp-removed"><span class="dot"></span>LP Removed</span>';
+    }
+
+    document.getElementById('contractLink').href = CONFIG.EXPLORER + '/address/' + CONFIG.VAULT;
+  } catch (e) {
+    console.error('Failed to load vault stats:', e);
+  }
+}
+
+async function refreshUserPosition() {
+  try {
+    const shares = await vaultContract.balanceOf(userAddress);
+    const value = shares > 0n ? await vaultContract.convertToAssets(shares) : 0n;
+    const usdcBal = await usdcContract.balanceOf(userAddress);
+
+    document.getElementById('portfolio').style.display = shares > 0n ? 'block' : 'none';
+    document.getElementById('userShares').textContent = Number(ethers.formatUnits(shares, CONFIG.USDC_DECIMALS)).toFixed(2);
+    document.getElementById('userValue').textContent = '$' + Number(ethers.formatUnits(value, CONFIG.USDC_DECIMALS)).toFixed(2);
+
+    if (currentTab === 'deposit') {
+      document.getElementById('inputBalance').textContent = 'Balance: ' + Number(ethers.formatUnits(usdcBal, CONFIG.USDC_DECIMALS)).toFixed(2) + ' USDC';
+    } else {
+      document.getElementById('inputBalance').textContent = 'Shares: ' + Number(ethers.formatUnits(shares, CONFIG.USDC_DECIMALS)).toFixed(2);
+    }
+  } catch (e) {
+    console.error('Failed to load user position:', e);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UI LOGIC
+// ═══════════════════════════════════════════════════════════════
+function setTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', (i === 0 && tab === 'deposit') || (i === 1 && tab === 'withdraw'));
+  });
+  document.getElementById('inputLabel').textContent = tab === 'deposit' ? 'Amount (USDC)' : 'Shares to redeem';
+  document.getElementById('amountInput').value = '';
+  document.getElementById('previewBox').style.display = 'none';
+  document.getElementById('previewFeeRow').style.display = tab === 'withdraw' ? 'flex' : 'none';
+  if (userAddress) refreshUserPosition();
+  updateActionButton();
+}
+
+async function setMax() {
+  if (!userAddress) return;
+  try {
+    if (currentTab === 'deposit') {
+      const bal = await usdcContract.balanceOf(userAddress);
+      const maxDep = await vaultContract.maxDeposit(userAddress);
+      const max = bal < maxDep ? bal : maxDep;
+      document.getElementById('amountInput').value = ethers.formatUnits(max, CONFIG.USDC_DECIMALS);
+    } else {
+      const shares = await vaultContract.balanceOf(userAddress);
+      document.getElementById('amountInput').value = ethers.formatUnits(shares, CONFIG.USDC_DECIMALS);
+    }
+    updatePreview();
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function updatePreview() {
+  const raw = document.getElementById('amountInput').value;
+  if (!raw || isNaN(raw) || Number(raw) <= 0) {
+    document.getElementById('previewBox').style.display = 'none';
+    updateActionButton();
+    return;
+  }
+
+  try {
+    const amount = ethers.parseUnits(raw, CONFIG.USDC_DECIMALS);
+    const readProvider = provider || new ethers.JsonRpcProvider(CONFIG.RPC_URL);
+    const vault = new ethers.Contract(CONFIG.VAULT, VAULT_ABI, readProvider);
+
+    if (currentTab === 'deposit') {
+      const shares = await vault.convertToShares(amount);
+      document.getElementById('previewLabel').textContent = 'You receive (shares)';
+      document.getElementById('previewValue').textContent = Number(ethers.formatUnits(shares, CONFIG.USDC_DECIMALS)).toFixed(4);
+    } else {
+      const assets = await vault.convertToAssets(amount);
+      const feeBps = await vault.withdrawalFeeBps();
+      const fee = Number(ethers.formatUnits(assets, CONFIG.USDC_DECIMALS)) * Number(feeBps) / 10000;
+      document.getElementById('previewLabel').textContent = 'You receive (USDC)';
+      document.getElementById('previewValue').textContent = Number(ethers.formatUnits(assets, CONFIG.USDC_DECIMALS)).toFixed(4);
+      document.getElementById('previewFee').textContent = '-$' + fee.toFixed(4);
+    }
+
+    const metrics = await vault.getVaultMetrics();
+    document.getElementById('previewSharePrice').textContent = '$' + (Number(metrics[4]) / 1e18).toFixed(4);
+    document.getElementById('previewBox').style.display = 'block';
+  } catch (e) {
+    console.error(e);
+  }
+  updateActionButton();
+}
+
+function updateActionButton() {
+  const btn = document.getElementById('actionBtn');
+  const raw = document.getElementById('amountInput').value;
+
+  if (!userAddress) {
+    btn.textContent = 'Connect Wallet';
+    btn.disabled = true;
+    return;
+  }
+  if (!raw || isNaN(raw) || Number(raw) <= 0) {
+    btn.textContent = 'Enter amount';
+    btn.disabled = true;
+    return;
+  }
+
+  btn.disabled = false;
+  btn.className = 'action-btn btn-primary';
+  btn.textContent = currentTab === 'deposit' ? 'Deposit USDC' : 'Withdraw';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TRANSACTION EXECUTION
+// ═══════════════════════════════════════════════════════════════
+async function executeAction() {
+  if (!userAddress || !signer) return;
+
+  const raw = document.getElementById('amountInput').value;
+  if (!raw || isNaN(raw) || Number(raw) <= 0) return;
+
+  const amount = ethers.parseUnits(raw, CONFIG.USDC_DECIMALS);
+
+  // Security: re-verify chain before ANY transaction
+  const network = await provider.getNetwork();
+  if (Number(network.chainId) !== CONFIG.CHAIN_ID) {
+    showTx('error', 'Wrong chain! Switch to Base.');
+    return;
+  }
+
+  if (currentTab === 'deposit') {
+    await executeDeposit(amount);
+  } else {
+    await executeWithdraw(amount);
+  }
+}
+
+async function executeDeposit(amount) {
+  try {
+    // Step 1: Check allowance
+    const allowance = await usdcContract.allowance(userAddress, CONFIG.VAULT);
+
+    if (allowance < amount) {
+      // Security: approve EXACT amount, not unlimited
+      showTx('pending', 'Approving USDC... (1/2)');
+      const approveTx = await usdcContract.approve(CONFIG.VAULT, amount);
+      await approveTx.wait();
+      showTx('pending', 'Approved. Depositing... (2/2)');
+    } else {
+      showTx('pending', 'Depositing...');
+    }
+
+    // Step 2: Deposit
+    const tx = await vaultContract.deposit(amount, userAddress);
+    showTx('pending', 'Transaction submitted. Waiting for confirmation...');
+    const receipt = await tx.wait();
+
+    showTx('success', 'Deposit successful! ' +
+      '<a href="' + CONFIG.EXPLORER + '/tx/' + receipt.hash + '" target="_blank" style="color:inherit;">View tx ↗</a>');
+
+    document.getElementById('amountInput').value = '';
+    await refreshAll();
+  } catch (e) {
+    const msg = e.reason || e.message || 'Transaction failed';
+    if (msg.includes('DepositCapExceeded')) {
+      showTx('error', 'Deposit cap exceeded. Max deposit: ' + document.getElementById('capRemaining').textContent);
+    } else if (msg.includes('PriceManipulated')) {
+      showTx('error', 'Price manipulation detected. Try again later.');
+    } else if (msg.includes('user rejected')) {
+      showTx('error', 'Transaction cancelled.');
+    } else {
+      showTx('error', msg);
+    }
+  }
+}
+
+async function executeWithdraw(shares) {
+  try {
+    showTx('pending', 'Withdrawing...');
+    const tx = await vaultContract.redeem(shares, userAddress, userAddress);
+    showTx('pending', 'Transaction submitted. Waiting for confirmation...');
+    const receipt = await tx.wait();
+
+    showTx('success', 'Withdrawal successful! ' +
+      '<a href="' + CONFIG.EXPLORER + '/tx/' + receipt.hash + '" target="_blank" style="color:inherit;">View tx ↗</a>');
+
+    document.getElementById('amountInput').value = '';
+    await refreshAll();
+  } catch (e) {
+    const msg = e.reason || e.message || 'Transaction failed';
+    if (msg.includes('PriceManipulated')) {
+      showTx('error', 'Price manipulation detected. Try again later.');
+    } else if (msg.includes('user rejected')) {
+      showTx('error', 'Transaction cancelled.');
+    } else {
+      showTx('error', msg);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════
+function shortAddr(addr) {
+  return addr.slice(0, 6) + '...' + addr.slice(-4);
+}
+
+function showTx(type, msg) {
+  const el = document.getElementById('txStatus');
+  el.style.display = 'block';
+  el.className = 'tx-status tx-' + type;
+  el.innerHTML = msg;
+}
+
+// Auto-load vault stats on page load (read-only, no wallet needed)
+(async () => {
+  if (CONFIG.VAULT === '0x0000000000000000000000000000000000000000') {
+    document.getElementById('tvl').textContent = 'Not deployed';
+    document.getElementById('sharePrice').textContent = '—';
+    document.getElementById('depositCap').textContent = '—';
+    return;
+  }
+  await refreshVaultStats();
+})();
+</script>
+</body>
+</html>

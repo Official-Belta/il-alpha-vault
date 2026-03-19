@@ -469,15 +469,15 @@ def build_html(roadmap, contracts):
 
   .phase {{ display: grid; grid-template-columns: 220px 1fr; gap: 48px; padding: 48px 0; border-top: 1px solid var(--gray-200); }}
   @media (max-width: 768px) {{ .phase {{ grid-template-columns: 1fr; gap: 24px; }} }}
-  .phase-label {{ font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray-500); margin-bottom: 12px; }}
-  .phase-name {{ font-family: var(--serif); font-size: 32px; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 8px; line-height: 1.2; }}
-  .phase-status {{ font-family: var(--mono); font-size: 14px; }}
+  .phase-label {{ font-family: var(--mono); font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray-500); margin-bottom: 12px; }}
+  .phase-name {{ font-family: var(--serif); font-size: clamp(36px,5vw,48px); font-weight: 400; letter-spacing: -0.02em; margin-bottom: 10px; line-height: 1.2; }}
+  .phase-status {{ font-family: var(--mono); font-size: 15px; font-weight: 600; }}
   .status-done {{ color: var(--accent); }}
   .status-active {{ color: var(--black); font-weight: 500; }}
   .status-wait {{ color: var(--gray-400); }}
-  .phase-desc {{ font-size: 17px; color: var(--gray-600); line-height: 1.75; margin-bottom: 28px; max-width: 560px; }}
-  .items {{ display: flex; flex-direction: column; gap: 4px; }}
-  .item {{ display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; font-size: 16px; line-height: 1.5; }}
+  .phase-desc {{ font-size: 18px; color: var(--gray-600); line-height: 1.75; margin-bottom: 28px; max-width: 560px; }}
+  .items {{ display: flex; flex-direction: column; gap: 6px; }}
+  .item {{ display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; font-size: 17px; line-height: 1.5; }}
   .item-icon {{ width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }}
   .icon-done {{ background: var(--accent); color: white; }}
   .icon-active {{ border: 2px solid var(--black); }}

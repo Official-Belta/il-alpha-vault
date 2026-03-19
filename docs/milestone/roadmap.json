@@ -1,0 +1,321 @@
+{
+  "project": {
+    "name": "IL Alpha",
+    "tagline": "Volatility-aware liquidity management",
+    "description": "The first protocol that removes your LP position before impermanent loss hits. Not range adjustment. Full removal.",
+    "eyebrow": "Uniswap V4 Hook",
+    "network": "Sepolia",
+    "twitter": "https://twitter.com",
+    "etherscan_base": "https://sepolia.etherscan.io"
+  },
+  "phases": [
+    {
+      "number": "01",
+      "name": "Backtest",
+      "status": "complete",
+      "description": "Six months of real ETH/USDC price data spanning a full bull-to-bear market cycle. Strategy validated quantitatively against two control strategies.",
+      "items": [
+        { "text": "Volatility-based LP on/off signal design", "status": "done" },
+        { "text": "Full-cycle backtest outperforms AlwaysLP and HODL", "status": "done" },
+        { "text": "99 Python tests passing", "status": "done" }
+      ]
+    },
+    {
+      "number": "02",
+      "name": "Smart Contracts",
+      "status": "complete",
+      "description": "Uniswap V4 hook with on-chain volatility oracle. ERC-4626 vault for deposits. Two control vaults for rigorous apples-to-apples comparison.",
+      "items": [
+        { "text": "ILAlphaHook \u2014 beforeSwap volatility check", "status": "done" },
+        { "text": "ILAlphaVault \u2014 ERC-4626 deposit and withdraw", "status": "done" },
+        { "text": "AlwaysLPVault + HODLVault \u2014 control groups", "status": "done" },
+        { "text": "65 Solidity tests including fuzz \u2014 zero failures", "status": "done" }
+      ]
+    },
+    {
+      "number": "03",
+      "name": "Testnet Validation",
+      "status": "active",
+      "description": "Three vaults deployed to Sepolia with equal funding on the same pool. Keeper bot running automated volatility-based LP management cycles.",
+      "items": [
+        { "text": "CREATE2 address mining for hook deployment", "status": "done" },
+        { "text": "Deploy five contracts to Ethereum Sepolia", "status": "done", "sub": "Hook \u00b7 Vault \u00b7 AlwaysLP \u00b7 HODL \u00b7 SwapHelper" },
+        { "text": "Keeper bot first cycle success", "status": "done" },
+        { "text": "Monitor across two or more volatility regime changes", "status": "active", "sub": "IL Alpha vs AlwaysLP vs HODL \u2014 live comparison" },
+        { "text": "Performance comparison report", "status": "pending" },
+        { "text": "Gas cost analysis and oracle accuracy report", "status": "pending" }
+      ]
+    },
+    {
+      "number": "04",
+      "name": "Mainnet",
+      "status": "upcoming",
+      "description": "External security audit. Mainnet deployment on Base or Arbitrum. Seed liquidity and public performance dashboard.",
+      "items": [
+        { "text": "External security audit", "status": "pending" },
+        { "text": "Mainnet deployment", "status": "pending" },
+        { "text": "Seed liquidity and early partnerships", "status": "pending" },
+        { "text": "Public performance dashboard", "status": "pending" }
+      ]
+    },
+    {
+      "number": "05",
+      "name": "Growth",
+      "status": "upcoming",
+      "description": "Multi-pool expansion starting with safest pairs. B2B partnerships with DAO treasuries and new token projects. Yield aggregator integrations.",
+      "items": [
+        { "text": "wstETH/ETH pool (safest: high correlation, minimal IL)", "status": "pending" },
+        { "text": "USDC/USDT stablepair (IL ≈ 0, pure fee farming)", "status": "pending" },
+        { "text": "ETH/USDC pool (high vol = maximum strategy value)", "status": "pending" },
+        { "text": "New token project partnerships (highest ROI segment)", "status": "pending" },
+        { "text": "DAO treasury partnerships ($10M+ idle capital)", "status": "pending" },
+        { "text": "Yield aggregator integrations (Yearn, Beefy)", "status": "pending" }
+      ]
+    },
+    {
+      "number": "06",
+      "name": "Moat Building",
+      "status": "upcoming",
+      "description": "Data advantage from runtime. Custom volatility models beyond EWMA. First-mover position in V4 hook ecosystem. Continuous audit track record.",
+      "items": [
+        { "text": "Data moat: longer runtime = more accurate vol oracle", "status": "pending" },
+        { "text": "Custom vol models: implied vol (Deribit), realized vol blend, ML prediction", "status": "pending" },
+        { "text": "V4 hook ecosystem first-mover advantage", "status": "pending" },
+        { "text": "Network effects: TVL ↑ → better performance → more deposits", "status": "pending" },
+        { "text": "Continuous audit + unbroken runtime as trust signal", "status": "pending" }
+      ]
+    },
+    {
+      "number": "07",
+      "name": "Governance",
+      "status": "upcoming",
+      "description": "Token decision only after product-market fit confirmed and TVL exceeds $5M. Pure revenue model until then — simpler regulatory, operational focus.",
+      "items": [
+        { "text": "PMF confirmation: TVL $5M+, 10+ external depositors, 6mo+ no incidents", "status": "pending" },
+        { "text": "Token vs no-token decision", "status": "pending" },
+        { "text": "If token: community participation, incentive alignment, liquidity bootstrap", "status": "pending" },
+        { "text": "If no token: pure revenue model, simpler regulatory path", "status": "pending" }
+      ]
+    },
+    {
+      "number": "08",
+      "name": "Multi-Chain",
+      "status": "upcoming",
+      "description": "Expand from Base to Arbitrum and Ethereum L1. Deploy where V4 activity and TVL justify the gas costs. L1 Ethereum only after TVL exceeds $1M.",
+      "items": [
+        { "text": "Base L1 launch (lowest gas, Coinbase ecosystem, V4 active)", "status": "pending" },
+        { "text": "Arbitrum deployment (second largest V4 ecosystem)", "status": "pending" },
+        { "text": "Ethereum L1 deployment (TVL $1M+ threshold — keeper gas too high for small TVL)", "status": "pending" },
+        { "text": "Cross-chain vault aggregation and unified dashboard", "status": "pending" }
+      ]
+    },
+    {
+      "number": "09",
+      "name": "Institutional",
+      "status": "upcoming",
+      "description": "White-label LP management for protocols and funds. Managed accounts for institutional capital. Singapore entity for regulatory compliance at scale.",
+      "items": [
+        { "text": "White-label vault deployment for token projects", "status": "pending" },
+        { "text": "Managed account service for institutional LPs and funds", "status": "pending" },
+        { "text": "Singapore entity formation (TVL $5-10M threshold)", "status": "pending" },
+        { "text": "Custom vol models per pool (implied vol, ML prediction)", "status": "pending" }
+      ]
+    }
+  ],
+  "contracts": {
+    "display_order": ["ILAlphaHook", "ILAlphaVault", "AlwaysLPVault", "HODLVault", "SwapHelper"],
+    "meta": {
+      "ILAlphaHook": { "role": "V4 hook \u2014 volatility oracle, LP on/off signal", "tag": "Core" },
+      "ILAlphaVault": { "role": "ERC-4626 vault \u2014 deposit, earn, auto-protect", "tag": null },
+      "AlwaysLPVault": { "role": "Control \u2014 always in pool, no protection", "tag": null },
+      "HODLVault": { "role": "Control \u2014 hold only, never LP", "tag": null },
+      "SwapHelper": { "role": "Keeper integration \u2014 testnet swap execution", "tag": null }
+    }
+  },
+  "competitors": [
+    { "name": "Arrakis", "action": "Raise swap fees", "exposure": "Exposed", "action_ko": "\uc2a4\uc655 \uc218\uc218\ub8cc \uc778\uc0c1", "exposure_ko": "\ub178\ucd9c" },
+    { "name": "Gamma", "action": "Widen range", "exposure": "Exposed", "action_ko": "\ubc94\uc704 \ud655\ub300", "exposure_ko": "\ub178\ucd9c" },
+    { "name": "Charm", "action": "Rebalance range", "exposure": "Exposed", "action_ko": "\ubc94\uc704 \ub9ac\ubc38\ub7f0\uc2f1", "exposure_ko": "\ub178\ucd9c" }
+  ],
+  "log": [
+    {
+      "date": "2026-03-19",
+      "entries": [
+        {
+          "category": "dev",
+          "title": "Phase 2 → 3 Complete. LP Activated.",
+          "title_ko": "Phase 2 → 3 완료. LP 활성화 성공.",
+          "summary": "Solidity contracts shipped. Sepolia deployed. Keeper bot live. First LP activation on-chain.",
+          "summary_ko": "솔리디티 컨트랙트 완성. Sepolia 배포. 키퍼 봇 가동. 최초 온체인 LP 활성화.",
+          "items": [
+            "Solidity contracts complete: ILAlphaHook (V4 hook + EWMA vol oracle), ILAlphaVault (ERC-4626), BaseVault, 2 control vaults. 44 → 65 tests, all passing.",
+            "Deployed to Ethereum Sepolia — 3 attempts. Problem: V4 PoolManager not available on Sepolia. Solution: deployed our own PoolManager.",
+            "CREATE2 hook deployment failed — owner was proxy address. Fix: added explicit owner parameter to constructor.",
+            "Keeper bot live (1hr intervals). First cycle: feeYield > ilCost → LP ON. 100K tUSDC deployed to V4 pool.",
+            "SwapHelper deployed for testnet volume generation. CSV metrics logging added."
+          ],
+          "items_ko": [
+            "Solidity 컨트랙트 완성: ILAlphaHook (V4 hook + EWMA 변동성 오라클), ILAlphaVault (ERC-4626), BaseVault, 대조군 2개. 44 → 65 테스트 전부 통과.",
+            "Ethereum Sepolia 배포 — 3회 시도. 문제: Sepolia에 V4 PoolManager 미배포. 해결: 자체 PoolManager 배포.",
+            "CREATE2 hook 배포 실패 — owner가 proxy 주소. 수정: constructor에 owner 파라미터 추가.",
+            "키퍼 봇 가동 (1시간 간격). 첫 사이클: feeYield > ilCost → LP ON. 100K tUSDC가 V4 풀에 배포됨.",
+            "SwapHelper 배포로 테스트넷 볼륨 생성. CSV 메트릭 로깅 추가."
+          ]
+        },
+        {
+          "category": "strategy",
+          "title": "Positioning Locked. Arrakis Analyzed.",
+          "title_ko": "포지셔닝 확정. Arrakis 분석 완료.",
+          "summary": "Product positioning defined. Competitive analysis complete. Fee structure and go-to-market locked.",
+          "summary_ko": "프로덕트 포지셔닝 확정. 경쟁사 분석 완료. 수수료 구조 및 GTM 전략 확정.",
+          "items": [
+            "We are NOT: staking alt, lending alt, liquidity guarantee. We ARE: IL-defended LP management for capital seeking 15%+ returns.",
+            "New token projects identified as highest ROI segment. Pitch: 'your treasury lasts 12mo instead of 6mo.' NOT 'we supply liquidity.'",
+            "Arrakis deep dive: B2B dynamic fees (keeps LP in) vs our B2C LP removal (IL = 0). Markets don't overlap.",
+            "Survival math: $10K→$1M probability ~17%. Must secure Day 1 customer at mainnet launch (Arrakis playbook).",
+            "Fee structure finalized: Stage 1 = 10% performance, 0% management. No fees if no profit."
+          ],
+          "items_ko": [
+            "우리는 아님: 스테이킹 대안, 렌딩 대안, 유동성 보장. 우리임: 15%+ 수익을 원하는 자본을 위한 IL 방어 LP 관리.",
+            "새 토큰 프로젝트 = 최고 ROI 세그먼트. 피치: '트레저리가 6개월 대신 12개월 유지.' '유동성 공급'이 아님.",
+            "Arrakis 심층 분석: B2B 동적 수수료 (LP 유지) vs 우리 B2C LP 제거 (IL = 0). 시장 안 겹침.",
+            "생존 확률: $10K→$1M 약 17%. 메인넷 Day 1에 첫 고객 확보 필수 (Arrakis 플레이북).",
+            "수수료 구조 확정: Stage 1 = 성과보수 10%, 관리보수 0%. 수익 없으면 수수료 0원."
+          ]
+        },
+        {
+          "category": "design",
+          "title": "Design System + Public Site Live.",
+          "title_ko": "디자인 시스템 + 공개 사이트 라이브.",
+          "summary": "Blackstone-inspired design system. Milestone site deployed. Brand renamed to IL Alpha.",
+          "summary_ko": "Blackstone 스타일 디자인 시스템. 마일스톤 사이트 배포. 브랜드명 IL Alpha로 변경.",
+          "items": [
+            "Competitive visual research: Arrakis, Lido, EigenLayer, Sommelier screenshotted and analyzed.",
+            "Design system created (DESIGN.md). Direction: Blackstone-inspired institutional finance. Playfair Display + Satoshi + Geist Mono.",
+            "Milestone page built with build.py pipeline: roadmap.json → index.html. Live Etherscan tx count per contract.",
+            "Deployed to GitHub Pages: official-belta.github.io/il-alpha-site. English/Korean toggle with globe dropdown.",
+            "Name changed: 'IL Alpha Vault' → 'IL Alpha'. Vault is generic — we're a protocol, not a container."
+          ],
+          "items_ko": [
+            "경쟁사 비주얼 리서치: Arrakis, Lido, EigenLayer, Sommelier 스크린샷 + 분석.",
+            "디자인 시스템 생성 (DESIGN.md). 방향: Blackstone 스타일 기관 금융. Playfair Display + Satoshi + Geist Mono.",
+            "마일스톤 페이지 빌드 파이프라인: roadmap.json → build.py → index.html. 컨트랙트별 Etherscan 실시간 tx count.",
+            "GitHub Pages 배포: official-belta.github.io/il-alpha-site. 지구본 드롭다운으로 한영 전환.",
+            "이름 변경: 'IL Alpha Vault' → 'IL Alpha'. Vault는 너무 일반적 — 우리는 프로토콜."
+          ]
+        }
+      ]
+    }
+  ],
+  "i18n": {
+    "ko": {
+      "project": {
+        "tagline": "\ubcc0\ub3d9\uc131 \uae30\ubc18 \uc720\ub3d9\uc131 \uad00\ub9ac",
+        "description": "\ube44\uc601\uad6c\uc801 \uc190\uc2e4\uc774 \ubc1c\uc0dd\ud558\uae30 \uc804\uc5d0 LP \ud3ec\uc9c0\uc158\uc744 \uc81c\uac70\ud558\ub294 \ucd5c\ucd08\uc758 \ud504\ub85c\ud1a0\ucf5c. \ubc94\uc704 \uc870\uc815\uc774 \uc544\ub2cc \uc644\uc804 \uc81c\uac70."
+      },
+      "ui": {
+        "roadmap": "\ub85c\ub4dc\ub9f5",
+        "contracts": "\ucee8\ud2b8\ub799\ud2b8",
+        "testnet_live": "\ud14c\uc2a4\ud2b8\ub137 \ub77c\uc774\ube0c",
+        "progress": "\uc9c4\ud589 \uc0c1\ud669",
+        "on_chain": "\uc628\uccb4\uc778",
+        "deployed_contracts": "\ubc30\ud3ec\ub41c \ucee8\ud2b8\ub799\ud2b8",
+        "mechanism": "\uba54\ucee4\ub2c8\uc998",
+        "how_it_works": "\uc791\ub3d9 \ubc29\uc2dd",
+        "positioning": "\ud3ec\uc9c0\uc154\ub2dd",
+        "when_vol_spikes": "\ubcc0\ub3d9\uc131\uc774 \uae09\ub4f1\ud560 \ub54c",
+        "building_public": "\ud37c\ube14\ub9ad\uc73c\ub85c \ube4c\ub529 \uc911.",
+        "everything_onchain": "\ubaa8\ub4e0 \uac83\uc774 \uc628\uccb4\uc778.",
+        "follow_progress": "\ud14c\uc2a4\ud2b8\ub137 \uc9c4\ud589 \uc0c1\ud669\uc744 \ud314\ub85c\uc6b0\ud558\uc138\uc694. \uba54\uc778\ub137 \ucd9c\uc2dc\uc5d0 \uac00\uc7a5 \uba3c\uc800 \uc54c\ub824\ub4dc\ub9bd\ub2c8\ub2e4.",
+        "view_etherscan": "Etherscan\uc5d0\uc11c \ubcf4\uae30",
+        "follow_x": "X \ud314\ub85c\uc6b0",
+        "phase": "\ud398\uc774\uc988",
+        "tests_passing": "\ud1b5\uacfc \ud14c\uc2a4\ud2b8",
+        "contracts_deployed": "\ubc30\ud3ec\ub41c \ucee8\ud2b8\ub799\ud2b8",
+        "network": "\ub124\ud2b8\uc6cc\ud06c",
+        "complete": "\uc644\ub8cc",
+        "in_progress": "\uc9c4\ud589 \uc911",
+        "upcoming": "\uc608\uc815",
+        "protocol": "\ud504\ub85c\ud1a0\ucf5c",
+        "response": "\ub300\uc751",
+        "il_exposure": "IL \ub178\ucd9c",
+        "remove_lp": "LP \uc644\uc804 \uc81c\uac70",
+        "zero": "\uc81c\ub85c",
+        "monitor": "\ubaa8\ub2c8\ud130\ub9c1",
+        "evaluate": "\ud3c9\uac00",
+        "execute": "\uc2e4\ud589",
+        "monitor_desc": "\uc628\uccb4\uc778 \ubcc0\ub3d9\uc131 \uc624\ub77c\ud074\uc774 EWMA\ub97c \uc0ac\uc6a9\ud558\uc5ec \uac00\uaca9 \ubd84\uc0b0\uc744 \ucd94\uc801\ud569\ub2c8\ub2e4. \ubaa8\ub4e0 \uc2a4\uc655\uc774 \ucd94\uc815\uce58\ub97c \uc5c5\ub370\uc774\ud2b8\ud569\ub2c8\ub2e4. \uc624\ud504\uccb4\uc778 \uc758\uc874\uc131 \uc81c\ub85c.",
+        "evaluate_desc": "\ubd84\uc0b0\uc774 \uc784\uacc4\uac12\uc744 \ucd08\uacfc\ud558\uba74 \ud6c5\uc774 \uc81c\uac70 \uc2e0\ud638\ub97c \ubcf4\ub0c5\ub2c8\ub2e4. \uc774\uc9c4 \ud310\ub2e8. LP\uac00 \uc548\uc804\ud55c\uc9c0, \uc544\ub2cc\uc9c0.",
+        "execute_desc": "\ud0a4\ud37c \ubd07\uc774 \uc2e0\ud638\uc5d0 \ub530\ub77c \uc2e4\ud589\ud569\ub2c8\ub2e4. \ub192\uc740 \ubcc0\ub3d9\uc131 \uc2dc LP \uc81c\uac70, \uc870\uac74 \uc815\uc0c1\ud654 \uc2dc \uc7ac\uc9c4\uc785.",
+        "verified_onchain": "\uc628\uccb4\uc778 \uac80\uc99d \uac00\ub2a5"
+      },
+      "phases": {
+        "01": { "name": "\ubc31\ud14c\uc2a4\ud2b8", "description": "6\uac1c\uc6d4\uac04\uc758 \uc2e4\uc81c ETH/USDC \uac00\uaca9 \ub370\uc774\ud130\ub85c \uc0c1\uc2b9\uc7a5\ubd80\ud130 \ud558\ub77d\uc7a5\uae4c\uc9c0 \uc804\uccb4 \uc2dc\uc7a5 \uc0ac\uc774\ud074\uc744 \ucee4\ubc84. \ub450 \uac00\uc9c0 \ub300\uc870\uad70 \uc804\ub7b5 \ub300\ube44 \uc815\ub7c9\uc801 \uac80\uc99d \uc644\ub8cc." },
+        "02": { "name": "\uc2a4\ub9c8\ud2b8 \ucee8\ud2b8\ub799\ud2b8", "description": "\uc628\uccb4\uc778 \ubcc0\ub3d9\uc131 \uc624\ub77c\ud074\uc744 \ud0d1\uc7ac\ud55c Uniswap V4 \ud6c5. \uc608\uce58\uc6a9 ERC-4626 \ubcfc\ud2b8. \uc5c4\ubc00\ud55c \ube44\uad50\ub97c \uc704\ud55c \ub450 \uac1c\uc758 \ub300\uc870\uad70 \ubcfc\ud2b8." },
+        "03": { "name": "\ud14c\uc2a4\ud2b8\ub137 \uac80\uc99d", "description": "\ub3d9\uc77c \ud480\uc5d0 \ub3d9\uc77c \uc790\uae08\uc73c\ub85c 3\uac1c \ubcfc\ud2b8\ub97c Sepolia\uc5d0 \ubc30\ud3ec. \ud0a4\ud37c \ubd07\uc774 \ubcc0\ub3d9\uc131 \uae30\ubc18 LP \uc790\ub3d9 \uad00\ub9ac \uc2e4\ud589 \uc911." },
+        "04": { "name": "\uba54\uc778\ub137", "description": "\uc678\ubd80 \ubcf4\uc548 \uac10\uc0ac. Base \ub610\ub294 Arbitrum\uc5d0 \uba54\uc778\ub137 \ubc30\ud3ec. \ucd08\uae30 \uc720\ub3d9\uc131 \ud655\ubcf4 \ubc0f \ud37c\ube14\ub9ad \ud37c\ud3ec\uba3c\uc2a4 \ub300\uc2dc\ubcf4\ub4dc." },
+        "05": { "name": "\uc131\uc7a5", "description": "\uc548\uc804\ud55c \ud398\uc5b4\ubd80\ud130 \uba40\ud2f0\ud480 \ud655\uc7a5. DAO \ud2b8\ub808\uc800\ub9ac \ubc0f \uc2e0\uaddc \ud1a0\ud070 \ud504\ub85c\uc81d\ud2b8 B2B \ud30c\ud2b8\ub108\uc2ed. \uc218\uc775\ub960 \uc560\uadf8\ub9ac\uac8c\uc774\ud130 \ud1b5\ud569." },
+        "06": { "name": "\ud574\uc790 \uad6c\ucd95", "description": "\ub7f0\ud0c0\uc784 \ub370\uc774\ud130 \uc6b0\uc704. EWMA \ub108\uba38 \ucee4\uc2a4\ud140 \ubcc0\ub3d9\uc131 \ubaa8\ub378. V4 \ud6c5 \uc0dd\ud0dc\uacc4 \uc120\uc810. \uc9c0\uc18d\uc801 \uac10\uc0ac \uc2e0\ub8b0 \ucd95\uc801." },
+        "07": { "name": "\uac70\ubc84\ub10c\uc2a4", "description": "PMF \ud655\uc778 \ubc0f TVL $5M \ucd08\uacfc \ud6c4\uc5d0\ub9cc \ud1a0\ud070 \uacb0\uc815. \uadf8\uc804\uae4c\uc9c0 \uc21c\uc218 \uc218\uc775 \ubaa8\ub378 \u2014 \uaddc\uc81c \uac04\uc18c\ud654, \uc6b4\uc601 \uc9d1\uc911." },
+        "08": { "name": "멀티체인", "description": "Base에서 Arbitrum, Ethereum L1으로 확장. V4 활동과 TVL이 가스 비용을 정당화하는 곳에 배포. L1 Ethereum은 TVL $1M 이상에서만." },
+        "09": { "name": "기관 서비스", "description": "프로토콜 및 펀드를 위한 화이트라벨 LP 관리. 기관 자본을 위한 매니지드 어카운트. 규모에 맞는 싱가포르 법인 설립." }
+      },
+      "items": {
+        "Volatility-based LP on/off signal design": "\ubcc0\ub3d9\uc131 \uae30\ubc18 LP \uc628/\uc624\ud504 \uc2e0\ud638 \uc124\uacc4",
+        "Full-cycle backtest outperforms AlwaysLP and HODL": "\uc804\uccb4 \uc0ac\uc774\ud074 \ubc31\ud14c\uc2a4\ud2b8\uc5d0\uc11c AlwaysLP \ubc0f HODL \ub300\ube44 \uc6b0\uc218\ud55c \uc131\uacfc",
+        "99 Python tests passing": "99\uac1c Python \ud14c\uc2a4\ud2b8 \ud1b5\uacfc",
+        "ILAlphaHook \u2014 beforeSwap volatility check": "ILAlphaHook \u2014 beforeSwap \ubcc0\ub3d9\uc131 \uac80\uc0ac",
+        "ILAlphaVault \u2014 ERC-4626 deposit and withdraw": "ILAlphaVault \u2014 ERC-4626 \uc608\uce58 \ubc0f \uc778\ucd9c",
+        "AlwaysLPVault + HODLVault \u2014 control groups": "AlwaysLPVault + HODLVault \u2014 \ub300\uc870\uad70",
+        "65 Solidity tests including fuzz \u2014 zero failures": "65\uac1c Solidity \ud14c\uc2a4\ud2b8 (\ud37c\uc988 \ud3ec\ud568) \u2014 \uc2e4\ud328 0",
+        "CREATE2 address mining for hook deployment": "CREATE2 \uc8fc\uc18c \ub9c8\uc774\ub2dd\uc73c\ub85c \ud6c5 \ubc30\ud3ec",
+        "Deploy five contracts to Ethereum Sepolia": "Ethereum Sepolia\uc5d0 5\uac1c \ucee8\ud2b8\ub799\ud2b8 \ubc30\ud3ec",
+        "Keeper bot first cycle success": "\ud0a4\ud37c \ubd07 \uccab \uc0ac\uc774\ud074 \uc131\uacf5",
+        "Monitor across two or more volatility regime changes": "2\ud68c \uc774\uc0c1 \ubcc0\ub3d9\uc131 \ub808\uc9d0 \ubcc0\ud654 \ubaa8\ub2c8\ud130\ub9c1",
+        "Performance comparison report": "\uc131\uacfc \ube44\uad50 \ub9ac\ud3ec\ud2b8",
+        "Gas cost analysis and oracle accuracy report": "\uac00\uc2a4 \ube44\uc6a9 \ubd84\uc11d \ubc0f \uc624\ub77c\ud074 \uc815\ud655\ub3c4 \ub9ac\ud3ec\ud2b8",
+        "External security audit": "\uc678\ubd80 \ubcf4\uc548 \uac10\uc0ac",
+        "Mainnet deployment": "\uba54\uc778\ub137 \ubc30\ud3ec",
+        "Seed liquidity and early partnerships": "\ucd08\uae30 \uc720\ub3d9\uc131 \ud655\ubcf4 \ubc0f \ud30c\ud2b8\ub108\uc2ed",
+        "Public performance dashboard": "\ud37c\ube14\ub9ad \ud37c\ud3ec\uba3c\uc2a4 \ub300\uc2dc\ubcf4\ub4dc",
+        "Multi-pool: wstETH/ETH, USDC/USDT, ETH/USDC": "\uba40\ud2f0\ud480: wstETH/ETH, USDC/USDT, ETH/USDC",
+        "DAO treasury partnerships": "DAO \ud2b8\ub808\uc800\ub9ac \ud30c\ud2b8\ub108\uc2ed",
+        "Yield aggregator integrations": "\uc218\uc775\ub960 \uc560\uadf8\ub9ac\uac8c\uc774\ud130 \ud1b5\ud569",
+        "wstETH/ETH pool (safest: high correlation, minimal IL)": "wstETH/ETH 풀 (최안전: 높은 상관관계, 최소 IL)",
+        "USDC/USDT stablepair (IL ≈ 0, pure fee farming)": "USDC/USDT 스테이블페어 (IL ≈ 0, 순수 수수료 파밍)",
+        "ETH/USDC pool (high vol = maximum strategy value)": "ETH/USDC 풀 (높은 변동성 = 전략 가치 극대화)",
+        "New token project partnerships (highest ROI segment)": "신규 토큰 프로젝트 파트너십 (최고 ROI 세그먼트)",
+        "DAO treasury partnerships ($10M+ idle capital)": "DAO 트레저리 파트너십 ($10M+ 유휴 자본)",
+        "Yield aggregator integrations (Yearn, Beefy)": "수익률 애그리게이터 통합 (Yearn, Beefy)",
+        "Data moat: longer runtime = more accurate vol oracle": "데이터 해자: 더 긴 운영 = 더 정확한 변동성 오라클",
+        "Custom vol models: implied vol (Deribit), realized vol blend, ML prediction": "커스텀 변동성 모델: 내재 변동성 (Deribit), 실현 변동성 혼합, ML 예측",
+        "V4 hook ecosystem first-mover advantage": "V4 훅 생태계 선점자 우위",
+        "Network effects: TVL ↑ → better performance → more deposits": "네트워크 효과: TVL ↑ → 더 나은 성과 → 더 많은 예치",
+        "Continuous audit + unbroken runtime as trust signal": "지속적 감사 + 무중단 운영으로 신뢰 구축",
+        "PMF confirmation: TVL $5M+, 10+ external depositors, 6mo+ no incidents": "PMF 확인: TVL $5M+, 외부 예치자 10명+, 6개월+ 무사고",
+        "Token vs no-token decision": "토큰 발행 vs 미발행 결정",
+        "If token: community participation, incentive alignment, liquidity bootstrap": "토큰 발행 시: 커뮤니티 참여, 인센티브 정렬, 유동성 부트스트랩",
+        "If no token: pure revenue model, simpler regulatory path": "미발행 시: 순수 수익 모델, 간소화된 규제 경로",
+        "Base L1 launch (lowest gas, Coinbase ecosystem, V4 active)": "Base L1 출시 (최저 가스, Coinbase 생태계, V4 활성)",
+        "Arbitrum deployment (second largest V4 ecosystem)": "Arbitrum 배포 (V4 생태계 2위)",
+        "Ethereum L1 deployment (TVL $1M+ threshold — keeper gas too high for small TVL)": "Ethereum L1 배포 (TVL $1M+ 기준 — 소규모 TVL에선 키퍼 가스 과다)",
+        "Cross-chain vault aggregation and unified dashboard": "크로스체인 볼트 통합 및 통합 대시보드",
+        "White-label vault deployment for token projects": "토큰 프로젝트용 화이트라벨 볼트 배포",
+        "Managed account service for institutional LPs and funds": "기관 LP 및 펀드용 매니지드 어카운트 서비스",
+        "Singapore entity formation (TVL $5-10M threshold)": "싱가포르 법인 설립 (TVL $5-10M 기준)",
+        "Custom vol models per pool (implied vol, ML prediction)": "풀별 커스텀 변동성 모델 (내재 변동성, ML 예측)"
+      },
+      "subs": {
+        "Hook \u00b7 Vault \u00b7 AlwaysLP \u00b7 HODL \u00b7 SwapHelper": "Hook \u00b7 Vault \u00b7 AlwaysLP \u00b7 HODL \u00b7 SwapHelper",
+        "IL Alpha vs AlwaysLP vs HODL \u2014 live comparison": "IL Alpha vs AlwaysLP vs HODL \u2014 \uc2e4\uc2dc\uac04 \ube44\uad50"
+      },
+      "contracts_meta": {
+        "ILAlphaHook": "V4 \ud6c5 \u2014 \ubcc0\ub3d9\uc131 \uc624\ub77c\ud074, LP \uc628/\uc624\ud504 \uc2e0\ud638",
+        "ILAlphaVault": "ERC-4626 \ubcfc\ud2b8 \u2014 \uc608\uce58, \uc218\uc775, \uc790\ub3d9 \ubcf4\ud638",
+        "AlwaysLPVault": "\ub300\uc870\uad70 \u2014 \ud56d\uc0c1 \ud480\uc5d0 \uc788\uc74c, \ubcf4\ud638 \uc5c6\uc74c",
+        "HODLVault": "\ub300\uc870\uad70 \u2014 \ubcf4\uc720\ub9cc, LP \uc5c6\uc74c",
+        "SwapHelper": "\ud0a4\ud37c \ud1b5\ud569 \u2014 \ud14c\uc2a4\ud2b8\ub137 \uc2a4\uc655 \uc2e4\ud589"
+      }
+    }
+  }
+}

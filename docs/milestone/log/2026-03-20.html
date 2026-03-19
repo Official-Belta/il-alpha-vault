@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IL Alpha — 2026-03-20</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet">
+<style>
+  :root { --black:#0C0C0C; --white:#FAFAF9; --gray-200:#E7E5E4; --gray-400:#A8A29E; --gray-500:#78716C; --gray-600:#57534E; --gray-700:#44403C; --gray-900:#1C1917; --accent:#1A7F64; --display:'Playfair Display',Georgia,serif; --sans:'Geist Sans','Satoshi',system-ui,sans-serif; --mono:'Geist Mono','SF Mono',monospace; --ease:cubic-bezier(0.25,0.46,0.45,0.94); }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:var(--sans); background:var(--white); color:var(--black); -webkit-font-smoothing:antialiased; }
+  ::selection { background:var(--black); color:var(--white); }
+
+  nav { position:sticky; top:0; z-index:100; padding:0 48px; height:64px; display:flex; align-items:center; justify-content:space-between; background:rgba(250,250,249,0.92); backdrop-filter:blur(20px); border-bottom:1px solid var(--gray-200); }
+  .logo { font-family:var(--sans); font-weight:700; font-size:18px; letter-spacing:-0.03em; color:var(--black); text-decoration:none; }
+  .nav-links { display:flex; align-items:center; gap:28px; }
+  .nav-links a { font-size:15px; font-weight:500; color:var(--gray-600); text-decoration:none; transition:color 300ms var(--ease); }
+  .nav-links a:hover { color:var(--black); }
+  .nav-links a.active { color:var(--black); font-weight:700; border-bottom:2px solid var(--accent); padding-bottom:2px; }
+  .nav-live::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-right:6px; animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+  .hamburger { display:none; background:none; border:none; cursor:pointer; padding:8px; color:var(--gray-600); }
+  .hamburger svg { width:24px; height:24px; }
+  .mobile-menu { display:none; position:fixed; top:64px; left:0; right:0; background:var(--white); border-bottom:1px solid var(--gray-200); padding:16px 24px; z-index:99; flex-direction:column; gap:16px; }
+  .mobile-menu.open { display:flex; }
+  .mobile-menu a { font-size:16px; font-weight:500; color:var(--gray-600); text-decoration:none; padding:8px 0; }
+  .mobile-menu a.active { color:var(--accent); font-weight:700; }
+  @media (max-width:640px) { .nav-links a.hm { display:none; } .hamburger { display:block; } }
+  .lang-btn { position:relative; display:flex; align-items:center; gap:6px; font-family:var(--sans); font-size:14px; font-weight:500; color:var(--gray-500); background:transparent; border:1px solid var(--gray-200); border-radius:100px; padding:6px 14px; cursor:pointer; transition:all 200ms var(--ease); }
+  .lang-btn:hover { color:var(--black); border-color:var(--gray-400); }
+  .lang-btn svg { width:16px; height:16px; }
+  .lang-dropdown { position:absolute; top:calc(100% + 8px); right:0; background:var(--white); border:1px solid var(--gray-200); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); overflow:hidden; opacity:0; transform:translateY(-4px); pointer-events:none; transition:all 200ms var(--ease); min-width:140px; z-index:200; }
+  .lang-dropdown.open { opacity:1; transform:translateY(0); pointer-events:auto; }
+  .lang-option { display:flex; align-items:center; gap:10px; padding:12px 16px; font-size:14px; font-weight:500; color:var(--gray-600); cursor:pointer; transition:background 150ms var(--ease); }
+  .lang-option:hover { background:var(--gray-200); }
+  .lang-option.active { color:var(--accent); }
+  @media (max-width:640px) { nav { padding:0 24px; } }
+
+  .hero { padding:100px 48px 64px; }
+  @media (max-width:640px) { .hero { padding:80px 24px 48px; } }
+  .hero-date { font-family:var(--display); font-size:clamp(36px,5vw,56px); font-weight:400; letter-spacing:-0.025em; margin-bottom:16px; }
+
+  .detail-section { padding:48px 48px; max-width:820px; }
+  .detail-section + .detail-section { border-top:1px solid var(--gray-200); margin-top:16px; padding-top:48px; }
+  @media (max-width:640px) { .detail-section { padding:32px 24px; } }
+  .detail-card { background:var(--gray-100); border-radius:12px; padding:48px; margin-bottom:0; }
+  .detail-cat { display:inline-block; font-family:var(--sans); font-size:18px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--black); padding:0 0 8px; margin-bottom:24px; border-bottom:2px solid var(--black); }
+  .detail-title { font-family:var(--display); font-size:clamp(32px,5vw,48px); font-weight:400; letter-spacing:-0.02em; margin-bottom:36px; line-height:1.2; }
+  .detail-items { padding-left:20px; display:flex; flex-direction:column; gap:24px; }
+  .detail-items li { font-size:18px; color:var(--gray-600); line-height:1.8; }
+
+  .fab-back { position:fixed; bottom:32px; right:32px; z-index:90; font-family:var(--sans); font-size:15px; font-weight:600; color:var(--white); background:var(--black); text-decoration:none; display:flex; align-items:center; gap:8px; padding:14px 24px; border-radius:9999px; box-shadow:0 4px 20px rgba(0,0,0,0.2); transition:all 200ms var(--ease); opacity:0; transform:translateY(12px); pointer-events:none; }
+  .fab-back.visible { opacity:1; transform:translateY(0); pointer-events:auto; }
+  .fab-back:hover { background:var(--accent); transform:translateY(-2px); box-shadow:0 6px 28px rgba(0,0,0,0.25); }
+  @media (max-width:640px) { .fab-back { bottom:24px; right:24px; font-size:14px; padding:12px 20px; } }
+
+  footer { padding:32px 48px; border-top:1px solid var(--gray-200); }
+  footer span { font-family:var(--mono); font-size:11px; color:var(--gray-500); }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="../index.html">IL Alpha</a>
+  <div class="nav-links">
+    <a href="../index.html#roadmap" class="hm" data-ko="로드맵">Roadmap</a>
+    <a href="../index.html#log" class="hm active" data-ko="빌드 로그">Log</a>
+    <a href="../thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
+    <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div style="position:relative;">
+      <button class="lang-btn" onclick="document.querySelector('.lang-dropdown').classList.toggle('open')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span id="langLabel">EN</span>
+      </button>
+      <div class="lang-dropdown">
+        <div class="lang-option active" data-lang="en" onclick="setLang('en')">English</div>
+        <div class="lang-option" data-lang="ko" onclick="setLang('ko')">한국어</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-menu">
+  <a href="../index.html#roadmap" data-ko="로드맵" onclick="this.parentElement.classList.remove('open')">Roadmap</a>
+  <a href="../vault.html" data-ko="볼트" onclick="this.parentElement.classList.remove('open')">Vault</a>
+  <a href="../index.html#log" data-ko="빌드 로그" onclick="this.parentElement.classList.remove('open')">Log</a>
+  <a href="../thesis.html" data-ko="투자 논문">Thesis</a>
+</div>
+
+<section class="hero">
+  <h1 class="hero-date">2026-03-20</h1>
+</section>
+
+
+    <section class="detail-section" id="dev">
+      <div class="detail-card">
+        <div class="detail-cat" data-cat="dev" data-ko="개발">Development</div>
+        <h2 class="detail-title" data-ko="코드 프리즈. 77 테스트. 메인넷 준비 완료.">Code Freeze. 77 Tests. Mainnet Ready.</h2>
+        <ul class="detail-items"><li data-ko="코드 프리즈 선언: 77 테스트 (Hook 31 + Vault 37 + Controls 9), 0 실패. 더 이상 컨트랙트 변경 없음.">Code freeze declared: 77 tests (Hook 31 + Vault 37 + Controls 9), 0 failures. No more contract changes.</li><li data-ko="4라운드 Trail of Bits 보안 감사: Critical 0, High 0. 준비 점수 89/100.">4-round Trail of Bits security audit: 0 Critical, 0 High. Readiness score 89/100.</li><li data-ko="F-2 setLPRange 가드 추가 — LP 배포 중 range 변경 방지.">F-2 setLPRange guard added — prevents range change while LP deployed.</li><li data-ko="TWAP 체크 — 입출금 시 샌드위치 공격 차단 (±5% 임계값).">TWAP check on deposit/withdraw — blocks sandwich attacks (±5% threshold).</li><li data-ko="볼륨 스파이크 트리거 — 비정상 볼륨 시 쿨다운 무시하고 긴급 LP 제거.">Volume spike trigger — emergency LP removal bypasses cooldown on abnormal volume.</li><li data-ko="ERC-4626 준수를 위해 출금 수수료 제거.">Withdrawal fee removed for ERC-4626 compliance and simplicity.</li><li data-ko="Base 메인넷 지갑 설정: Deployer, Operator, Treasury Safe (Gnosis 2/3), Sentinel.">Base mainnet wallet setup: Deployer, Operator, Treasury Safe (Gnosis 2/3), Sentinel.</li></ul>
+      </div>
+    </section>
+    <section class="detail-section" id="strategy">
+      <div class="detail-card">
+        <div class="detail-cat" data-cat="strategy" data-ko="전략">Strategy</div>
+        <h2 class="detail-title" data-ko="B2B 피봇. DAO 트레저리 GTM.">B2B Pivot. DAO Treasury GTM.</h2>
+        <ul class="detail-items"><li data-ko="B2B 피봇: DAO 트레저리 (1순위), 개인 LP (2순위). $24.5B 유휴, 67%가 0% 수익률.">B2B pivot: DAO treasuries (primary) over retail LPs (secondary). $24.5B idle, 67% at 0% yield.</li><li data-ko="20개 타겟 DAO 3개 티어로 선정. Top 3: Gnosis (새 트레저리 매니저), ENS (활발한 포럼), Polygon ($1.3B 유휴).">20 target DAOs selected across 3 tiers. Top 3: Gnosis (new treasury manager), ENS (active forum), Polygon ($1.3B idle).</li><li data-ko="거버넌스 제안서 템플릿 (EN/KO) — Sharpe 3.66, DD -12%, 성과보수만, ERC-4626.">Governance proposal template created (EN/KO) — Sharpe 3.66, DD -12%, perf-fee-only, ERC-4626.</li><li data-ko="그랜트 전략: UFSF 감사 보조금 (100% 커버), Hook Design Lab 코호트 2, v4 Hooks Support.">Grant strategy: UFSF audit subsidy (100% coverage), Hook Design Lab Cohort 2, v4 Hooks Support.</li><li data-ko="메인넷 직행: 테스트넷 연장 없이 → Base 메인넷 $1.2K 시드, 캡 제한, 4주 실데이터.">Mainnet direct: skip extended testnet → Base mainnet with $1.2K seed, capped deposit, 4-week live data.</li><li data-ko="Thesis 페이지 전면 교체: DAO 트레저리 피치 + 백테스트 데이터, 시장 규모, 수익 모델, 타이밍 (Bunni 빈자리).">Thesis page rewritten: DAO treasury pitch with backtest data, market sizing, revenue model, timing (Bunni vacancy).</li></ul>
+      </div>
+    </section>
+    <section class="detail-section" id="design">
+      <div class="detail-card">
+        <div class="detail-cat" data-cat="design" data-ko="디자인 &amp; 홍보">Design &amp; Marketing</div>
+        <h2 class="detail-title" data-ko="볼트 페이지. 메인넷 사이트. 페이즈 재구성.">Vault Page. Mainnet Site. Phase Restructure.</h2>
+        <ul class="detail-items"><li data-ko="볼트 페이지: ethers.js v6으로 ERC-4626 입출금. Rabby/MetaMask, Base 자동 전환, 실시간 통계.">Vault page: ERC-4626 deposit/withdraw with ethers.js v6. Rabby/MetaMask, Base auto-switch, real-time stats.</li><li data-ko="위험 고지 게이트: 볼트 진입 전 다크 풀스크린 경고. 세션 기반 (탭 닫으면 리셋).">Risk disclosure gate: dark fullscreen warning before vault access. Session-based (resets per tab).</li><li data-ko="로드맵 재구성: Phase 3→완료, 4→Base 메인넷 (진행 중), 5→그랜트&amp;감사, 6→DAO GTM, 7→해자, 8→거버넌스, 9→멀티체인.">Roadmap restructured: Phase 3→complete, 4→Base Mainnet (active), 5→Grants &amp; Audit, 6→DAO GTM, 7→Moat, 8→Governance, 9→Multi-Chain.</li><li data-ko="네트워크 전환: Sepolia → Base. etherscan → basescan.org. 테스트 164 → 77. beforeSwap → afterSwap.">Network transition: Sepolia → Base. etherscan → basescan.org. Tests 164 → 77. beforeSwap → afterSwap.</li><li data-ko="UNAUDITED 배너: 볼트에만 (메인/thesis/대시보드에서 제거). 플로팅 Vault FAB 버튼 전 페이지.">UNAUDITED banner: vault-only (removed from main/thesis/dashboard). Floating Vault FAB button on all pages.</li><li data-ko="타이포그래피: Playfair Display 제목 복원, Geist Sans 본문, 볼트·로드맵 폰트 확대.">Typography: Playfair Display restored for titles, Geist Sans body, font sizes enlarged across vault and roadmap.</li></ul>
+      </div>
+    </section>
+
+<a class="fab-back" href="../index.html" id="fabBack">&larr; <span data-ko="메인으로">Home</span></a>
+
+<footer><span>&copy; 2026 IL Alpha</span></footer>
+
+<script>
+  // Floating back button
+  const fabBack = document.getElementById('fabBack');
+  window.addEventListener('scroll', () => {
+    fabBack.classList.toggle('visible', window.scrollY > 300);
+  });
+
+  let currentLang = localStorage.getItem('lang') || 'en';
+  const langLabel = document.getElementById('langLabel');
+  const dropdown = document.querySelector('.lang-dropdown');
+  function setLang(lang) { currentLang = lang; localStorage.setItem('lang', lang); dropdown.classList.remove('open'); applyLang(); }
+  function applyLang() {
+    langLabel.textContent = currentLang === 'en' ? 'EN' : 'KR';
+    document.documentElement.lang = currentLang === 'ko' ? 'ko' : 'en';
+    document.querySelectorAll('.lang-option').forEach(o => o.classList.toggle('active', o.dataset.lang === currentLang));
+    document.querySelectorAll('[data-ko],[data-ko-html]').forEach(el => {
+      if (!el.dataset.en) el.dataset.en = el.innerHTML;
+      if (currentLang === 'ko') {
+        if (el.dataset.koHtml) el.innerHTML = el.dataset.koHtml;
+        else if (el.dataset.ko) el.textContent = el.dataset.ko;
+      } else if (el.dataset.en) {
+        el.innerHTML = el.dataset.en;
+      }
+    });
+  }
+  document.addEventListener('click', e => { if (!e.target.closest('.lang-btn') && !e.target.closest('.lang-dropdown')) dropdown.classList.remove('open'); });
+  if (currentLang === 'ko') applyLang();
+</script>
+</body>
+</html>

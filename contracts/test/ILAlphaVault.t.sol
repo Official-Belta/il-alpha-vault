@@ -260,7 +260,7 @@ contract ILAlphaVaultTest is Test {
         vault.rebalance();
 
         assertTrue(vault.deployedLiquidity() > 0, "Should have deployed liquidity");
-        assertTrue(vault.deployedAssets() > 0, "Should track deployed assets");
+        assertTrue(vault.deployedLiquidity() > 0, "Should have deployed liquidity");
 
         // 4. Deactivate LP
         hook.pushVolEstimate(poolKey, 10000e18); // huge vol
@@ -272,7 +272,7 @@ contract ILAlphaVaultTest is Test {
         vault.rebalance();
 
         assertEq(vault.deployedLiquidity(), 0, "Liquidity should be 0 after removal");
-        assertEq(vault.deployedAssets(), 0, "Deployed assets should be 0");
+        assertEq(vault.deployedLiquidity(), 0, "Deployed assets should be 0");
 
         // 6. Vault should still have tokens (recovered from LP)
         uint256 token0Balance = token0.balanceOf(address(vault));

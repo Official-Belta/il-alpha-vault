@@ -32,7 +32,7 @@ contract DeployHook is Script {
 
         // Deploy
         vm.startBroadcast();
-        ILAlphaHook hook = new ILAlphaHook{salt: salt}(IPoolManager(POOL_MANAGER));
+        ILAlphaHook hook = new ILAlphaHook{salt: salt}(IPoolManager(POOL_MANAGER), msg.sender);
         vm.stopBroadcast();
 
         require(address(hook) == expectedAddr, "Address mismatch");

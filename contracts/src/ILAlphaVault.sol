@@ -122,11 +122,6 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
         _;
     }
 
-    modifier onlyKeeper() {
-        if (msg.sender != keeper && msg.sender != owner) revert OnlyKeeper();
-        _;
-    }
-
     modifier nonReentrant() {
         if (_locked) revert Reentrancy();
         _locked = true;
@@ -190,9 +185,18 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     }
 
     /// @notice ERC-4626 maxDeposit — enforces deposit cap
+    /// @notice V3 M-1 FIX: returns 0 when paused
     function maxDeposit(address) public view override returns (uint256) {
+        if (paused) return 0;
         uint256 total = totalAssets();
         return total >= depositCap ? 0 : depositCap - total;
+    }
+
+    /// @notice V3 M-1 FIX: maxMint respects pause + deposit cap
+    function maxMint(address) public view override returns (uint256) {
+        if (paused) return 0;
+        uint256 maxAssets = maxDeposit(address(0));
+        return maxAssets == 0 ? 0 : convertToShares(maxAssets);
     }
 
     // ─── Rebalance ───────────────────────────────────────────────────
@@ -313,15 +317,10 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
             }), "");
 
         _settleDelta(delta);
-        // R-4: slippage check on removal too (anti-sandwich)
-        // For removal, "expected" is estimated from LP value
-        (uint256 estValue0, uint256 estValue1) = _getDeployedLPValue();
-        // Not checking slippage on removal to avoid bricking emergency withdraw
-        // The TWAP check on withdraw already provides sandwich protection
         deployedLiquidity = 0;
     }
 
-    // ─── Withdraw (H-5: reentrancy, no fee — fee deferred post-audit) ──
+    // ─── Withdraw (reentrancy guard, TWAP check) ──────────────────
 
     /// @dev No whenNotPaused — users must be able to withdraw after emergency
     function withdraw(uint256 assets, address receiver, address owner_)
@@ -448,6 +447,7 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
             Currency.unwrap(_poolKey.currency1) != assetAddr
         ) revert InvalidPoolKey();
         poolKey = _poolKey;
+        emit PoolKeyUpdated();
     }
 
     function setPaused(bool _paused) external onlyOwner {

@@ -2,7 +2,7 @@
   "project": {
     "name": "IL Alpha",
     "tagline": "Volatility-aware liquidity management",
-    "description": "The first protocol that removes your LP position before impermanent loss hits. Not range adjustment. Full removal.",
+    "description": "Treasury-grade LP management that removes positions before impermanent loss hits. Capital preservation with LP-level returns.",
     "eyebrow": "Uniswap V4 Hook",
     "network": "Sepolia",
     "twitter": "https://twitter.com",
@@ -60,15 +60,15 @@
     },
     {
       "number": "05",
-      "name": "Growth",
+      "name": "DAO GTM",
       "status": "upcoming",
-      "description": "Multi-pool expansion starting with safest pairs. B2B partnerships with DAO treasuries and new token projects. Yield aggregator integrations.",
+      "description": "DAO treasury acquisition as primary go-to-market. 3-5 partnerships at $1-2M each. Multi-pool expansion starting with safest pairs.",
       "items": [
+        { "text": "DAO treasury partnerships ($10M+ idle capital)", "status": "pending" },
+        { "text": "Governance proposal template with testnet data", "status": "pending" },
         { "text": "wstETH/ETH pool (safest: high correlation, minimal IL)", "status": "pending" },
         { "text": "USDC/USDT stablepair (IL ≈ 0, pure fee farming)", "status": "pending" },
-        { "text": "ETH/USDC pool (high vol = maximum strategy value)", "status": "pending" },
-        { "text": "New token project partnerships (highest ROI segment)", "status": "pending" },
-        { "text": "DAO treasury partnerships ($10M+ idle capital)", "status": "pending" },
+        { "text": "Protocol treasury partnerships (reduce IL burn)", "status": "pending" },
         { "text": "Yield aggregator integrations (Yearn, Beefy)", "status": "pending" }
       ]
     },
@@ -171,14 +171,14 @@
           "items": [
             "We are NOT: staking alt, lending alt, liquidity guarantee. We ARE: IL-defended LP management for capital seeking 15%+ returns.",
             "New token projects identified as highest ROI segment. Pitch: 'your treasury lasts 12mo instead of 6mo.' NOT 'we supply liquidity.'",
-            "Arrakis deep dive: B2B dynamic fees (keeps LP in) vs our B2C LP removal (IL = 0). Markets don't overlap.",
+            "Arrakis deep dive: B2B dynamic fees for token issuers (keeps LP in) vs our B2B treasury protection (LP removal). Non-overlapping markets.",
             "Survival math: $10K→$1M probability ~17%. Must secure Day 1 customer at mainnet launch (Arrakis playbook).",
             "Fee structure finalized: Stage 1 = 10% performance, 0% management. No fees if no profit."
           ],
           "items_ko": [
             "우리는 아님: 스테이킹 대안, 렌딩 대안, 유동성 보장. 우리임: 15%+ 수익을 원하는 자본을 위한 IL 방어 LP 관리.",
             "새 토큰 프로젝트 = 최고 ROI 세그먼트. 피치: '트레저리가 6개월 대신 12개월 유지.' '유동성 공급'이 아님.",
-            "Arrakis 심층 분석: B2B 동적 수수료 (LP 유지) vs 우리 B2C LP 제거 (IL = 0). 시장 안 겹침.",
+            "Arrakis 심층 분석: 토큰 발행자용 B2B 동적 수수료 (LP 유지) vs 우리 트레저리 보호 B2B (LP 제거). 시장 안 겹침.",
             "생존 확률: $10K→$1M 약 17%. 메인넷 Day 1에 첫 고객 확보 필수 (Arrakis 플레이북).",
             "수수료 구조 확정: Stage 1 = 성과보수 10%, 관리보수 0%. 수익 없으면 수수료 0원."
           ]
@@ -211,7 +211,7 @@
     "ko": {
       "project": {
         "tagline": "\ubcc0\ub3d9\uc131 \uae30\ubc18 \uc720\ub3d9\uc131 \uad00\ub9ac",
-        "description": "\ube44\uc601\uad6c\uc801 \uc190\uc2e4\uc774 \ubc1c\uc0dd\ud558\uae30 \uc804\uc5d0 LP \ud3ec\uc9c0\uc158\uc744 \uc81c\uac70\ud558\ub294 \ucd5c\ucd08\uc758 \ud504\ub85c\ud1a0\ucf5c. \ubc94\uc704 \uc870\uc815\uc774 \uc544\ub2cc \uc644\uc804 \uc81c\uac70."
+        "description": "비영구적 손실이 발생하기 전에 LP 포지션을 제거하는 트레저리급 LP 관리. LP 수준의 수익률과 자본 보전."
       },
       "ui": {
         "roadmap": "\ub85c\ub4dc\ub9f5",
@@ -254,7 +254,7 @@
         "02": { "name": "\uc2a4\ub9c8\ud2b8 \ucee8\ud2b8\ub799\ud2b8", "description": "\uc628\uccb4\uc778 \ubcc0\ub3d9\uc131 \uc624\ub77c\ud074\uc744 \ud0d1\uc7ac\ud55c Uniswap V4 \ud6c5. \uc608\uce58\uc6a9 ERC-4626 \ubcfc\ud2b8. \uc5c4\ubc00\ud55c \ube44\uad50\ub97c \uc704\ud55c \ub450 \uac1c\uc758 \ub300\uc870\uad70 \ubcfc\ud2b8." },
         "03": { "name": "\ud14c\uc2a4\ud2b8\ub137 \uac80\uc99d", "description": "\ub3d9\uc77c \ud480\uc5d0 \ub3d9\uc77c \uc790\uae08\uc73c\ub85c 3\uac1c \ubcfc\ud2b8\ub97c Sepolia\uc5d0 \ubc30\ud3ec. \ud0a4\ud37c \ubd07\uc774 \ubcc0\ub3d9\uc131 \uae30\ubc18 LP \uc790\ub3d9 \uad00\ub9ac \uc2e4\ud589 \uc911." },
         "04": { "name": "\uba54\uc778\ub137", "description": "\uc678\ubd80 \ubcf4\uc548 \uac10\uc0ac. Base \ub610\ub294 Arbitrum\uc5d0 \uba54\uc778\ub137 \ubc30\ud3ec. \ucd08\uae30 \uc720\ub3d9\uc131 \ud655\ubcf4 \ubc0f \ud37c\ube14\ub9ad \ud37c\ud3ec\uba3c\uc2a4 \ub300\uc2dc\ubcf4\ub4dc." },
-        "05": { "name": "\uc131\uc7a5", "description": "\uc548\uc804\ud55c \ud398\uc5b4\ubd80\ud130 \uba40\ud2f0\ud480 \ud655\uc7a5. DAO \ud2b8\ub808\uc800\ub9ac \ubc0f \uc2e0\uaddc \ud1a0\ud070 \ud504\ub85c\uc81d\ud2b8 B2B \ud30c\ud2b8\ub108\uc2ed. \uc218\uc775\ub960 \uc560\uadf8\ub9ac\uac8c\uc774\ud130 \ud1b5\ud569." },
+        "05": { "name": "DAO GTM", "description": "DAO 트레저리 확보가 핵심 GTM. 3-5개 파트너십 × $1-2M. 안전한 페어부터 멀티풀 확장." },
         "06": { "name": "\ud574\uc790 \uad6c\ucd95", "description": "\ub7f0\ud0c0\uc784 \ub370\uc774\ud130 \uc6b0\uc704. EWMA \ub108\uba38 \ucee4\uc2a4\ud140 \ubcc0\ub3d9\uc131 \ubaa8\ub378. V4 \ud6c5 \uc0dd\ud0dc\uacc4 \uc120\uc810. \uc9c0\uc18d\uc801 \uac10\uc0ac \uc2e0\ub8b0 \ucd95\uc801." },
         "07": { "name": "\uac70\ubc84\ub10c\uc2a4", "description": "PMF \ud655\uc778 \ubc0f TVL $5M \ucd08\uacfc \ud6c4\uc5d0\ub9cc \ud1a0\ud070 \uacb0\uc815. \uadf8\uc804\uae4c\uc9c0 \uc21c\uc218 \uc218\uc775 \ubaa8\ub378 \u2014 \uaddc\uc81c \uac04\uc18c\ud654, \uc6b4\uc601 \uc9d1\uc911." },
         "08": { "name": "멀티체인", "description": "Base에서 Arbitrum, Ethereum L1으로 확장. V4 활동과 TVL이 가스 비용을 정당화하는 곳에 배포. L1 Ethereum은 TVL $1M 이상에서만." },
@@ -285,6 +285,8 @@
         "USDC/USDT stablepair (IL ≈ 0, pure fee farming)": "USDC/USDT 스테이블페어 (IL ≈ 0, 순수 수수료 파밍)",
         "ETH/USDC pool (high vol = maximum strategy value)": "ETH/USDC 풀 (높은 변동성 = 전략 가치 극대화)",
         "New token project partnerships (highest ROI segment)": "신규 토큰 프로젝트 파트너십 (최고 ROI 세그먼트)",
+        "Governance proposal template with testnet data": "테스트넷 데이터 포함 거버넌스 제안서 템플릿",
+        "Protocol treasury partnerships (reduce IL burn)": "프로토콜 트레저리 파트너십 (IL 손실 감소)",
         "DAO treasury partnerships ($10M+ idle capital)": "DAO 트레저리 파트너십 ($10M+ 유휴 자본)",
         "Yield aggregator integrations (Yearn, Beefy)": "수익률 애그리게이터 통합 (Yearn, Beefy)",
         "Data moat: longer runtime = more accurate vol oracle": "데이터 해자: 더 긴 운영 = 더 정확한 변동성 오라클",

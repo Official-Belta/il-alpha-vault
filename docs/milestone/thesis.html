@@ -130,34 +130,34 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-eyebrow" data-ko="투자 논문">Investment Thesis</div>
-  <h1 class="reveal" data-ko-html="LP 수수료는 원하지만, <em>비영구적 손실은 원하지 않는</em> 자본을 위해">For capital that wants LP fees, <em>without the impermanent loss</em></h1>
-  <p class="hero-sub reveal" data-ko="Uniswap LP의 49.5%가 돈을 잃고 있습니다. 수수료로 $199M을 벌었지만, IL로 $260M을 잃었습니다. IL Alpha는 위험할 때 LP를 끕니다.">49.5% of Uniswap LPs lose money. They earned $199M in fees but lost $260M to impermanent loss. IL Alpha turns LP off when it's dangerous.</p>
+  <div class="hero-eyebrow" data-ko="DAO 트레저리를 위한">For DAO Treasuries</div>
+  <h1 class="reveal" data-ko-html="트레저리 자본 보전과 <em>LP 수준의 수익률</em>">Treasury capital preservation with <em>LP-level returns</em></h1>
+  <p class="hero-sub reveal" data-ko="$24.5B의 DAO 트레저리가 IL 때문에 유휴 상태입니다. IL Alpha는 위험할 때 LP를 끕니다. Sharpe 3.66. Max Drawdown -12%.">$24.5B in DAO treasuries sit idle because LP means impermanent loss. IL Alpha turns LP off when it's dangerous. Sharpe 3.66. Max Drawdown -12%.</p>
 </section>
 
 <!-- THE PROBLEM -->
 <section class="section reveal">
   <div class="section-label" data-ko="문제">The Problem</div>
-  <h2 data-ko="대부분의 LP는 돈을 잃고 있습니다">Most LPs are losing money</h2>
+  <h2 data-ko="DAO 트레저리는 LP 수익에 안전하게 접근할 수 없습니다">DAO treasuries can't access LP yield safely</h2>
   <div class="stats-grid">
     <div class="stat-cell">
+      <div class="stat-value" data-ko="$24.5B">$24.5B</div>
+      <div class="stat-label" data-ko="DAO 트레저리 총 자산">in DAO treasury assets</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-value" data-ko="67%">67%</div>
+      <div class="stat-label" data-ko="유휴 상태인 DAO 트레저리 비율">of DAO treasury capital sitting idle at 0% yield</div>
+    </div>
+    <div class="stat-cell">
       <div class="stat-value" data-ko="49.5%">49.5%</div>
-      <div class="stat-label" data-ko="수익보다 IL이 큰 LP 비율">of LPs lose more to IL than they earn in fees</div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-value" data-ko="-$61M">-$61M</div>
-      <div class="stat-label" data-ko="V3 LP 순손실 (수수료 $199M - IL $260M)">net loss across V3 LPs (fees $199M − IL $260M)</div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-value" data-ko="80%">80%</div>
-      <div class="stat-label" data-ko="IL이 수수료를 초과하는 풀 비율">of pools where IL exceeds fee revenue</div>
+      <div class="stat-label" data-ko="수익보다 IL이 큰 LP 비율 — 거버넌스가 LP를 거부하는 이유">of LPs lose money — why governance rejects LP proposals</div>
     </div>
     <div class="stat-cell">
       <div class="stat-value" data-ko="4배">4×</div>
-      <div class="stat-label" data-ko="V3 집중 유동성으로 인한 IL 증폭">IL amplification from V3 concentrated liquidity</div>
+      <div class="stat-label" data-ko="V3/V4 집중 유동성으로 인한 IL 증폭">IL amplification from concentrated liquidity</div>
     </div>
   </div>
-  <p class="body" data-ko="V3의 집중 유동성은 수수료를 증가시켰지만, 동시에 비영구적 손실도 4배 증폭시켰습니다. V4도 마찬가지입니다. 모든 경쟁 LP 매니저는 변동성이 높을 때 LP를 풀에 유지합니다. 우리만 완전히 제거합니다.">V3 concentrated liquidity increased fees but also amplified impermanent loss by 4×. V4 is no different. Every competing LP manager keeps your position in the pool during volatility. We remove it entirely.</p>
+  <p class="body" data-ko="DAO 트레저리는 LP 수익률(15%+)을 원하지만, LP 참여자의 49.5%가 손실을 보는 현실에서 거버넌스 승인이 불가능합니다. 모든 경쟁 LP 매니저는 변동성이 높을 때 LP를 풀에 유지합니다. 우리만 완전히 제거합니다.">DAO treasuries want LP-level yields (15%+), but governance can't approve a strategy where 49.5% of participants lose money. Every competing LP manager keeps positions in the pool during volatility. We remove them entirely.</p>
 </section>
 
 <!-- OUR SOLUTION -->
@@ -193,24 +193,24 @@
 <!-- BACKTEST -->
 <section class="section reveal">
   <div class="section-label" data-ko="백테스트 결과">Backtest Results</div>
-  <h2 data-ko="실제 데이터로 검증됨">Validated on real data</h2>
-  <p class="body" data-ko="2024년 1월부터 2026년 3월까지 실제 ETH/USDC 가격 데이터. 상승장과 하락장을 모두 포함한 전체 시장 사이클.">Real ETH/USDC price data from January 2024 to March 2026. Full market cycle covering both bull and bear regimes.</p>
+  <h2 data-ko="트레저리급 리스크 지표">Treasury-grade risk metrics</h2>
+  <p class="body" data-ko="2024년 1월부터 2026년 3월까지 실제 ETH/USDC 가격 데이터. 상승장과 하락장을 모두 포함한 전체 시장 사이클. 거버넌스 제안에 필요한 핵심 지표:">Real ETH/USDC price data from January 2024 to March 2026. Full market cycle covering both bull and bear regimes. Key metrics for governance proposals:</p>
   <div class="stats-grid">
     <div class="stat-cell">
-      <div class="stat-value" style="color:var(--accent);" data-ko="+231%">+231%</div>
-      <div class="stat-label" data-ko="IL Alpha 수익률 (EWMA, fee_share 0.5%)">IL Alpha return (EWMA, fee_share 0.5%)</div>
+      <div class="stat-value" style="color:var(--accent);" data-ko="3.66">3.66</div>
+      <div class="stat-label" data-ko="샤프 비율 (S&P 500 ~0.5 대비 7배)">Sharpe ratio (7× the S&P 500's ~0.5)</div>
     </div>
     <div class="stat-cell">
-      <div class="stat-value" data-ko="3.66">3.66</div>
-      <div class="stat-label" data-ko="샤프 비율">Sharpe ratio</div>
+      <div class="stat-value" style="color:var(--accent);" data-ko="-12%">-12%</div>
+      <div class="stat-label" data-ko="최대 낙폭 (Raw LP -45% 대비 1/4)">max drawdown (vs -45% for raw LP)</div>
     </div>
     <div class="stat-cell">
-      <div class="stat-value" data-ko="-12%">-12%</div>
-      <div class="stat-label" data-ko="최대 낙폭 (IL Alpha)">max drawdown (IL Alpha)</div>
+      <div class="stat-value" data-ko="+231%">+231%</div>
+      <div class="stat-label" data-ko="2년 누적 수익률">cumulative return over 2 years</div>
     </div>
     <div class="stat-cell">
-      <div class="stat-value" style="color:var(--gray-400);" data-ko="-45%">-45%</div>
-      <div class="stat-label" data-ko="최대 낙폭 (HODL)">max drawdown (HODL)</div>
+      <div class="stat-value" data-ko="88%">88%</div>
+      <div class="stat-label" data-ko="최악 시나리오 원금 보전율 (HODL 55%)">capital preserved in worst drawdown (vs 55% HODL)</div>
     </div>
   </div>
   <p class="body" style="font-size:14px; color:var(--gray-500);" data-ko="⚠️ 주의: 백테스트 결과이며 실전 성과를 보장하지 않습니다. fee_share 0.5%는 가정치이며, 실제 비율은 TVL에 따라 달라집니다. 테스트넷 대조군 데이터가 실전 검증을 제공할 것입니다.">⚠️ Caveat: backtest results, not guaranteed. fee_share 0.5% is assumed — real ratio depends on TVL. Testnet control group data will provide real-world validation.</p>
@@ -234,7 +234,23 @@
       <div class="big-number" style="color:var(--white);">67%</div>
     </div>
   </div>
-  <p class="body" data-ko="DAO들이 LP를 하지 않는 이유: 비영구적 손실. 우리는 그 문제를 해결합니다. '트레저리가 LP 수수료를 벌면서, 최악의 손실이 1/4' — 거버넌스 투표를 통과할 수 있는 제안.">DAOs don't LP because of impermanent loss. We solve that. "Your treasury earns LP fees with 1/4 the worst-case loss" — a proposal that passes governance votes.</p>
+  <p class="body" data-ko="DAO들이 LP를 하지 않는 이유: 비영구적 손실. 우리는 그 문제를 해결합니다.">DAOs don't LP because of impermanent loss. We solve that.</p>
+  <table class="fee-table" style="margin-top:32px;">
+    <thead>
+      <tr>
+        <th data-ko="대안">Alternative</th>
+        <th data-ko="수익률">Yield</th>
+        <th data-ko="리스크">Risk</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td data-ko="스테이블코인 보유">Hold stablecoins</td><td>0%</td><td data-ko="없음">None</td></tr>
+      <tr><td>Aave/Compound</td><td>4-5%</td><td data-ko="낮음">Low</td></tr>
+      <tr><td>Lido/stETH</td><td>6-8%</td><td data-ko="ETH 가격 리스크">ETH price risk</td></tr>
+      <tr><td data-ko="직접 LP (Uniswap)">Raw LP (Uniswap)</td><td>15-30%</td><td data-ko="49.5% 손실, DD -45%">49.5% lose, DD -45%</td></tr>
+      <tr class="stage-active"><td><strong>IL Alpha Vault</strong></td><td><strong>15%+</strong></td><td data-ko="Sharpe 3.66, DD -12%"><strong>Sharpe 3.66, DD -12%</strong></td></tr>
+    </tbody>
+  </table>
 </section>
 
 <!-- REVENUE -->
@@ -302,10 +318,36 @@
   <p class="body" data-ko="교훈: (1) 유동성 회계의 반올림 오류는 실제 위협 (2) 감사 예산 $50-150K 필수 (3) 단순한 설계 = 작은 공격 표면">Lesson: (1) rounding errors in liquidity accounting are real threats (2) audit budget $50–150K is non-negotiable (3) simpler design = smaller attack surface.</p>
 </section>
 
+<!-- FOR DAO GOVERNANCE -->
+<section class="section reveal">
+  <div class="section-label" data-ko="DAO 거버넌스를 위한">For DAO Governance</div>
+  <h2 data-ko="거버넌스 투표를 통과시킬 수 있는 제안">A proposal that passes governance</h2>
+  <p class="body" style="margin-bottom:24px;" data-ko="거버넌스 제안서에 포함할 핵심 지표:">Key metrics for your governance proposal:</p>
+  <div class="stats-grid">
+    <div class="stat-cell">
+      <div class="stat-value" style="color:var(--accent);" data-ko="Sharpe 3.66">Sharpe 3.66</div>
+      <div class="stat-label" data-ko="리스크 조정 수익률">Risk-adjusted return</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-value" data-ko="DD -12%">DD -12%</div>
+      <div class="stat-label" data-ko="최대 낙폭 (Raw LP -45% 대비)">Max drawdown (vs -45% raw LP)</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-value" data-ko="0%">0%</div>
+      <div class="stat-label" data-ko="손실 시 수수료 (Performance-fee-only)">Fee when losing (perf-fee-only)</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-value" data-ko="ERC-4626">ERC-4626</div>
+      <div class="stat-label" data-ko="락업 없음, 즉시 인출 가능">No lockup, instant withdrawal</div>
+    </div>
+  </div>
+  <p class="body" data-ko="우리가 거버넌스 제안서 초안을 제공합니다. 테스트넷 성과 데이터, 리스크 분석, 벤치마크 비교 포함. 4주 모니터링 후 성과 리포트 제공.">We provide governance proposal drafts with testnet performance data, risk analysis, and benchmark comparisons. Performance report after 4-week monitoring period.</p>
+</section>
+
 <!-- CTA -->
 <section class="section" style="padding:96px 48px; text-align:center;">
   <h2 style="font-family:var(--display); font-size:clamp(32px,4vw,48px); font-weight:400; margin-bottom:24px;" data-ko="테스트넷에서 검증 중">Verifying on testnet</h2>
-  <p style="font-size:17px; color:var(--gray-500); margin:0 auto 40px; max-width:480px; line-height:1.7;" data-ko="3개 볼트를 동일 조건으로 비교 중입니다. 결과는 공개됩니다.">Three vaults running head-to-head under identical conditions. Results will be published publicly.</p>
+  <p style="font-size:17px; color:var(--gray-500); margin:0 auto 40px; max-width:480px; line-height:1.7;" data-ko="3개 볼트를 동일 조건으로 비교 중입니다. DAO 트레저리 평가를 요청하세요.">Three vaults running head-to-head under identical conditions. Request a treasury assessment.</p>
   <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
     <a href="https://sepolia.etherscan.io/address/0xb3150d39893dc6842bd4c0eb6d0fdab4a6211040" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:8px; font-family:var(--sans); font-weight:600; font-size:15px; background:var(--black); color:var(--white); padding:14px 28px; border-radius:4px; text-decoration:none; transition:opacity 300ms;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'" data-ko="Etherscan에서 보기 →">View on Etherscan →</a>
     <a href="index.html" style="display:inline-flex; align-items:center; gap:8px; font-family:var(--sans); font-weight:500; font-size:15px; color:var(--gray-500); padding:14px 28px; border-radius:4px; border:1px solid var(--gray-200); text-decoration:none; transition:all 300ms;" onmouseover="this.style.borderColor='var(--gray-400)'; this.style.color='var(--black)'" onmouseout="this.style.borderColor='var(--gray-200)'; this.style.color='var(--gray-500)'" data-ko="로드맵 보기">View Roadmap</a>

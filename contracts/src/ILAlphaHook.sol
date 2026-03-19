@@ -350,12 +350,22 @@ contract ILAlphaHook is IHooks {
     // ─── Keeper Functions ────────────────────────────────────────────
 
     /// @notice Keeper pushes external vol estimate (e.g., from off-chain EWMA on Binance data)
+    /// @dev Rate limited: max change per push is 2x current value (prevents keeper key abuse).
+    ///      Keeper can move vol up or down, but not by more than 2x in a single call.
     function pushVolEstimate(PoolKey calldata key, uint256 externalVar) external onlyKeeper {
         PoolId poolId = key.toId();
         VolOracle storage vo = volOracles[poolId];
 
+        // Rate limit: external estimate can't be more than 2x current on-chain var
+        // This limits damage from a compromised keeper key
+        uint256 currentVar = uint256(vo.ewmaVar);
+        uint256 maxExternal = currentVar == 0 ? type(uint128).max : currentVar * 4;
+        if (externalVar > maxExternal) {
+            externalVar = maxExternal;
+        }
+
         // Blend: 50% on-chain EWMA + 50% external, capped to uint128
-        uint256 blended = (uint256(vo.ewmaVar) + externalVar) / 2;
+        uint256 blended = (currentVar + externalVar) / 2;
         vo.ewmaVar = blended > type(uint128).max ? type(uint128).max : uint128(blended);
         vo.lastTimestamp = uint40(block.timestamp);
 

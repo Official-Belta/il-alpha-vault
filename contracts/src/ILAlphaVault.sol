@@ -36,9 +36,11 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
 
     // ─── Errors ──────────────────────────────────────────────────────
     error OnlyOwner();
+    error OnlyKeeper();
     error OnlyPoolManager();
     error Paused();
     error DepositTooSmall();
+    error DepositCapExceeded();
     error Reentrancy();
     error InvalidPoolKey();
     error PriceManipulated();
@@ -62,13 +64,17 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
 
     address public owner;
     address public pendingOwner;
+    address public keeper;
     bool public paused;
     bool private _locked;
 
     /// @notice Tracks the liquidity units deployed in the pool
     uint128 public deployedLiquidity;
 
-    /// @notice TWAP manipulation threshold (max tick deviation from TWAP, default ±500 ticks ≈ ±5%)
+    /// @notice Maximum total deposits allowed (default $10K USDC = 10_000e6)
+    uint256 public depositCap = 10_000e6;
+
+    /// @notice TWAP manipulation threshold (max tick deviation, default ±500 ticks ≈ ±5%)
     int24 public twapThreshold = 500;
 
     /// @notice Withdrawal fee in basis points (default 10 = 0.1%)
@@ -92,6 +98,7 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
         poolManager = _poolManager;
         hook = _hook;
         owner = msg.sender;
+        keeper = msg.sender;
     }
 
     // ─── Modifiers ───────────────────────────────────────────────────
@@ -102,6 +109,11 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
 
     modifier whenNotPaused() {
         if (paused) revert Paused();
+        _;
+    }
+
+    modifier onlyKeeper() {
+        if (msg.sender != keeper && msg.sender != owner) revert OnlyKeeper();
         _;
     }
 
@@ -141,14 +153,22 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
         returns (uint256 shares)
     {
         if (assets < VIRTUAL_ASSETS) revert DepositTooSmall();
-        _checkTWAP(); // Prevent deposit at manipulated price
+        if (totalAssets() + assets > depositCap) revert DepositCapExceeded();
+        _checkTWAP();
         shares = super.deposit(assets, receiver);
+    }
+
+    /// @notice ERC-4626 maxDeposit — enforces deposit cap
+    function maxDeposit(address) public view override returns (uint256) {
+        uint256 total = totalAssets();
+        return total >= depositCap ? 0 : depositCap - total;
     }
 
     // ─── Rebalance ───────────────────────────────────────────────────
 
     /// @notice Rebalance vault: add/remove LP based on hook signal
-    function rebalance() external whenNotPaused nonReentrant {
+    /// @dev Restricted to keeper/owner — prevents random callers from timing rebalances
+    function rebalance() external onlyKeeper whenNotPaused nonReentrant {
         bool shouldLP = hook.isLPActive(poolKey);
         uint256 totalBefore = totalAssets();
         uint128 liquidityBefore = deployedLiquidity;
@@ -387,6 +407,14 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
 
     function setPaused(bool _paused) external onlyOwner {
         paused = _paused;
+    }
+
+    function setKeeper(address _keeper) external onlyOwner {
+        keeper = _keeper;
+    }
+
+    function setDepositCap(uint256 _cap) external onlyOwner {
+        depositCap = _cap;
     }
 
     function setTwapThreshold(int24 _threshold) external onlyOwner {

@@ -104,6 +104,9 @@ contract ILAlphaVaultTest is Test {
         );
 
         vault.setPoolKey(poolKey);
+
+        // Tests use 18-decimal tokens with large amounts — raise cap for testing
+        vault.setDepositCap(type(uint256).max);
     }
 
     // ─── Deposit / Withdraw ──────────────────────────────────────────

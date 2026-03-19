@@ -277,11 +277,20 @@ contract ILAlphaHookTest is Test {
         hook.pushVolEstimate(poolKey, 100e18);
     }
 
-    function test_keeper_pushVolEstimate_maxUint_capped() public {
-        // Push max uint256 — should cap to uint128.max
+    function test_keeper_pushVolEstimate_rateLimited() public {
+        // Set a known baseline first
+        hook.pushVolEstimate(poolKey, 100e18);
+        (uint128 baseline,,,) = hook.volOracles(poolId);
+        assertTrue(baseline > 0);
+
+        // Try to push a huge value — should be rate-limited to 4x baseline
         hook.pushVolEstimate(poolKey, type(uint256).max);
-        (uint128 ewmaVar,,,) = hook.volOracles(poolId);
-        assertEq(ewmaVar, type(uint128).max, "Should cap to uint128.max");
+        (uint128 afterPush,,,) = hook.volOracles(poolId);
+
+        // Result should be (baseline + min(max, baseline*4)) / 2 = (baseline + baseline*4) / 2 = baseline*2.5
+        // Not uint128.max — rate limiting worked
+        assertTrue(afterPush > baseline, "Should increase");
+        assertTrue(afterPush < baseline * 4, "Should be rate-limited, not 4x+");
     }
 
     function test_keeper_triggerEvaluation_cooldown() public {

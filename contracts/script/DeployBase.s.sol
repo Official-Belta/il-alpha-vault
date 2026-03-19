@@ -99,11 +99,18 @@ contract DeployBase is Script {
         console.log("Token0:       ", token0);
         console.log("Token1:       ", token1);
         console.log("Pool fee:      3000 (0.3%)");
+        console.log("Deposit cap:   10,000 USDC");
         console.log("Owner:        ", deployer);
         console.log("");
-        console.log("NEXT STEPS:");
-        console.log("1. Deposit USDC: vault.deposit(amount, yourAddress)");
-        console.log("2. Set keeper: hook.setKeeper(keeperAddress)");
-        console.log("3. Start keeper bot with --rpc-url https://mainnet.base.org");
+        console.log("=== SECURITY CHECKLIST (do ALL before depositing) ===");
+        console.log("1. Create SEPARATE keeper wallet (new EOA)");
+        console.log("2. hook.setKeeper(keeperAddress)");
+        console.log("3. vault.setKeeper(keeperAddress)");
+        console.log("4. Fund keeper wallet with ~0.01 ETH for gas");
+        console.log("5. Transfer ownership to Gnosis Safe multi-sig:");
+        console.log("   hook.transferOwnership(safeAddress)");
+        console.log("   vault.transferOwnership(safeAddress)");
+        console.log("   Then from Safe: hook.acceptOwnership() + vault.acceptOwnership()");
+        console.log("6. ONLY THEN: vault.deposit(amount, yourAddress)");
     }
 }

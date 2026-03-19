@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IL Alpha — Vault</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<style>
+  :root { --black:#0C0C0C; --white:#FAFAF9; --gray-100:#F5F5F4; --gray-200:#E7E5E4; --gray-300:#D6D3D1; --gray-400:#A8A29E; --gray-500:#78716C; --gray-600:#57534E; --gray-700:#44403C; --gray-800:#292524; --gray-900:#1C1917; --accent:#1A7F64; --red:#EF4444; --display:'Playfair Display',Georgia,serif; --sans:'Geist Sans','Satoshi',system-ui,sans-serif; --mono:'Geist Mono','SF Mono',monospace; --ease:cubic-bezier(0.25,0.46,0.45,0.94); }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:var(--sans); background:var(--white); color:var(--black); -webkit-font-smoothing:antialiased; }
+  ::selection { background:var(--black); color:var(--white); }
+
+  .unaudited { background:var(--gray-900); color:var(--gray-400); font-family:var(--mono); font-size:12px; text-align:center; padding:10px 48px; letter-spacing:0.06em; }
+  .unaudited strong { color:var(--white); }
+
+  nav { position:sticky; top:0; z-index:100; padding:0 48px; height:64px; display:flex; align-items:center; justify-content:space-between; background:rgba(250,250,249,0.92); backdrop-filter:blur(20px); border-bottom:1px solid var(--gray-200); }
+  .logo { font-family:var(--sans); font-weight:700; font-size:18px; letter-spacing:-0.03em; color:var(--black); text-decoration:none; }
+  .nav-links { display:flex; align-items:center; gap:28px; }
+  .nav-links a { font-size:15px; font-weight:500; color:var(--gray-600); text-decoration:none; transition:color 300ms var(--ease); }
+  .nav-links a:hover { color:var(--black); }
+  .nav-links a.active { color:var(--black); font-weight:700; border-bottom:2px solid var(--accent); padding-bottom:2px; }
+  .nav-live::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-right:6px; animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+  .hamburger { display:none; background:none; border:none; cursor:pointer; padding:8px; color:var(--gray-600); }
+  .hamburger svg { width:24px; height:24px; }
+  .mobile-menu { display:none; position:fixed; top:64px; left:0; right:0; background:var(--white); border-bottom:1px solid var(--gray-200); padding:16px 24px; z-index:99; flex-direction:column; gap:16px; }
+  .mobile-menu.open { display:flex; }
+  .mobile-menu a { font-size:16px; font-weight:500; color:var(--gray-600); text-decoration:none; padding:8px 0; }
+  @media (max-width:640px) { .nav-links a.hm { display:none; } .hamburger { display:block; } nav { padding:0 24px; } }
+  .lang-btn { position:relative; display:flex; align-items:center; gap:6px; font-family:var(--sans); font-size:14px; font-weight:500; color:var(--gray-500); background:transparent; border:1px solid var(--gray-200); border-radius:100px; padding:6px 14px; cursor:pointer; transition:all 200ms var(--ease); }
+  .lang-btn:hover { color:var(--black); border-color:var(--gray-400); }
+  .lang-btn svg { width:16px; height:16px; }
+  .lang-dropdown { position:absolute; top:calc(100% + 8px); right:0; background:var(--white); border:1px solid var(--gray-200); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); overflow:hidden; opacity:0; transform:translateY(-4px); pointer-events:none; transition:all 200ms var(--ease); min-width:140px; z-index:200; }
+  .lang-dropdown.open { opacity:1; transform:translateY(0); pointer-events:auto; }
+  .lang-option { display:flex; align-items:center; gap:10px; padding:12px 16px; font-size:14px; font-weight:500; color:var(--gray-600); cursor:pointer; transition:background 150ms var(--ease); }
+  .lang-option:hover { background:var(--gray-100); }
+  .lang-option.active { color:var(--accent); }
+
+  .vault-page { max-width:720px; margin:0 auto; padding:96px 48px 64px; }
+  @media (max-width:640px) { .vault-page { padding:80px 24px 48px; } }
+
+  .vault-header { margin-bottom:48px; }
+  .vault-eyebrow { font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+  .vault-eyebrow .dot { width:8px; height:8px; border-radius:50%; background:var(--accent); animation:pulse 2s ease-in-out infinite; }
+  .vault-title { font-family:var(--display); font-size:clamp(32px,5vw,48px); font-weight:400; letter-spacing:-0.025em; margin-bottom:16px; }
+  .vault-sub { font-size:17px; color:var(--gray-500); line-height:1.6; }
+
+  .connect-btn { font-family:var(--sans); font-size:15px; font-weight:600; background:var(--black); color:var(--white); border:none; padding:14px 28px; border-radius:4px; cursor:pointer; transition:opacity 200ms var(--ease); margin-bottom:48px; display:inline-block; }
+  .connect-btn:hover { opacity:0.85; }
+  .connect-btn.connected { background:var(--accent); }
+
+  .stats-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; border:1px solid var(--gray-200); border-radius:8px; overflow:hidden; margin-bottom:48px; }
+  @media (max-width:640px) { .stats-grid { grid-template-columns:1fr; } }
+  .stat { padding:24px; border-right:1px solid var(--gray-200); }
+  .stat:last-child { border-right:none; }
+  @media (max-width:640px) { .stat { border-right:none; border-bottom:1px solid var(--gray-200); } .stat:last-child { border-bottom:none; } }
+  .stat-label { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:6px; }
+  .stat-value { font-family:var(--mono); font-size:22px; font-weight:700; letter-spacing:-0.02em; }
+  .stat-sub { font-family:var(--mono); font-size:12px; color:var(--gray-400); margin-top:4px; }
+
+  .action-section { margin-bottom:48px; }
+  .action-label { font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:16px; display:flex; align-items:center; gap:12px; }
+  .action-label::after { content:''; flex:1; max-width:48px; height:1px; background:var(--gray-300); }
+  .action-row { display:flex; gap:12px; align-items:stretch; }
+  @media (max-width:640px) { .action-row { flex-direction:column; } }
+  .action-input { flex:1; font-family:var(--mono); font-size:18px; padding:16px 20px; border:1px solid var(--gray-200); border-radius:4px; background:var(--white); color:var(--black); outline:none; transition:border-color 200ms var(--ease); }
+  .action-input:focus { border-color:var(--black); }
+  .action-input::placeholder { color:var(--gray-400); }
+  .action-btn { font-family:var(--sans); font-size:15px; font-weight:600; padding:16px 32px; border:none; border-radius:4px; cursor:pointer; transition:all 200ms var(--ease); white-space:nowrap; }
+  .action-btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn-deposit { background:var(--black); color:var(--white); }
+  .btn-deposit:hover:not(:disabled) { opacity:0.85; }
+  .btn-withdraw { background:var(--white); color:var(--black); border:1px solid var(--gray-200); }
+  .btn-withdraw:hover:not(:disabled) { border-color:var(--black); }
+  .action-info { font-family:var(--mono); font-size:13px; color:var(--gray-500); margin-top:10px; }
+
+  .balance-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .balance-label { font-family:var(--mono); font-size:12px; color:var(--gray-500); }
+  .max-btn { font-family:var(--mono); font-size:11px; color:var(--accent); background:none; border:none; cursor:pointer; text-transform:uppercase; letter-spacing:0.06em; font-weight:600; }
+  .max-btn:hover { text-decoration:underline; }
+
+  .tx-status { font-family:var(--mono); font-size:13px; padding:12px 16px; border-radius:4px; margin-top:12px; display:none; }
+  .tx-pending { background:rgba(26,127,100,0.06); color:var(--accent); display:block; }
+  .tx-success { background:rgba(26,127,100,0.06); color:var(--accent); display:block; }
+  .tx-error { background:rgba(239,68,68,0.06); color:var(--red); display:block; }
+
+  .contract-link { font-family:var(--mono); font-size:13px; color:var(--gray-500); margin-top:48px; padding-top:24px; border-top:1px solid var(--gray-200); }
+  .contract-link a { color:var(--gray-500); text-decoration:none; }
+  .contract-link a:hover { color:var(--black); }
+
+  footer { padding:24px 48px; border-top:1px solid var(--gray-200); }
+  footer span { font-family:var(--mono); font-size:11px; color:var(--gray-500); }
+</style>
+</head>
+<body>
+
+<div class="unaudited" data-ko="⚠️ <strong>UNAUDITED</strong> — 감사 전 소프트웨어. 본인 책임 하에 사용하세요.">⚠️ <strong>UNAUDITED</strong> — Pre-audit software. Use at your own risk.</div>
+
+<nav>
+  <a class="logo" href="index.html">IL Alpha</a>
+  <div class="nav-links">
+    <a href="index.html#roadmap" class="hm" data-ko="로드맵">Roadmap</a>
+    <a href="vault.html" class="hm active" data-ko="볼트">Vault</a>
+    <a href="thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
+    <a href="dashboard/dashboard.html" class="hm nav-live" data-ko="라이브">Live</a>
+    <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div style="position:relative;">
+      <button class="lang-btn" onclick="document.querySelector('.lang-dropdown').classList.toggle('open')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span id="langLabel">EN</span>
+      </button>
+      <div class="lang-dropdown">
+        <div class="lang-option active" data-lang="en" onclick="setLang('en')">English</div>
+        <div class="lang-option" data-lang="ko" onclick="setLang('ko')">한국어</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-menu">
+  <a href="index.html#roadmap" data-ko="로드맵" onclick="this.parentElement.classList.remove('open')">Roadmap</a>
+  <a href="vault.html" class="active" data-ko="볼트">Vault</a>
+  <a href="thesis.html" data-ko="투자 논문">Thesis</a>
+  <a href="dashboard/dashboard.html" data-ko="라이브">Live</a>
+</div>
+
+<div class="vault-page">
+
+  <div class="vault-header">
+    <div class="vault-eyebrow"><span class="dot"></span> <span data-ko="Base 메인넷">Base Mainnet</span></div>
+    <h1 class="vault-title" data-ko="IL Alpha Vault">IL Alpha Vault</h1>
+    <p class="vault-sub" data-ko="변동성이 높을 때 자동으로 LP를 제거합니다. ERC-4626. 락업 없음.">Automatically removes LP when volatility spikes. ERC-4626. No lockup.</p>
+  </div>
+
+  <button class="connect-btn" id="connectBtn" onclick="connectWallet()" data-ko="지갑 연결">Connect Wallet</button>
+
+  <div class="stats-grid">
+    <div class="stat">
+      <div class="stat-label" data-ko="총 자산">Total Assets</div>
+      <div class="stat-value" id="totalAssets">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label" data-ko="셰어 가격">Share Price</div>
+      <div class="stat-value" id="sharePrice">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label" data-ko="LP 상태">LP Status</div>
+      <div class="stat-value" id="lpStatus">—</div>
+      <div class="stat-sub" id="depositCap"></div>
+    </div>
+  </div>
+
+  <div class="action-section" id="depositSection" style="display:none;">
+    <div class="action-label" data-ko="입금">Deposit</div>
+    <div class="balance-row">
+      <span class="balance-label" data-ko="USDC 잔액">USDC Balance: <span id="usdcBalance">—</span></span>
+      <button class="max-btn" onclick="setMax('deposit')">MAX</button>
+    </div>
+    <div class="action-row">
+      <input class="action-input" id="depositAmount" type="number" placeholder="0.00" min="1" step="0.01">
+      <button class="action-btn btn-deposit" id="depositBtn" onclick="doDeposit()" disabled data-ko="입금">Deposit</button>
+    </div>
+    <div class="action-info" id="depositInfo"></div>
+    <div class="tx-status" id="depositTx"></div>
+  </div>
+
+  <div class="action-section" id="withdrawSection" style="display:none;">
+    <div class="action-label" data-ko="출금">Withdraw</div>
+    <div class="balance-row">
+      <span class="balance-label" data-ko="Vault 셰어">Vault Shares: <span id="shareBalance">—</span></span>
+      <button class="max-btn" onclick="setMax('withdraw')">MAX</button>
+    </div>
+    <div class="action-row">
+      <input class="action-input" id="withdrawAmount" type="number" placeholder="0.00" min="0.01" step="0.01">
+      <button class="action-btn btn-withdraw" id="withdrawBtn" onclick="doWithdraw()" disabled data-ko="출금">Withdraw</button>
+    </div>
+    <div class="action-info" id="withdrawInfo"></div>
+    <div class="tx-status" id="withdrawTx"></div>
+  </div>
+
+  <div class="contract-link">
+    <span data-ko="컨트랙트:">Contract:</span> <a id="contractLink" href="#" target="_blank" rel="noopener"><span id="contractAddr">—</span> ↗</a>
+  </div>
+</div>
+
+<footer><span>&copy; 2026 IL Alpha</span></footer>
+
+<script>
+// --- CONFIG ---
+const BASE_CHAIN_ID = 8453;
+const VAULT_ADDRESS = '0x0000000000000000000000000000000000000000'; // TODO: replace after Base deploy
+const USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'; // Base USDC
+const BASESCAN = 'https://basescan.org';
+
+const VAULT_ABI = [
+  'function deposit(uint256 assets, address receiver) external returns (uint256)',
+  'function withdraw(uint256 assets, address receiver, address owner) external returns (uint256)',
+  'function totalAssets() external view returns (uint256)',
+  'function balanceOf(address) external view returns (uint256)',
+  'function convertToShares(uint256 assets) external view returns (uint256)',
+  'function convertToAssets(uint256 shares) external view returns (uint256)',
+  'function maxDeposit(address) external view returns (uint256)',
+  'function depositCap() external view returns (uint256)',
+  'function paused() external view returns (bool)',
+  'function getVaultMetrics() external view returns (uint256,uint256,uint256,uint128,uint256,bool,bool)',
+  'function UNAUDITED() external view returns (bool)'
+];
+
+const ERC20_ABI = [
+  'function balanceOf(address) external view returns (uint256)',
+  'function allowance(address owner, address spender) external view returns (uint256)',
+  'function approve(address spender, uint256 amount) external returns (bool)',
+  'function decimals() external view returns (uint8)'
+];
+
+let provider, signer, vault, usdc, userAddress;
+
+// --- WALLET ---
+async function connectWallet() {
+  if (!window.ethereum) {
+    alert('No wallet detected. Please install Rabby or MetaMask.');
+    return;
+  }
+  try {
+    provider = new ethers.BrowserProvider(window.ethereum);
+    const network = await provider.getNetwork();
+    if (Number(network.chainId) !== BASE_CHAIN_ID) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x' + BASE_CHAIN_ID.toString(16) }]
+        });
+        provider = new ethers.BrowserProvider(window.ethereum);
+      } catch (e) {
+        alert('Please switch to Base network.');
+        return;
+      }
+    }
+    signer = await provider.getSigner();
+    userAddress = await signer.getAddress();
+    vault = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, signer);
+    usdc = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, signer);
+
+    const btn = document.getElementById('connectBtn');
+    btn.textContent = userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+    btn.classList.add('connected');
+
+    document.getElementById('depositSection').style.display = 'block';
+    document.getElementById('withdrawSection').style.display = 'block';
+    document.getElementById('contractLink').href = BASESCAN + '/address/' + VAULT_ADDRESS;
+    document.getElementById('contractAddr').textContent = VAULT_ADDRESS.slice(0, 10) + '...' + VAULT_ADDRESS.slice(-8);
+
+    await refreshData();
+    document.getElementById('depositBtn').disabled = false;
+    document.getElementById('withdrawBtn').disabled = false;
+
+    // Listen for input changes
+    document.getElementById('depositAmount').addEventListener('input', updateDepositPreview);
+    document.getElementById('withdrawAmount').addEventListener('input', updateWithdrawPreview);
+  } catch (e) {
+    console.error(e);
+    alert('Connection failed: ' + e.message);
+  }
+}
+
+// --- DATA ---
+async function refreshData() {
+  try {
+    const [metrics, usdcBal, shares] = await Promise.all([
+      vault.getVaultMetrics(),
+      usdc.balanceOf(userAddress),
+      vault.balanceOf(userAddress)
+    ]);
+
+    const totalAssetsVal = Number(metrics[0]) / 1e6;
+    const sharePrice = Number(metrics[4]) / 1e6;
+    const lpActive = metrics[5];
+    const isPaused = metrics[6];
+
+    document.getElementById('totalAssets').textContent = formatUSDC(totalAssetsVal);
+    document.getElementById('sharePrice').textContent = '$' + sharePrice.toFixed(4);
+    document.getElementById('lpStatus').textContent = lpActive ? 'LP ON' : 'LP OFF';
+    document.getElementById('lpStatus').style.color = lpActive ? 'var(--accent)' : 'var(--gray-500)';
+
+    const maxDep = await vault.maxDeposit(userAddress);
+    document.getElementById('depositCap').textContent = 'Cap: ' + formatUSDC(Number(maxDep) / 1e6) + ' remaining';
+
+    document.getElementById('usdcBalance').textContent = formatUSDC(Number(usdcBal) / 1e6);
+    document.getElementById('shareBalance').textContent = formatUSDC(Number(shares) / 1e6);
+
+    if (isPaused) {
+      document.getElementById('depositBtn').disabled = true;
+      document.getElementById('depositInfo').textContent = 'Vault is paused. Deposits disabled.';
+    }
+  } catch (e) {
+    console.error('Data refresh error:', e);
+  }
+}
+
+// --- PREVIEWS ---
+async function updateDepositPreview() {
+  const val = document.getElementById('depositAmount').value;
+  if (!val || Number(val) <= 0) { document.getElementById('depositInfo').textContent = ''; return; }
+  try {
+    const assets = ethers.parseUnits(val, 6);
+    const shares = await vault.convertToShares(assets);
+    document.getElementById('depositInfo').textContent = 'You receive: ' + formatUSDC(Number(shares) / 1e6) + ' shares';
+  } catch (e) { document.getElementById('depositInfo').textContent = ''; }
+}
+
+async function updateWithdrawPreview() {
+  const val = document.getElementById('withdrawAmount').value;
+  if (!val || Number(val) <= 0) { document.getElementById('withdrawInfo').textContent = ''; return; }
+  try {
+    const assets = ethers.parseUnits(val, 6);
+    const sharesNeeded = await vault.convertToShares(assets);
+    document.getElementById('withdrawInfo').textContent = 'Burns: ' + formatUSDC(Number(sharesNeeded) / 1e6) + ' shares';
+  } catch (e) { document.getElementById('withdrawInfo').textContent = ''; }
+}
+
+// --- ACTIONS ---
+async function doDeposit() {
+  const val = document.getElementById('depositAmount').value;
+  if (!val || Number(val) <= 0) return;
+  const txEl = document.getElementById('depositTx');
+  try {
+    const assets = ethers.parseUnits(val, 6);
+
+    // Check allowance
+    const allowance = await usdc.allowance(userAddress, VAULT_ADDRESS);
+    if (allowance < assets) {
+      txEl.className = 'tx-status tx-pending';
+      txEl.textContent = 'Approving USDC...';
+      const approveTx = await usdc.approve(VAULT_ADDRESS, ethers.MaxUint256);
+      await approveTx.wait();
+    }
+
+    txEl.className = 'tx-status tx-pending';
+    txEl.textContent = 'Depositing...';
+    const tx = await vault.deposit(assets, userAddress);
+    await tx.wait();
+
+    txEl.className = 'tx-status tx-success';
+    txEl.innerHTML = 'Deposit confirmed. <a href="' + BASESCAN + '/tx/' + tx.hash + '" target="_blank" style="color:var(--accent)">View ↗</a>';
+    document.getElementById('depositAmount').value = '';
+    await refreshData();
+  } catch (e) {
+    txEl.className = 'tx-status tx-error';
+    txEl.textContent = 'Error: ' + (e.reason || e.message).slice(0, 80);
+  }
+}
+
+async function doWithdraw() {
+  const val = document.getElementById('withdrawAmount').value;
+  if (!val || Number(val) <= 0) return;
+  const txEl = document.getElementById('withdrawTx');
+  try {
+    const assets = ethers.parseUnits(val, 6);
+    txEl.className = 'tx-status tx-pending';
+    txEl.textContent = 'Withdrawing...';
+    const tx = await vault.withdraw(assets, userAddress, userAddress);
+    await tx.wait();
+
+    txEl.className = 'tx-status tx-success';
+    txEl.innerHTML = 'Withdrawal confirmed. <a href="' + BASESCAN + '/tx/' + tx.hash + '" target="_blank" style="color:var(--accent)">View ↗</a>';
+    document.getElementById('withdrawAmount').value = '';
+    await refreshData();
+  } catch (e) {
+    txEl.className = 'tx-status tx-error';
+    txEl.textContent = 'Error: ' + (e.reason || e.message).slice(0, 80);
+  }
+}
+
+function setMax(type) {
+  if (type === 'deposit') {
+    const bal = document.getElementById('usdcBalance').textContent.replace(/,/g, '');
+    document.getElementById('depositAmount').value = bal;
+    updateDepositPreview();
+  } else {
+    const shares = document.getElementById('shareBalance').textContent.replace(/,/g, '');
+    document.getElementById('withdrawAmount').value = shares;
+    updateWithdrawPreview();
+  }
+}
+
+function formatUSDC(n) { return Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+// --- i18n ---
+let currentLang = localStorage.getItem('lang') || 'en';
+const langLabel = document.getElementById('langLabel');
+const dropdown = document.querySelector('.lang-dropdown');
+function setLang(lang) { currentLang = lang; localStorage.setItem('lang', lang); dropdown.classList.remove('open'); applyLang(); }
+function applyLang() {
+  langLabel.textContent = currentLang === 'en' ? 'EN' : 'KR';
+  document.documentElement.lang = currentLang === 'ko' ? 'ko' : 'en';
+  document.querySelectorAll('.lang-option').forEach(o => o.classList.toggle('active', o.dataset.lang === currentLang));
+  document.querySelectorAll('[data-ko],[data-ko-html]').forEach(el => {
+    if (!el.dataset.en) el.dataset.en = el.innerHTML;
+    if (currentLang === 'ko') {
+      if (el.dataset.koHtml) el.innerHTML = el.dataset.koHtml;
+      else if (el.dataset.ko) el.textContent = el.dataset.ko;
+    } else if (el.dataset.en) { el.innerHTML = el.dataset.en; }
+  });
+}
+document.addEventListener('click', e => { if (!e.target.closest('.lang-btn') && !e.target.closest('.lang-dropdown')) dropdown.classList.remove('open'); });
+if (currentLang === 'ko') applyLang();
+
+// Auto-refresh every 30s if connected
+setInterval(() => { if (vault) refreshData(); }, 30000);
+</script>
+</body>
+</html>

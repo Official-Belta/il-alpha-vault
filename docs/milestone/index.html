@@ -197,13 +197,11 @@
 </head>
 <body>
 
-<div class="unaudited" data-ko="⚠️ <strong>UNAUDITED</strong> — 감사 전 소프트웨어. 본인 책임 하에 사용하세요.">⚠️ <strong>UNAUDITED</strong> — Pre-audit software. Use at your own risk.</div>
-
 <nav id="nav">
   <a class="logo" href="#">IL Alpha</a>
   <div class="nav-links">
     <a href="#roadmap" class="hm nav-item" data-section="roadmap" data-ko="로드맵">Roadmap</a>
-    <a href="#contracts" class="hm nav-item" data-section="contracts" data-ko="컨트랙트">Contracts</a>
+    <a href="vault.html" class="hm nav-item" data-ko="볼트">Vault</a>
     <a href="#log" class="hm nav-item" data-section="log" data-ko="빌드 로그">Log</a>
     <a href="thesis.html" class="hm nav-item" data-ko="투자 논문">Thesis</a>
     <a href="dashboard/dashboard.html" class="hm nav-item nav-live" data-ko="라이브">Live</a>
@@ -225,7 +223,7 @@
 
 <div class="mobile-menu">
   <a href="#roadmap" data-ko="로드맵" onclick="this.parentElement.classList.remove('open')">Roadmap</a>
-  <a href="#contracts" data-ko="컨트랙트" onclick="this.parentElement.classList.remove('open')">Contracts</a>
+  <a href="vault.html" data-ko="볼트">Vault</a>
   <a href="#log" data-ko="빌드 로그" onclick="this.parentElement.classList.remove('open')">Log</a>
   <a href="thesis.html" data-ko="투자 논문">Thesis</a>
   <a href="dashboard/dashboard.html" data-ko="라이브">Live</a>
@@ -458,38 +456,12 @@
   </div>
 </section>
 
-<section class="section-light" id="contracts">
+<section class="section-light" id="vault">
   <div class="section-inner">
-    <div class="section-eyebrow" data-ko="온체인">On-Chain</div>
-    <h2 class="section-title reveal" data-ko="배포된 컨트랙트">Deployed Contracts</h2>
-    <div class="contracts-grid reveal">
-      <div class="contract">
-        <div class="contract-name">ILAlphaHook <span class="tag">Core</span></div>
-        <div class="contract-desc" data-ko="V4 훅 — 변동성 오라클, LP 온/오프 신호">V4 hook — volatility oracle, LP on/off signal</div>
-        <div class="contract-addr"><a href="https://basescan.org/address/0xb3150d39893dc6842bd4c0eb6d0fdab4a6211040" target="_blank" rel="noopener">0xb3150d39...a6211040 &nearr;</a></div>
-        <div class="contract-live" data-address="0xb3150d39893dc6842bd4c0eb6d0fdab4a6211040"></div>
-      </div><div class="contract">
-        <div class="contract-name">ILAlphaVault</div>
-        <div class="contract-desc" data-ko="ERC-4626 볼트 — 예치, 수익, 자동 보호">ERC-4626 vault — deposit, earn, auto-protect</div>
-        <div class="contract-addr"><a href="https://basescan.org/address/0x8a4a048e5da48de8dca28686a2d326048796e4b1" target="_blank" rel="noopener">0x8a4a048e...8796e4b1 &nearr;</a></div>
-        <div class="contract-live" data-address="0x8a4a048e5da48de8dca28686a2d326048796e4b1"></div>
-      </div><div class="contract">
-        <div class="contract-name">AlwaysLPVault</div>
-        <div class="contract-desc" data-ko="대조군 — 항상 풀에 있음, 보호 없음">Control — always in pool, no protection</div>
-        <div class="contract-addr"><a href="https://basescan.org/address/0x7f6699ecb6cf92e385fa919fe2810f79b5c52040" target="_blank" rel="noopener">0x7f6699ec...b5c52040 &nearr;</a></div>
-        <div class="contract-live" data-address="0x7f6699ecb6cf92e385fa919fe2810f79b5c52040"></div>
-      </div><div class="contract">
-        <div class="contract-name">HODLVault</div>
-        <div class="contract-desc" data-ko="대조군 — 보유만, LP 없음">Control — hold only, never LP</div>
-        <div class="contract-addr"><a href="https://basescan.org/address/0x979c2460b29c0e8992fed8a3ba0a4284b2a10c0c" target="_blank" rel="noopener">0x979c2460...b2a10c0c &nearr;</a></div>
-        <div class="contract-live" data-address="0x979c2460b29c0e8992fed8a3ba0a4284b2a10c0c"></div>
-      </div><div class="contract">
-        <div class="contract-name">SwapHelper</div>
-        <div class="contract-desc" data-ko="키퍼 통합 — 테스트넷 스왕 실행">Keeper integration — testnet swap execution</div>
-        <div class="contract-addr"><a href="https://basescan.org/address/0x000ae7da3f7c9190fccc359ba4e661df0e7129be" target="_blank" rel="noopener">0x000ae7da...0e7129be &nearr;</a></div>
-        <div class="contract-live" data-address="0x000ae7da3f7c9190fccc359ba4e661df0e7129be"></div>
-      </div>
-    </div>
+    <div class="section-eyebrow" data-ko="볼트">Vault</div>
+    <h2 class="section-title reveal" data-ko="입금 및 출금">Deposit & Withdraw</h2>
+    <p class="phase-desc reveal" data-ko="ERC-4626 볼트. 락업 없음. 성과 수수료만 — 수익 없으면 수수료 없음.">ERC-4626 vault. No lockup. Performance-fee-only — if we don't make money, you don't pay.</p>
+    <a class="btn-white" href="vault.html" style="background:var(--black); color:var(--white); display:inline-flex; align-items:center; gap:8px; font-family:var(--sans); font-weight:600; font-size:15px; padding:14px 28px; border-radius:4px; text-decoration:none; transition:opacity 300ms var(--ease);" data-ko="볼트 열기 →">Open Vault →</a>
   </div>
 </section>
 

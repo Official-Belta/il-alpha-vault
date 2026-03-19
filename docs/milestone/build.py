@@ -272,7 +272,7 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
   <a class="logo" href="../index.html">{esc(proj["name"])}</a>
   <div class="nav-links">
     <a href="../index.html#roadmap" class="hm" data-ko="로드맵">Roadmap</a>
-    <a href="../index.html#contracts" class="hm" data-ko="컨트랙트">Contracts</a>
+    <a href="../vault.html" class="hm" data-ko="볼트">Vault</a>
     <a href="../index.html#log" class="hm active" data-ko="빌드 로그">Log</a>
     <a href="../thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
     <a href="../dashboard/dashboard.html" class="hm nav-live" data-ko="라이브">Live</a>
@@ -294,7 +294,7 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
 
 <div class="mobile-menu">
   <a href="../index.html#roadmap" data-ko="로드맵" onclick="this.parentElement.classList.remove('open')">Roadmap</a>
-  <a href="../index.html#contracts" data-ko="컨트랙트" onclick="this.parentElement.classList.remove('open')">Contracts</a>
+  <a href="../vault.html" data-ko="볼트" onclick="this.parentElement.classList.remove('open')">Vault</a>
   <a href="../index.html#log" data-ko="빌드 로그" onclick="this.parentElement.classList.remove('open')">Log</a>
   <a href="../thesis.html" data-ko="투자 논문">Thesis</a>
   <a href="../dashboard/dashboard.html" data-ko="라이브">Live</a>
@@ -587,13 +587,11 @@ def build_html(roadmap, contracts):
 </head>
 <body>
 
-<div class="unaudited" data-ko="⚠️ <strong>UNAUDITED</strong> — 감사 전 소프트웨어. 본인 책임 하에 사용하세요.">⚠️ <strong>UNAUDITED</strong> — Pre-audit software. Use at your own risk.</div>
-
 <nav id="nav">
   <a class="logo" href="#">{esc(proj["name"])}</a>
   <div class="nav-links">
     <a href="#roadmap" class="hm nav-item" data-section="roadmap" data-ko="{esc(ko_ui.get('roadmap', 'Roadmap'))}">Roadmap</a>
-    <a href="#contracts" class="hm nav-item" data-section="contracts" data-ko="{esc(ko_ui.get('contracts', 'Contracts'))}">Contracts</a>
+    <a href="vault.html" class="hm nav-item" data-ko="볼트">Vault</a>
     <a href="#log" class="hm nav-item" data-section="log" data-ko="빌드 로그">Log</a>
     <a href="thesis.html" class="hm nav-item" data-ko="투자 논문">Thesis</a>
     <a href="dashboard/dashboard.html" class="hm nav-item nav-live" data-ko="라이브">Live</a>
@@ -615,7 +613,7 @@ def build_html(roadmap, contracts):
 
 <div class="mobile-menu">
   <a href="#roadmap" data-ko="{esc(ko_ui.get('roadmap', 'Roadmap'))}" onclick="this.parentElement.classList.remove('open')">Roadmap</a>
-  <a href="#contracts" data-ko="{esc(ko_ui.get('contracts', 'Contracts'))}" onclick="this.parentElement.classList.remove('open')">Contracts</a>
+  <a href="vault.html" data-ko="볼트">Vault</a>
   <a href="#log" data-ko="빌드 로그" onclick="this.parentElement.classList.remove('open')">Log</a>
   <a href="thesis.html" data-ko="투자 논문">Thesis</a>
   <a href="dashboard/dashboard.html" data-ko="라이브">Live</a>
@@ -666,13 +664,12 @@ def build_html(roadmap, contracts):
   </div>
 </section>
 
-<section class="section-light" id="contracts">
+<section class="section-light" id="vault">
   <div class="section-inner">
-    <div class="section-eyebrow" data-ko="{esc(ko_ui.get('on_chain', 'On-Chain'))}">On-Chain</div>
-    <h2 class="section-title reveal" data-ko="{esc(ko_ui.get('deployed_contracts', 'Deployed Contracts'))}">Deployed Contracts</h2>
-    <div class="contracts-grid reveal">
-      {contracts_html}
-    </div>
+    <div class="section-eyebrow" data-ko="볼트">Vault</div>
+    <h2 class="section-title reveal" data-ko="입금 및 출금">Deposit & Withdraw</h2>
+    <p class="phase-desc reveal" data-ko="ERC-4626 볼트. 락업 없음. 성과 수수료만 — 수익 없으면 수수료 없음.">ERC-4626 vault. No lockup. Performance-fee-only — if we don't make money, you don't pay.</p>
+    <a class="btn-white" href="vault.html" style="background:var(--black); color:var(--white); display:inline-flex; align-items:center; gap:8px; font-family:var(--sans); font-weight:600; font-size:15px; padding:14px 28px; border-radius:4px; text-decoration:none; transition:opacity 300ms var(--ease);" data-ko="볼트 열기 →">Open Vault →</a>
   </div>
 </section>
 

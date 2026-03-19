@@ -210,11 +210,11 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{esc(proj["name"])} — {esc(day["date"])}</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap" rel="stylesheet">
-<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet">
 <style>
-  :root {{ --black:#0C0C0C; --white:#FAFAF9; --gray-200:#E7E5E4; --gray-400:#A8A29E; --gray-500:#78716C; --gray-600:#57534E; --gray-700:#44403C; --gray-900:#1C1917; --accent:#1A7F64; --serif:'Playfair Display',Georgia,serif; --sans:'Satoshi',system-ui,sans-serif; --mono:'Geist Mono','SF Mono',monospace; --ease:cubic-bezier(0.25,0.46,0.45,0.94); }}
+  :root {{ --black:#0C0C0C; --white:#FAFAF9; --gray-200:#E7E5E4; --gray-400:#A8A29E; --gray-500:#78716C; --gray-600:#57534E; --gray-700:#44403C; --gray-900:#1C1917; --accent:#1A7F64; --display:'Satoshi',system-ui,sans-serif; --sans:'Geist Sans','Satoshi',system-ui,sans-serif; --mono:'Geist Mono','SF Mono',monospace; --ease:cubic-bezier(0.25,0.46,0.45,0.94); }}
   * {{ margin:0; padding:0; box-sizing:border-box; }}
   body {{ font-family:var(--sans); background:var(--white); color:var(--black); -webkit-font-smoothing:antialiased; }}
   ::selection {{ background:var(--black); color:var(--white); }}
@@ -244,7 +244,7 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
 
   .hero {{ padding:100px 48px 64px; }}
   @media (max-width:640px) {{ .hero {{ padding:80px 24px 48px; }} }}
-  .hero-date {{ font-family:var(--serif); font-size:clamp(36px,5vw,56px); font-weight:400; letter-spacing:-0.025em; margin-bottom:16px; }}
+  .hero-date {{ font-family:var(--display); font-size:clamp(36px,5vw,56px); font-weight:900; letter-spacing:-0.03em; margin-bottom:16px; }}
 
   .detail-section {{ padding:48px 48px; max-width:820px; }}
   .detail-section + .detail-section {{ border-top:1px solid var(--gray-200); margin-top:16px; padding-top:48px; }}
@@ -254,7 +254,7 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
   .detail-cat[data-cat="dev"] {{ color:#00E5A0; background:rgba(0,229,160,0.12); border:1px solid rgba(0,229,160,0.25); }}
   .detail-cat[data-cat="strategy"] {{ color:#F5A623; background:rgba(245,166,35,0.12); border:1px solid rgba(245,166,35,0.25); }}
   .detail-cat[data-cat="design"] {{ color:#60A5FA; background:rgba(96,165,250,0.12); border:1px solid rgba(96,165,250,0.25); }}
-  .detail-title {{ font-family:var(--serif); font-size:clamp(32px,5vw,48px); font-weight:400; letter-spacing:-0.02em; margin-bottom:36px; line-height:1.2; }}
+  .detail-title {{ font-family:var(--display); font-size:clamp(32px,5vw,48px); font-weight:700; letter-spacing:-0.02em; margin-bottom:36px; line-height:1.2; }}
   .detail-items {{ padding-left:20px; display:flex; flex-direction:column; gap:24px; }}
   .detail-items li {{ font-size:18px; color:var(--gray-600); line-height:1.8; }}
 
@@ -392,8 +392,8 @@ def build_html(roadmap, contracts):
 <meta property="og:title" content="{esc(proj["name"])} — Testnet Milestones">
 <meta property="og:description" content="{esc(proj["tagline"])}. Live on {esc(proj["network"])} testnet.">
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap" rel="stylesheet">
-<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet">
 
 <style>
@@ -410,8 +410,8 @@ def build_html(roadmap, contracts):
     --gray-800: #292524;
     --gray-900: #1C1917;
     --accent: #1A7F64;
-    --serif: 'Playfair Display', Georgia, serif;
-    --sans: 'Satoshi', system-ui, sans-serif;
+    --display: 'Satoshi', system-ui, sans-serif;
+    --sans: 'Geist Sans', 'Satoshi', system-ui, sans-serif;
     --mono: 'Geist Mono', 'SF Mono', monospace;
     --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }}
@@ -457,8 +457,8 @@ def build_html(roadmap, contracts):
   .hero {{ background: var(--black); color: var(--white); padding: 180px 48px 120px; min-height: 85vh; display: flex; flex-direction: column; justify-content: flex-end; }}
   @media (max-width: 640px) {{ .hero {{ padding: 140px 24px 80px; min-height: 70vh; }} }}
   .hero-eyebrow {{ font-family: var(--mono); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 32px; }}
-  .hero h1 {{ font-family: var(--serif); font-weight: 400; font-size: clamp(52px,8vw,96px); line-height: 1.08; letter-spacing: -0.025em; max-width: 900px; margin-bottom: 40px; }}
-  .hero h1 em {{ font-style: italic; }}
+  .hero h1 {{ font-family: var(--display); font-weight: 900; font-size: clamp(52px,8vw,96px); line-height: 1.08; letter-spacing: -0.03em; max-width: 900px; margin-bottom: 40px; }}
+  .hero h1 em {{ font-style: normal; color: var(--accent); }}
   .hero-sub {{ font-size: 20px; color: var(--gray-400); max-width: 520px; line-height: 1.7; }}
 
   .metrics-bar {{ background: var(--white); padding: 64px 48px; border-bottom: 1px solid var(--gray-200); }}
@@ -466,7 +466,7 @@ def build_html(roadmap, contracts):
   .metrics-row {{ display: flex; gap: 80px; flex-wrap: wrap; max-width: 960px; }}
   @media (max-width: 640px) {{ .metrics-row {{ gap: 40px; }} }}
   .metric-label {{ font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray-500); margin-bottom: 8px; }}
-  .metric-value {{ font-family: var(--serif); font-size: 42px; font-weight: 400; letter-spacing: -0.03em; line-height: 1.1; }}
+  .metric-value {{ font-family: var(--display); font-size: 42px; font-weight: 900; letter-spacing: -0.03em; line-height: 1.1; }}
 
   .section-light {{ background: var(--white); padding: 96px 48px; border-bottom: 1px solid var(--gray-200); }}
   .section-dark {{ background: var(--black); color: var(--white); padding: 96px 48px; }}
@@ -475,12 +475,12 @@ def build_html(roadmap, contracts):
   .section-eyebrow {{ font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray-500); margin-bottom: 14px; display: flex; align-items: center; gap: 16px; }}
   .section-eyebrow::after {{ content: ''; flex: 1; max-width: 48px; height: 1px; background: var(--gray-300); }}
   .section-dark .section-eyebrow::after {{ background: var(--gray-700); }}
-  .section-title {{ font-family: var(--serif); font-weight: 400; font-size: clamp(36px,5vw,56px); letter-spacing: -0.025em; line-height: 1.15; margin-bottom: 56px; }}
+  .section-title {{ font-family: var(--display); font-weight: 700; font-size: clamp(36px,5vw,56px); letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 56px; }}
 
   .phase {{ display: grid; grid-template-columns: 220px 1fr; gap: 48px; padding: 48px 0; border-top: 1px solid var(--gray-200); }}
   @media (max-width: 768px) {{ .phase {{ grid-template-columns: 1fr; gap: 24px; }} }}
   .phase-label {{ font-family: var(--mono); font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray-500); margin-bottom: 12px; }}
-  .phase-name {{ font-family: var(--serif); font-size: clamp(36px,5vw,48px); font-weight: 400; letter-spacing: -0.02em; margin-bottom: 10px; line-height: 1.2; }}
+  .phase-name {{ font-family: var(--display); font-size: clamp(36px,5vw,48px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px; line-height: 1.2; }}
   .phase-status {{ font-family: var(--mono); font-size: 15px; font-weight: 600; }}
   .status-done {{ color: var(--accent); }}
   .status-active {{ color: var(--black); font-weight: 500; }}
@@ -517,7 +517,7 @@ def build_html(roadmap, contracts):
   .how-item:not(:last-child) {{ border-right: 1px solid rgba(255,255,255,0.06); padding-right: 32px; }}
   .how-item:not(:first-child) {{ padding-left: 32px; }}
   @media (max-width: 640px) {{ .how-item {{ padding: 32px 0 !important; border-right: none !important; }} }}
-  .how-num {{ font-family: var(--serif); font-size: 32px; color: var(--gray-700); margin-bottom: 20px; line-height: 1; }}
+  .how-num {{ font-family: var(--display); font-size: 32px; font-weight: 700; color: var(--gray-700); margin-bottom: 20px; line-height: 1; }}
   .how-name {{ font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }}
   .how-desc {{ font-size: 16px; color: var(--gray-400); line-height: 1.7; }}
 
@@ -536,7 +536,7 @@ def build_html(roadmap, contracts):
   @media (max-width: 640px) {{ .log-section {{ padding: 64px 24px; }} }}
   .log-section .section-eyebrow::after {{ background: var(--gray-700); }}
   .log-day {{ margin-bottom: 56px; }}
-  .log-date {{ font-family: var(--serif); font-size: 28px; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 32px; color: var(--white); }}
+  .log-date {{ font-family: var(--display); font-size: 28px; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 32px; color: var(--white); }}
   .log-cards {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; overflow: hidden; }}
   @media (max-width: 768px) {{ .log-cards {{ grid-template-columns: 1fr; }} }}
   .log-card {{ padding: 32px; background: var(--gray-900); transition: background 300ms var(--ease); cursor: pointer; text-decoration: none; color: inherit; display: block; }}
@@ -557,7 +557,7 @@ def build_html(roadmap, contracts):
 
   .cta {{ background: var(--black); color: var(--white); padding: 120px 48px; }}
   @media (max-width: 640px) {{ .cta {{ padding: 80px 24px; }} }}
-  .cta h2 {{ font-family: var(--serif); font-weight: 400; font-size: clamp(36px,5vw,56px); letter-spacing: -0.025em; line-height: 1.15; margin-bottom: 24px; max-width: 600px; }}
+  .cta h2 {{ font-family: var(--display); font-weight: 700; font-size: clamp(36px,5vw,56px); letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 24px; max-width: 600px; }}
   .cta p {{ font-size: 16px; color: var(--gray-500); margin-bottom: 48px; max-width: 400px; line-height: 1.7; }}
   .cta-row {{ display: flex; gap: 16px; flex-wrap: wrap; }}
   .btn-white {{ display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-weight: 600; font-size: 14px; background: var(--white); color: var(--black); padding: 14px 28px; border-radius: 4px; text-decoration: none; transition: opacity 300ms var(--ease), transform 200ms var(--ease); }}

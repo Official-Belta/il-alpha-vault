@@ -1,57 +1,35 @@
-# ENG Complete — Final Code (Post-Audit Fixes)
+# ENG Complete — V4 Audit Passed, Deploy Ready
 
 Date: 2026-03-20
-Status: **CODE FREEZE. Audit findings resolved. Ready for deployment.**
+Status: **SHIP ✅ — 4라운드 감사 통과. 배포 대기.**
 
 ---
 
-## 최종 수치
+## 감사 결과
 
-- 75 tests | 0 failures
-- Hook 31 + Vault 37 + Controls 7
-- Audit: 38 findings → 20 code fixes applied, rest resolved/documented
+```
+V1 (38건) → V2 (11건) → V3 (10건) → V4 (9건)
+C:4 H:8     C:0 H:2     C:0 H:0     C:0 H:0
+76%          80%          84%          89%
+55점         75점         85점         90점
+```
 
----
-
-## Audit 수정 요약
-
-| 심각도 | 발견 | 수정 |
-|--------|------|------|
-| Critical | 4 | 4 ✅ |
-| High | 8 | 7 ✅ (H-3 Phase 4) |
-| Medium | 10 | 6 ✅ (나머지 이미 해결) |
-| Low | 6 | 3 ✅ (나머지 이미 해결) |
-
-### Critical 수정
-- C-1: 출금수수료 실제 차감 (withdraw/redeem 오버라이드)
-- C-2: mint() 가드 추가 (pause, cap, TWAP, reentrancy)
-- C-3: setPoolKey LP 활성 시 차단
-- C-4: twapThreshold 범위 [10, 2000]
-
-### High 수정
-- H-1: 실제 TWAP (10-observation sliding window)
-- H-2: Slippage 보호 (maxSlippageBps 1%)
-- H-4: pushVol rate limit 2x + zero cap 1e18
-- H-5: withdraw/redeem nonReentrant
-- H-6: AlwaysLP double-count 제거
-- H-7: totalAssets asset 토큰만 계산
-- H-8: 모든 admin setter 이벤트
-
-### Medium 수정
-- M-3: setLPRange tick spacing 정렬 검증
-- M-4: afterInitialize lower == upper 방지
-- M-6: SwapHelper reentrancy + safeTransferFrom
-
-### Low 수정
-- L-4: transferOwnership zero-address 차단
-- L-5: setKeeper zero-address 차단
-- L-6: claimFees 잔액 체크 + zero-address 차단
+- Critical: 0 | High: 0 | ERC-4626 완전 준수
+- 71 tests passing | Maturity 89% | Readiness 90/100
 
 ---
 
-## 배포 준비
+## 배포 전 필수 체크 (Audit 권고)
 
-### Wallet 구성
+- [ ] Gnosis Safe multisig으로 owner 이전
+- [ ] Keeper를 별도 EOA로 분리
+- [ ] Sepolia에서 최신 코드 전체 플로우 재검증
+- [ ] 초기 seed LP는 팀 자금으로만
+
+---
+
+## Wallet 구성
+
 ```
 Deployer:  0x035FD73BD1583BAF23264eEE954aeb8D35d74bC1
 Operator:  0xbE61c1Fe3e6837d627200F46939173a88fe7fAA6
@@ -59,37 +37,47 @@ Treasury:  0x3d740198D9b9702fe27FaC80D6Bfa8704c438e46
 Sentinel:  0x0b034b10d7bB219d4bbdbf5d241380693e3B4c9C
 ```
 
-### 배포 명령어
-```bash
-export PRIVATE_KEY=0x...  # Deployer key
-export RPC_URL=https://mainnet.base.org
-cd contracts
-forge script script/DeployBase.s.sol:DeployBase \
-  --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
-```
+---
 
-### 배포 후 체크리스트
-1. hook.setKeeper(Sentinel 주소)
-2. vault.setKeeper(Sentinel 주소)
-3. hook.transferOwnership(Gnosis Safe) → Safe에서 acceptOwnership
-4. vault.transferOwnership(Gnosis Safe) → Safe에서 acceptOwnership
-5. vault.deposit(seed USDC)
-6. keeper bot 시작 (--rpc-url https://mainnet.base.org)
+## 라이브 링크
+
+- 사이트: https://official-belta.github.io/il-alpha-site/
+- 대시보드: https://official-belta.github.io/il-alpha-site/dashboard/dashboard.html
+- Vault UI: https://official-belta.github.io/il-alpha-site/app.html
+- GitHub: https://github.com/Official-Belta/il-alpha-vault
 
 ---
 
-## 프론트엔드
+## $10K cap 올리기 전 필수 (향후)
 
-- `app/index.html` — 지갑 연결 + deposit/withdraw
-- Live: https://official-belta.github.io/il-alpha-site/app.html
-- 배포 후 CONFIG.VAULT 주소 업데이트 필요
+1. 프로페셔널 감사 (UFSF)
+2. LP 제거 슬리피지 보호
+3. 50/50 split → 단면 LP 전환
+4. pushVolEstimate 시간당 제한
+5. TWAP window 30+ observations
 
 ---
 
-## Audit 대상 파일 (변경 금지)
+## Audit 아카이브
 
 ```
-contracts/src/ILAlphaHook.sol
-contracts/src/ILAlphaVault.sol
-contracts/src/BaseVault.sol
+docs/audit/     — V1 (38 findings, 8 reports)
+docs/audit/v2/  — V2 (11 findings, 8 reports)
+docs/audit/v3/  — V3 (10 findings, 4 reports)
+docs/audit/v4/  — V4 FINAL (9 findings, 2 reports)
 ```
+
+---
+
+## CEO 다음 액션
+
+1. Base mainnet 지갑에 ETH + USDC 입금
+2. Gnosis Safe 생성 (Base)
+3. ENG에게 배포 지시
+4. UFSF 감사 신청 (mainnet 주소 확보 후)
+
+## 디자이너 다음 액션
+
+1. 대시보드 실시간 CSV fetch 구현 (현재 정적 빌드)
+2. app.html에 CONFIG.VAULT 주소 업데이트 (배포 후)
+3. UNAUDITED 배너 유지

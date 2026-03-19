@@ -26,7 +26,7 @@
       "status": "complete",
       "description": "Uniswap V4 hook with on-chain volatility oracle. ERC-4626 vault for deposits. Two control vaults for rigorous apples-to-apples comparison.",
       "items": [
-        { "text": "ILAlphaHook \u2014 beforeSwap volatility check", "status": "done" },
+        { "text": "ILAlphaHook \u2014 afterSwap volatility check", "status": "done" },
         { "text": "ILAlphaVault \u2014 ERC-4626 deposit and withdraw", "status": "done" },
         { "text": "AlwaysLPVault + HODLVault \u2014 control groups", "status": "done" },
         { "text": "65 Solidity tests including fuzz \u2014 zero failures", "status": "done" }
@@ -264,7 +264,7 @@
         "Volatility-based LP on/off signal design": "\ubcc0\ub3d9\uc131 \uae30\ubc18 LP \uc628/\uc624\ud504 \uc2e0\ud638 \uc124\uacc4",
         "Full-cycle backtest outperforms AlwaysLP and HODL": "\uc804\uccb4 \uc0ac\uc774\ud074 \ubc31\ud14c\uc2a4\ud2b8\uc5d0\uc11c AlwaysLP \ubc0f HODL \ub300\ube44 \uc6b0\uc218\ud55c \uc131\uacfc",
         "99 Python tests passing": "99\uac1c Python \ud14c\uc2a4\ud2b8 \ud1b5\uacfc",
-        "ILAlphaHook \u2014 beforeSwap volatility check": "ILAlphaHook \u2014 beforeSwap \ubcc0\ub3d9\uc131 \uac80\uc0ac",
+        "ILAlphaHook \u2014 afterSwap volatility check": "ILAlphaHook \u2014 afterSwap 변동성 검사",
         "ILAlphaVault \u2014 ERC-4626 deposit and withdraw": "ILAlphaVault \u2014 ERC-4626 \uc608\uce58 \ubc0f \uc778\ucd9c",
         "AlwaysLPVault + HODLVault \u2014 control groups": "AlwaysLPVault + HODLVault \u2014 \ub300\uc870\uad70",
         "65 Solidity tests including fuzz \u2014 zero failures": "65\uac1c Solidity \ud14c\uc2a4\ud2b8 (\ud37c\uc988 \ud3ec\ud568) \u2014 \uc2e4\ud328 0",

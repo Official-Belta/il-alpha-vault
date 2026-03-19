@@ -5,3 +5,4 @@ data/raw/
 *.egg-info/
 .env
 contracts/lib/
+.gstack/

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IL Alpha Vault — Roadmap</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --purple: #bc8cff;
+    --orange: #f0883e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 0.25rem;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle { color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem; }
+
+  /* Status bar */
+  .status-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .status-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+  .status-card .label { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .status-card .value { font-size: 1.5rem; font-weight: 700; margin-top: 0.25rem; }
+  .status-card .bar { height: 6px; border-radius: 3px; background: var(--border); margin-top: 0.75rem; overflow: hidden; }
+  .status-card .bar .fill { height: 100%; border-radius: 3px; }
+  .fill-green { background: var(--green); }
+  .fill-yellow { background: var(--yellow); }
+  .fill-muted { background: var(--border); }
+
+  /* Timeline */
+  .timeline { position: relative; margin: 2rem 0; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 28px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .phase {
+    position: relative;
+    margin-bottom: 2rem;
+    padding-left: 72px;
+  }
+  .phase-dot {
+    position: absolute;
+    left: 18px;
+    top: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 3px solid;
+    background: var(--bg);
+    z-index: 1;
+  }
+  .dot-done { border-color: var(--green); background: var(--green); }
+  .dot-active { border-color: var(--accent); animation: pulse 2s infinite; }
+  .dot-future { border-color: var(--border); }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(88, 166, 255, 0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(88, 166, 255, 0); }
+  }
+  .phase-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .phase-title { font-size: 1.25rem; font-weight: 700; }
+  .phase-time { color: var(--text-muted); font-size: 0.85rem; }
+  .phase-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .badge-done { background: rgba(63, 185, 80, 0.15); color: var(--green); }
+  .badge-next { background: rgba(88, 166, 255, 0.15); color: var(--accent); }
+  .badge-future { background: rgba(139, 148, 158, 0.15); color: var(--text-muted); }
+
+  .phase-body {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+  .phase-body ul { list-style: none; }
+  .phase-body li {
+    padding: 0.4rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    color: var(--text);
+    font-size: 0.92rem;
+  }
+  .phase-body li::before {
+    position: absolute;
+    left: 0;
+    top: 0.45rem;
+  }
+  .phase-body li.done::before { content: '✓'; color: var(--green); font-weight: bold; }
+  .phase-body li.todo::before { content: '○'; color: var(--text-muted); }
+  .phase-body li.key::before { content: '★'; color: var(--yellow); }
+  .phase-body li .detail { color: var(--text-muted); font-size: 0.82rem; display: block; margin-top: 2px; }
+
+  /* Revenue model */
+  .revenue-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .rev-card {
+    background: rgba(88, 166, 255, 0.05);
+    border: 1px solid rgba(88, 166, 255, 0.15);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .rev-card .rev-val { font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+  .rev-card .rev-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+  /* Competitive table */
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.88rem;
+  }
+  .comp-table th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 2px solid var(--border);
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .comp-table td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table .yes { color: var(--green); font-weight: 600; }
+  .comp-table .no { color: var(--text-muted); }
+  .comp-table .highlight { background: rgba(88, 166, 255, 0.05); }
+
+  /* TVL projection */
+  .tvl-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+  }
+  .tvl-item { text-align: center; }
+  .tvl-item .tvl-label { font-size: 0.75rem; color: var(--text-muted); }
+  .tvl-item .tvl-value { font-size: 1.1rem; font-weight: 700; margin: 0.25rem 0; }
+  .tvl-item .tvl-rev { font-size: 0.8rem; color: var(--text-muted); }
+  .tvl-track {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+  }
+  .tvl-track .tvl-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--purple));
+  }
+
+  /* B2B segments */
+  .segment-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .segment {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .segment .seg-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.25rem; }
+  .segment .seg-target { color: var(--text-muted); font-size: 0.82rem; }
+  .segment .seg-pitch { color: var(--accent); font-size: 0.85rem; margin-top: 0.5rem; font-style: italic; }
+
+  /* Section headers */
+  .section-header {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 2.5rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Moat */
+  .moat-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 1rem 0; }
+  .moat-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+  }
+  .moat-item .moat-title { font-weight: 600; font-size: 0.9rem; }
+  .moat-item .moat-desc { color: var(--text-muted); font-size: 0.82rem; margin-top: 4px; }
+
+  /* Differentiator callout */
+  .callout {
+    background: rgba(88, 166, 255, 0.08);
+    border-left: 4px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+  }
+  .callout strong { color: var(--accent); }
+
+  .footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>IL Alpha Vault</h1>
+<p class="subtitle">Uniswap V4 Hook-Based Automated LP Vault &mdash; Commercialization Roadmap</p>
+
+<!-- Status Bar -->
+<div class="status-bar">
+  <div class="status-card">
+    <div class="label">Phase 1 &mdash; Python Backtest</div>
+    <div class="value" style="color: var(--green)">100%</div>
+    <div class="bar"><div class="fill fill-green" style="width:100%"></div></div>
+  </div>
+  <div class="status-card">
+    <div class="label">Phase 2 &mdash; Solidity Contracts</div>
+    <div class="value" style="color: var(--green)">100%</div>
+    <div class="bar"><div class="fill fill-green" style="width:100%"></div></div>
+  </div>
+  <div class="status-card">
+    <div class="label">Phase 3 &mdash; Testnet Validation</div>
+    <div class="value" style="color: var(--yellow)">0%</div>
+    <div class="bar"><div class="fill fill-muted" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="callout">
+  <strong>"LP를 끄는 용기"</strong> &mdash; 경쟁사는 항상 LP를 켜놓고 range만 조정합니다. 우리는 EV가 마이너스면 아예 끕니다. IL 방어의 근본적 차이.
+</div>
+
+<!-- Timeline -->
+<div class="section-header">Roadmap Timeline</div>
+
+<div class="timeline">
+
+  <!-- Phase 1 -->
+  <div class="phase">
+    <div class="phase-dot dot-done"></div>
+    <div class="phase-header">
+      <span class="phase-title">Phase 1: Python Backtest</span>
+      <span class="phase-badge badge-done">Complete</span>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li class="done">EWMA vol estimator + shock detector</li>
+        <li class="done">Gamma exposure IL model</li>
+        <li class="done">Full backtest: HODL vs AlwaysLP vs ILAlpha</li>
+        <li class="done">99 tests passing, thesis validated</li>
+        <li class="done">Jupyter notebook: IL-as-gamma-exposure derivation</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Phase 2 -->
+  <div class="phase">
+    <div class="phase-dot dot-done"></div>
+    <div class="phase-header">
+      <span class="phase-title">Phase 2: Solidity Contracts</span>
+      <span class="phase-badge badge-done">Complete</span>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li class="done">ILAlphaHook &mdash; V4 hook with EWMA vol oracle + LP toggle</li>
+        <li class="done">ILAlphaVault &mdash; ERC-4626 with virtual shares, reentrancy guard</li>
+        <li class="done">Volume-aware fee yield calculation</li>
+        <li class="done">55 tests passing (31 hook + 24 vault)</li>
+        <li class="done">Eng Review + CEO Review: CLEAR</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Phase 3 -->
+  <div class="phase">
+    <div class="phase-dot dot-active"></div>
+    <div class="phase-header">
+      <span class="phase-title">Phase 3: Testnet Validation</span>
+      <span class="phase-time">4 weeks</span>
+      <span class="phase-badge badge-next">Next</span>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li class="key">CREATE2 deploy script (hook address mining)
+          <span class="detail">V4 hook은 주소에 permission flag가 인코딩됨</span>
+        </li>
+        <li class="key">Keeper bot (Python)
+          <span class="detail">models/vol.py 재사용 → pushVolEstimate + triggerEvaluation + rebalance</span>
+        </li>
+        <li class="key">Control group vaults (AlwaysLP + HODL)
+          <span class="detail">BaseVault 추출 → 3개 vault 동시 운영으로 성과 비교</span>
+        </li>
+        <li class="todo">Testnet deploy (Base Sepolia / Arbitrum Sepolia)</li>
+        <li class="todo">2-4주 라이브 모니터링</li>
+        <li class="todo">성과 비교 데이터 수집</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Phase 4 -->
+  <div class="phase">
+    <div class="phase-dot dot-future"></div>
+    <div class="phase-header">
+      <span class="phase-title">Phase 4: Mainnet Launch</span>
+      <span class="phase-time">2-3 months</span>
+      <span class="phase-badge badge-future">Planned</span>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li class="todo">External security audit</li>
+        <li class="todo">Single-sided deposit (swap routing + MEV protection)</li>
+        <li class="todo">Mainnet deploy (Base or Arbitrum)</li>
+        <li class="todo">Seed liquidity + track record</li>
+        <li class="todo">Public performance dashboard</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Phase 5 -->
+  <div class="phase">
+    <div class="phase-dot dot-future"></div>
+    <div class="phase-header">
+      <span class="phase-title">Phase 5: Growth</span>
+      <span class="phase-time">3-6 months</span>
+      <span class="phase-badge badge-future">Planned</span>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li class="todo">B2C: 실적 기반 마케팅 + Dune 대시보드</li>
+        <li class="todo">B2B: DAO 트레저리 / LST 프로토콜 / Yield Aggregator 통합</li>
+        <li class="todo">Multi-pool 확장 (wstETH/ETH → USDC/USDT → ETH/USDC)</li>
+        <li class="todo">White-label LP-as-a-Service</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Phase 6 -->
+  <div class="phase">
+    <div class="phase-dot dot-future"></div>
+    <div class="phase-header">
+      <span class="phase-title">Phase 6: Moat Building</span>
+      <span class="phase-time">6-12 months</span>
+      <span class="phase-badge badge-future">Vision</span>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li class="todo">Advanced vol models (implied vol, ML prediction)</li>
+        <li class="todo">MEV defense (commit-reveal)</li>
+        <li class="todo">Dynamic tick range adjustment</li>
+        <li class="todo">Multi-chain deployment</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Phase 7 -->
+  <div class="phase">
+    <div class="phase-dot dot-future"></div>
+    <div class="phase-header">
+      <span class="phase-title">Phase 7: Token / Governance</span>
+      <span class="phase-time">Conditional</span>
+      <span class="phase-badge badge-future">TBD</span>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li class="todo">Decision point: PMF 확인 + TVL &gt; $5M 이후 판단</li>
+        <li class="todo">Pro: 커뮤니티 참여, 인센티브 정렬, 유동성 부트스트랩</li>
+        <li class="todo">Con: 규제 리스크, 토큰 가격 관리 부담</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- Revenue Model — Phased -->
+<div class="section-header">Revenue Model &mdash; Phased Fee Structure</div>
+<div class="revenue-grid">
+  <div class="rev-card" style="border-color: rgba(63, 185, 80, 0.3);">
+    <div class="rev-label" style="margin-bottom: 8px; font-weight: 600; color: var(--green);">Stage 1: Launch</div>
+    <div class="rev-val">10%</div>
+    <div class="rev-label">Performance Fee</div>
+    <div style="font-size: 1.3rem; font-weight: 700; color: var(--green); margin-top: 8px;">0%</div>
+    <div class="rev-label">Management Fee</div>
+    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">TVL &lt; $5M &mdash; "수익 안 나면 우리도 안 번다"</div>
+  </div>
+  <div class="rev-card">
+    <div class="rev-label" style="margin-bottom: 8px; font-weight: 600; color: var(--accent);">Stage 2: Growth</div>
+    <div class="rev-val">15%</div>
+    <div class="rev-label">Performance Fee</div>
+    <div style="font-size: 1.3rem; font-weight: 700; color: var(--accent); margin-top: 8px;">0.5%</div>
+    <div class="rev-label">Management Fee /yr</div>
+    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">TVL $5-20M &mdash; 실적 증명 후 도입</div>
+  </div>
+  <div class="rev-card" style="border-color: rgba(188, 140, 255, 0.3);">
+    <div class="rev-label" style="margin-bottom: 8px; font-weight: 600; color: var(--purple);">Stage 3: Established</div>
+    <div class="rev-val" style="color: var(--purple);">15-20%</div>
+    <div class="rev-label">Performance Fee</div>
+    <div style="font-size: 1.3rem; font-weight: 700; color: var(--purple); margin-top: 8px;">1%</div>
+    <div class="rev-label">Management Fee /yr</div>
+    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">TVL $20M+ &mdash; 풀 수수료 체계</div>
+  </div>
+</div>
+
+<!-- Fee Comparison -->
+<div class="section-header">Fee Comparison vs Industry</div>
+<table class="comp-table">
+  <tr>
+    <th>Protocol</th>
+    <th>Perf Fee</th>
+    <th>Mgmt Fee</th>
+    <th>Notes</th>
+  </tr>
+  <tr>
+    <td>Yearn v3</td>
+    <td>10%</td>
+    <td>2%</td>
+    <td class="no">Established brand, 5yr track record</td>
+  </tr>
+  <tr>
+    <td>Arrakis</td>
+    <td>10%</td>
+    <td>1%</td>
+    <td class="no">V3 LP manager</td>
+  </tr>
+  <tr>
+    <td>Gamma</td>
+    <td>0%</td>
+    <td>0%</td>
+    <td class="no">Token-funded (GAMMA inflation)</td>
+  </tr>
+  <tr>
+    <td>Beefy</td>
+    <td>4.5%</td>
+    <td>0%</td>
+    <td class="no">0.1% withdrawal fee</td>
+  </tr>
+  <tr>
+    <td>Sommelier</td>
+    <td>10-20%</td>
+    <td>2%</td>
+    <td class="no">Active strategies</td>
+  </tr>
+  <tr class="highlight">
+    <td><strong>Us (Stage 1)</strong></td>
+    <td class="yes"><strong>10%</strong></td>
+    <td class="yes"><strong>0%</strong></td>
+    <td style="color: var(--green);">Trust-building phase</td>
+  </tr>
+</table>
+
+<!-- TVL Projection — Realistic -->
+<div class="section-header">Growth Projection (Realistic)</div>
+<div class="tvl-bar" style="grid-template-columns: 1fr 1fr 1fr 1fr 1fr;">
+  <div class="tvl-item">
+    <div class="tvl-label">NOW</div>
+    <div class="tvl-value">$0</div>
+    <div class="tvl-rev">$0/mo</div>
+    <div style="font-size: 0.7rem; color: var(--text-muted);">—</div>
+    <div class="tvl-track"><div class="tvl-fill" style="width: 0%"></div></div>
+  </div>
+  <div class="tvl-item">
+    <div class="tvl-label">3 MONTHS</div>
+    <div class="tvl-value" style="color: var(--accent)">$1M</div>
+    <div class="tvl-rev">~$2K/mo</div>
+    <div style="font-size: 0.7rem; color: var(--green);">Stage 1</div>
+    <div class="tvl-track"><div class="tvl-fill" style="width: 7%"></div></div>
+  </div>
+  <div class="tvl-item">
+    <div class="tvl-label">6 MONTHS</div>
+    <div class="tvl-value" style="color: var(--accent)">$3-5M</div>
+    <div class="tvl-rev">~$10K/mo</div>
+    <div style="font-size: 0.7rem; color: var(--green);">Stage 1</div>
+    <div class="tvl-track"><div class="tvl-fill" style="width: 20%"></div></div>
+  </div>
+  <div class="tvl-item">
+    <div class="tvl-label">12 MONTHS</div>
+    <div class="tvl-value" style="color: var(--accent)">$5-10M</div>
+    <div class="tvl-rev">~$20K/mo</div>
+    <div style="font-size: 0.7rem; color: var(--accent);">Stage 2</div>
+    <div class="tvl-track"><div class="tvl-fill" style="width: 40%"></div></div>
+  </div>
+  <div class="tvl-item">
+    <div class="tvl-label">36 MONTHS</div>
+    <div class="tvl-value" style="color: var(--purple)">$15M</div>
+    <div class="tvl-rev">~$36K/mo</div>
+    <div style="font-size: 0.7rem; color: var(--purple);">Stage 3</div>
+    <div class="tvl-track"><div class="tvl-fill" style="width: 100%"></div></div>
+  </div>
+</div>
+
+<!-- Year 3 Financials -->
+<div class="section-header">Year 3 Steady State (Conservative)</div>
+<div class="revenue-grid">
+  <div class="rev-card" style="border-color: rgba(240, 136, 62, 0.3);">
+    <div class="rev-label" style="margin-bottom: 4px; font-weight: 600; color: var(--orange);">Pessimistic</div>
+    <div class="rev-val" style="color: var(--orange);">$10M TVL</div>
+    <div class="rev-label">$13K/mo net &mdash; $156K/yr</div>
+  </div>
+  <div class="rev-card" style="border-color: rgba(88, 166, 255, 0.3);">
+    <div class="rev-label" style="margin-bottom: 4px; font-weight: 600; color: var(--accent);">Conservative</div>
+    <div class="rev-val">$15M TVL</div>
+    <div class="rev-label">$25K/mo net &mdash; $300K/yr</div>
+  </div>
+  <div class="rev-card" style="border-color: rgba(188, 140, 255, 0.3);">
+    <div class="rev-label" style="margin-bottom: 4px; font-weight: 600; color: var(--purple);">Optimistic</div>
+    <div class="rev-val" style="color: var(--purple);">$25M TVL</div>
+    <div class="rev-label">$49K/mo net &mdash; $588K/yr</div>
+  </div>
+</div>
+<div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin: 1rem 0; font-size: 0.88rem;">
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+    <div>
+      <div style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 8px;">Revenue Breakdown ($15M)</div>
+      <div>Performance Fee: <span style="color: var(--accent);">$24K/mo</span></div>
+      <div style="color: var(--text-muted); font-size: 0.8rem;">$15M &times; 1.5% excess &times; 15% &times; 8.5/12 months</div>
+      <div style="margin-top: 4px;">Management Fee: <span style="color: var(--accent);">$12.5K/mo</span></div>
+      <div style="color: var(--text-muted); font-size: 0.8rem;">$15M &times; 1% / 12</div>
+    </div>
+    <div>
+      <div style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 8px;">Monthly Costs</div>
+      <div>Keeper infra: <span style="color: var(--text-muted);">$500</span></div>
+      <div>Audit amortized: <span style="color: var(--text-muted);">$7K</span></div>
+      <div>Marketing: <span style="color: var(--text-muted);">$3K</span></div>
+      <div>Legal: <span style="color: var(--text-muted);">$1K</span></div>
+      <div style="margin-top: 4px; font-weight: 600;">Margin: <span style="color: var(--green);">~70%</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- B2B Segments -->
+<div class="section-header">B2B Target Segments</div>
+<div class="segment-grid">
+  <div class="segment">
+    <div class="seg-title">Protocol Treasuries</div>
+    <div class="seg-target">DAOs with $10M+ idle tokens</div>
+    <div class="seg-pitch">"LP your treasury without IL risk"</div>
+  </div>
+  <div class="segment">
+    <div class="seg-title">Liquid Staking Protocols</div>
+    <div class="seg-target">Lido, Rocket Pool (wstETH/ETH)</div>
+    <div class="seg-pitch">"High correlation pair = low IL = easy win"</div>
+  </div>
+  <div class="segment" style="border-color: rgba(240, 136, 62, 0.3);">
+    <div class="seg-title" style="color: var(--orange);">New Token Projects (Highest ROI)</div>
+    <div class="seg-target">Teams with treasury melting from IL on own pools</div>
+    <div class="seg-pitch">"Treasury lasts 12mo instead of 6mo. Same liquidity, less IL."</div>
+  </div>
+  <div class="segment">
+    <div class="seg-title">Yield Aggregators</div>
+    <div class="seg-target">Yearn, Beefy</div>
+    <div class="seg-pitch">"Strategy integration — you bring the users"</div>
+  </div>
+</div>
+
+<!-- Multi-pool Expansion -->
+<div class="section-header">Multi-pool Expansion Order</div>
+<div class="phase-body" style="margin: 1rem 0">
+  <ul>
+    <li class="todo"><strong>1. wstETH/ETH</strong> &mdash; high correlation, minimal IL, high volume (safest first)
+    </li>
+    <li class="todo"><strong>2. USDC/USDT</strong> &mdash; stablepair, IL ≈ 0, pure fee farming
+    </li>
+    <li class="todo"><strong>3. ETH/USDC</strong> &mdash; original target, high vol = maximum strategy value
+    </li>
+    <li class="todo"><strong>4. BTC/ETH</strong> &mdash; medium correlation, market expansion
+    </li>
+    <li class="todo"><strong>5. Long-tail</strong> &mdash; project token pairs (B2B white-label)
+    </li>
+  </ul>
+</div>
+
+<!-- Competitive Landscape -->
+<div class="section-header">Competitive Landscape</div>
+<table class="comp-table">
+  <tr>
+    <th></th>
+    <th class="highlight">IL Alpha Vault</th>
+    <th>Arrakis (V3)</th>
+    <th>Gamma Strategies</th>
+  </tr>
+  <tr>
+    <td>V4 Native</td>
+    <td class="highlight yes">YES</td>
+    <td class="no">No (V3)</td>
+    <td class="no">No (V3)</td>
+  </tr>
+  <tr>
+    <td>IL-Aware</td>
+    <td class="highlight yes">YES (core)</td>
+    <td class="no">No</td>
+    <td class="no">No</td>
+  </tr>
+  <tr>
+    <td>Vol Oracle</td>
+    <td class="highlight yes">On-chain EWMA</td>
+    <td class="no">No</td>
+    <td class="no">No</td>
+  </tr>
+  <tr>
+    <td>LP On/Off Toggle</td>
+    <td class="highlight yes">YES</td>
+    <td class="no">Always on</td>
+    <td class="no">Always on</td>
+  </tr>
+  <tr>
+    <td>Range Management</td>
+    <td class="highlight">Phase 3</td>
+    <td class="yes">Yes</td>
+    <td class="yes">Yes</td>
+  </tr>
+  <tr>
+    <td>Multi-pool</td>
+    <td class="highlight">Phase 5</td>
+    <td class="yes">Yes</td>
+    <td class="yes">Yes</td>
+  </tr>
+</table>
+
+<!-- Positioning -->
+<div class="section-header">Product Positioning</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+  <div style="background: rgba(248, 81, 73, 0.08); border: 1px solid rgba(248, 81, 73, 0.2); border-radius: 8px; padding: 1rem;">
+    <div style="font-weight: 700; color: var(--red); margin-bottom: 8px;">We are NOT</div>
+    <div style="font-size: 0.85rem; color: var(--text-muted);">
+      &bull; Staking alternative (Lido 4-8% &rarr; use that)<br>
+      &bull; Lending alternative (Aave 4-5% &rarr; use that)<br>
+      &bull; Liquidity guarantee (we pull out during high vol)
+    </div>
+  </div>
+  <div style="background: rgba(63, 185, 80, 0.08); border: 1px solid rgba(63, 185, 80, 0.2); border-radius: 8px; padding: 1rem;">
+    <div style="font-weight: 700; color: var(--green); margin-bottom: 8px;">We ARE</div>
+    <div style="font-size: 0.85rem; color: var(--text-muted);">
+      &bull; IL-defended LP management for LP-level returns (15%+)<br>
+      &bull; Treasury protection for teams already doing LP<br>
+      &bull; Automatic risk management: same fees in calm, less loss in storms
+    </div>
+  </div>
+</div>
+
+<!-- Moats -->
+<div class="section-header">Moat Strategy</div>
+<div class="moat-list">
+  <div class="moat-item">
+    <div class="moat-title">Data Advantage</div>
+    <div class="moat-desc">More runtime = more accurate vol oracle. Competitors start from zero.</div>
+  </div>
+  <div class="moat-item">
+    <div class="moat-title">Network Effects</div>
+    <div class="moat-desc">TVL ↑ → more fee income → better performance → more deposits</div>
+  </div>
+  <div class="moat-item">
+    <div class="moat-title">Custom Vol Models</div>
+    <div class="moat-desc">Beyond EWMA: implied vol, realized vol blend, ML prediction</div>
+  </div>
+  <div class="moat-item">
+    <div class="moat-title">V4 First Mover</div>
+    <div class="moat-desc">Hook-based infrastructure as V4 ecosystem grows</div>
+  </div>
+</div>
+
+<div class="footer">
+  IL Alpha Vault &mdash; Roadmap generated 2026-03-18 &mdash; CEO + Eng Review: CLEARED
+</div>
+
+</body>
+</html>

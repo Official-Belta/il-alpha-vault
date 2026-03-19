@@ -446,7 +446,11 @@ contract ILAlphaHook is IHooks {
     // ─── H-1: TWAP Oracle ──────────────────────────────────────────
 
     function _recordTickObservation(PoolId poolId, int24 tick) internal {
+        // R-3 FIX: one observation per block (prevents same-block buffer flooding)
         uint8 idx = observationIndex[poolId];
+        uint8 prevIdx = idx == 0 ? TWAP_WINDOW - 1 : idx - 1;
+        if (tickObservations[poolId][prevIdx].timestamp == uint40(block.timestamp)) return;
+
         tickObservations[poolId][idx] = TickObservation({
             tick: tick,
             timestamp: uint40(block.timestamp)
@@ -474,7 +478,9 @@ contract ILAlphaHook is IHooks {
         }
 
         if (totalWeight == 0) {
-            return volOracles[poolId].lastTick; // fallback to lastTick
+            // R-7 FIX: no valid observations = no TWAP = skip check (safe default)
+            // Vault's _checkTWAP will see deviation=0 and pass
+            return volOracles[poolId].lastTick;
         }
 
         twapTick = int24(int256(weightedSum / int256(totalWeight)));

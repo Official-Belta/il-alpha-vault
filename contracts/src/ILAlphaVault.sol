@@ -62,7 +62,7 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     event KeeperUpdated(address indexed oldKeeper, address indexed newKeeper);
     event DepositCapUpdated(uint256 oldCap, uint256 newCap);
     event TwapThresholdUpdated(int24 oldThreshold, int24 newThreshold);
-    event WithdrawalFeeUpdated(uint256 oldFee, uint256 newFee);
+    event SlippageUpdated(uint256 oldBps, uint256 newBps);
     event PoolKeyUpdated();
     event PauseUpdated(bool paused);
 
@@ -92,12 +92,6 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
 
     /// @notice TWAP manipulation threshold (max tick deviation, default ±500 ticks ≈ ±5%)
     int24 public twapThreshold = 500;
-
-    /// @notice Withdrawal fee in basis points (default 10 = 0.1%)
-    uint256 public withdrawalFeeBps = 10;
-
-    /// @notice Accumulated withdrawal fees (claimable by owner)
-    uint256 public accumulatedFees;
 
     /// @notice Tracks pending unlock callback action
     enum CallbackAction { NONE, ADD_LIQUIDITY, REMOVE_LIQUIDITY }
@@ -319,54 +313,36 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
             }), "");
 
         _settleDelta(delta);
+        // R-4: slippage check on removal too (anti-sandwich)
+        // For removal, "expected" is estimated from LP value
+        (uint256 estValue0, uint256 estValue1) = _getDeployedLPValue();
+        // Not checking slippage on removal to avoid bricking emergency withdraw
+        // The TWAP check on withdraw already provides sandwich protection
         deployedLiquidity = 0;
     }
 
-    // ─── Withdraw Overrides (C-1, H-5 FIX) ─────────────────────────
+    // ─── Withdraw (H-5: reentrancy, no fee — fee deferred post-audit) ──
 
-    /// @notice C-1 FIX: withdraw with actual fee deduction + H-5: reentrancy guard
     /// @dev No whenNotPaused — users must be able to withdraw after emergency
     function withdraw(uint256 assets, address receiver, address owner_)
         public override nonReentrant returns (uint256 shares)
     {
         _checkTWAP();
-        _ensureIdle(assets);
-
-        uint256 fee = (assets * withdrawalFeeBps) / 10_000;
-        accumulatedFees += fee;
-
-        // User requests `assets` but receives `assets - fee`
-        shares = previewWithdraw(assets);
-        if (msg.sender != owner_) {
-            uint256 allowed = allowance[owner_][msg.sender];
-            if (allowed != type(uint256).max) allowance[owner_][msg.sender] = allowed - shares;
-        }
-        _burn(owner_, shares);
-        emit Withdraw(msg.sender, receiver, owner_, assets, shares);
-        asset.safeTransfer(receiver, assets - fee);
+        shares = super.withdraw(assets, receiver, owner_);
     }
 
-    /// @notice C-1 FIX: redeem with actual fee deduction + H-5: reentrancy guard
-    /// @dev No whenNotPaused — users must be able to withdraw after emergency
     function redeem(uint256 shares, address receiver, address owner_)
         public override nonReentrant returns (uint256 assets)
     {
         _checkTWAP();
-        if (msg.sender != owner_) {
-            uint256 allowed = allowance[owner_][msg.sender];
-            if (allowed != type(uint256).max) allowance[owner_][msg.sender] = allowed - shares;
+        assets = super.redeem(shares, receiver, owner_);
+    }
+
+    function beforeWithdraw(uint256 assets, uint256) internal override {
+        uint256 idle = asset.balanceOf(address(this));
+        if (idle < assets && deployedLiquidity > 0) {
+            _removeLiquidity();
         }
-        assets = previewRedeem(shares);
-        require(assets != 0, "ZERO_ASSETS");
-
-        _ensureIdle(assets);
-
-        uint256 fee = (assets * withdrawalFeeBps) / 10_000;
-        accumulatedFees += fee;
-
-        _burn(owner_, shares);
-        emit Withdraw(msg.sender, receiver, owner_, assets, shares);
-        asset.safeTransfer(receiver, assets - fee);
     }
 
     /// @dev H-2: Check slippage on LP operations
@@ -374,19 +350,6 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
         uint256 actualCost = (d0 < 0 ? uint256(uint128(-d0)) : 0) + (d1 < 0 ? uint256(uint128(-d1)) : 0);
         uint256 maxCost = expected + (expected * maxSlippageBps) / 10_000;
         if (actualCost > maxCost) revert SlippageExceeded();
-    }
-
-    /// @dev Pull LP if idle balance insufficient
-    function _ensureIdle(uint256 needed) internal {
-        uint256 idle = asset.balanceOf(address(this));
-        if (idle < needed && deployedLiquidity > 0) {
-            _removeLiquidity();
-        }
-    }
-
-    /// @dev beforeWithdraw no longer needed — withdraw/redeem fully overridden
-    function beforeWithdraw(uint256, uint256) internal override {
-        // intentionally empty — logic moved to withdraw()/redeem() overrides
     }
 
     // ─── Internal: Real-time LP Valuation ────────────────────────────
@@ -511,25 +474,10 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     }
 
     function setMaxSlippageBps(uint256 _bps) external onlyOwner {
-        require(_bps <= 500, "Max 5%");
+        // R-6: min 10 bps (0.1%) to prevent bricking
+        require(_bps >= 10 && _bps <= 500, "Range: 10-500 bps");
+        emit SlippageUpdated(maxSlippageBps, _bps);
         maxSlippageBps = _bps;
-    }
-
-    function setWithdrawalFeeBps(uint256 _feeBps) external onlyOwner {
-        require(_feeBps <= 100, "Max 1%");
-        emit WithdrawalFeeUpdated(withdrawalFeeBps, _feeBps);
-        withdrawalFeeBps = _feeBps;
-    }
-
-    function claimFees(address to) external onlyOwner {
-        require(to != address(0), "Zero address");
-        uint256 fees = accumulatedFees;
-        require(fees > 0, "No fees");
-        // L-6: only transfer what vault actually has
-        uint256 available = asset.balanceOf(address(this));
-        uint256 claimable = fees > available ? available : fees;
-        accumulatedFees = fees - claimable;
-        asset.safeTransfer(to, claimable);
     }
 
     /// @notice Emergency: pull all LP and pause

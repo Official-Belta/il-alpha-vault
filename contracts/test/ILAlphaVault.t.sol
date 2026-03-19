@@ -538,37 +538,6 @@ contract ILAlphaVaultTest is Test {
         vault.setKeeper(address(0xbeef));
     }
 
-    // ─── Security: Withdrawal Fee ────────────────────────────────────
-
-    function test_withdrawalFee_recorded() public {
-        token0.approve(address(vault), 1000 ether);
-        vault.deposit(1000 ether, address(this));
-
-        uint256 sharesBefore = vault.balanceOf(address(this));
-        vault.redeem(sharesBefore, address(this), address(this));
-
-        // Fee is recorded in accumulatedFees (accounting-only for now)
-        // Actual fee deduction requires audit review on ERC4626 integration
-        assertTrue(vault.accumulatedFees() > 0, "Fees should be recorded");
-    }
-
-    function test_claimFees_onlyOwner() public {
-        vm.prank(address(0xdead));
-        vm.expectRevert(ILAlphaVault.OnlyOwner.selector);
-        vault.claimFees(address(0xdead));
-    }
-
-    function test_setWithdrawalFee_onlyOwner() public {
-        vm.prank(address(0xdead));
-        vm.expectRevert(ILAlphaVault.OnlyOwner.selector);
-        vault.setWithdrawalFeeBps(50);
-    }
-
-    function test_setWithdrawalFee_maxCap() public {
-        vm.expectRevert("Max 1%");
-        vault.setWithdrawalFeeBps(101); // > 100 bps = > 1%
-    }
-
     // ─── Security: TWAP Check ────────────────────────────────────────
 
     function test_setTwapThreshold_onlyOwner() public {

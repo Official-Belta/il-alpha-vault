@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IL Alpha — Testnet Dashboard</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root { --bg:#0C0C0C; --surface:#1A1A1A; --border:#2A2A2A; --text:#FAFAF9; --muted:#78716C; --accent:#1A7F64; --red:#EF4444; --yellow:#EAB308; --blue:#3B82F6; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Satoshi',system-ui,sans-serif; background:var(--bg); color:var(--text); padding:2rem; max-width:1100px; margin:0 auto; }
+  h1 { font-size:1.8rem; font-weight:700; letter-spacing:-0.03em; margin-bottom:4px; }
+  .sub { color:var(--muted); font-size:0.9rem; margin-bottom:2rem; }
+  .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2rem; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1.2rem; }
+  .card .label { color:var(--muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; }
+  .card .value { font-size:1.6rem; font-weight:700; margin-top:4px; font-family:'Geist Mono',monospace; }
+  .card .delta { font-size:0.8rem; margin-top:4px; }
+  .green { color:var(--accent); }
+  .red { color:var(--red); }
+  .chart-container { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; }
+  .chart-title { font-size:0.85rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:1rem; }
+  canvas { width:100%!important; }
+  .status-bar { display:flex; gap:1rem; margin-bottom:2rem; }
+  .status-pill { display:flex; align-items:center; gap:6px; padding:6px 14px; border-radius:100px; font-size:0.8rem; font-weight:600; border:1px solid var(--border); }
+  .status-pill .dot { width:8px; height:8px; border-radius:50%; }
+  .dot-green { background:var(--accent); }
+  .dot-yellow { background:var(--yellow); }
+  .footer { color:var(--muted); font-size:0.75rem; text-align:center; margin-top:2rem; padding-top:1rem; border-top:1px solid var(--border); }
+  @media(max-width:640px) { .cards { grid-template-columns:1fr 1fr; } body { padding:1rem; } }
+</style>
+</head>
+<body>
+
+<h1>IL Alpha — Testnet Dashboard</h1>
+<p class="sub">Live monitoring · Ethereum Sepolia · Auto-updated from keeper metrics</p>
+
+<div class="status-bar">
+  <div class="status-pill"><span class="dot dot-green"></span> Keeper Running</div>
+  <div class="status-pill"><span class="dot" id="lpDot"></span> <span id="lpStatus">LP: —</span></div>
+  <div class="status-pill" id="cycleCount">Cycles: —</div>
+</div>
+
+<div class="cards">
+  <div class="card">
+    <div class="label">ETH Price</div>
+    <div class="value" id="ethPrice">—</div>
+    <div class="delta" id="ethDelta"></div>
+  </div>
+  <div class="card">
+    <div class="label">Total Assets</div>
+    <div class="value" id="totalAssets">—</div>
+  </div>
+  <div class="card">
+    <div class="label">Share Price</div>
+    <div class="value" id="sharePrice">—</div>
+    <div class="delta" id="shareDelta"></div>
+  </div>
+  <div class="card">
+    <div class="label">LP Uptime</div>
+    <div class="value" id="lpUptime">—</div>
+  </div>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">ETH Price + LP Status</div>
+  <canvas id="priceChart" height="200"></canvas>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">Tick Variance (EWMA Vol Oracle)</div>
+  <canvas id="volChart" height="160"></canvas>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">Vault Composition</div>
+  <canvas id="compChart" height="160"></canvas>
+</div>
+
+<div class="footer">
+  IL Alpha · Sepolia Testnet · Data from keeper/metrics.csv · <a href="https://github.com/Official-Belta/il-alpha-vault" style="color:var(--accent)">GitHub</a>
+</div>
+
+<script>
+// Parse CSV data (embedded at build time or fetched)
+const CSV_DATA = `CSVDATA`;
+
+function parseCSV(csv) {
+  const lines = csv.trim().split('\n');
+  const headers = lines[0].split(',');
+  return lines.slice(1).map(line => {
+    const vals = line.split(',');
+    const obj = {};
+    headers.forEach((h, i) => obj[h.trim()] = vals[i]?.trim());
+    return obj;
+  });
+}
+
+function formatNum(n, decimals=2) {
+  return Number(n).toLocaleString(undefined, {minimumFractionDigits:decimals, maximumFractionDigits:decimals});
+}
+
+const data = parseCSV(CSV_DATA);
+if (data.length === 0) {
+  document.body.innerHTML = '<h1 style="text-align:center;margin-top:4rem;">No data yet. Keeper is collecting...</h1>';
+} else {
+  const latest = data[data.length - 1];
+  const first = data[0];
+
+  // Cards
+  document.getElementById('ethPrice').textContent = '$' + formatNum(latest.eth_price);
+  const ethChange = ((latest.eth_price - first.eth_price) / first.eth_price * 100);
+  document.getElementById('ethDelta').innerHTML = `<span class="${ethChange >= 0 ? 'green' : 'red'}">${ethChange >= 0 ? '+' : ''}${ethChange.toFixed(2)}%</span> since start`;
+
+  const totalAssetsUSD = Number(latest.total_assets) / 1e6;
+  document.getElementById('totalAssets').textContent = formatNum(totalAssetsUSD, 0) + ' tUSDC';
+
+  const sp = Number(latest.share_price) / 1e18;
+  document.getElementById('sharePrice').textContent = '$' + sp.toFixed(4);
+  const spFirst = Number(first.share_price) / 1e18;
+  const spChange = ((sp - spFirst) / spFirst * 100);
+  document.getElementById('shareDelta').innerHTML = `<span class="${spChange >= 0 ? 'green' : 'red'}">${spChange >= 0 ? '+' : ''}${spChange.toFixed(4)}%</span>`;
+
+  const lpOnCount = data.filter(d => d.lp_active === 'True').length;
+  const lpPct = (lpOnCount / data.length * 100).toFixed(0);
+  document.getElementById('lpUptime').textContent = lpPct + '%';
+
+  const lpActive = latest.lp_active === 'True';
+  document.getElementById('lpDot').className = 'dot ' + (lpActive ? 'dot-green' : 'dot-yellow');
+  document.getElementById('lpStatus').textContent = 'LP: ' + (lpActive ? 'ACTIVE' : 'INACTIVE');
+  document.getElementById('cycleCount').textContent = 'Cycles: ' + data.length;
+
+  // Charts
+  const labels = data.map(d => d.timestamp.split(' ')[1]?.substring(0,5) || d.timestamp);
+  const prices = data.map(d => Number(d.eth_price));
+  const lpColors = data.map(d => d.lp_active === 'True' ? 'rgba(26,127,100,0.2)' : 'rgba(234,179,8,0.1)');
+
+  // Price chart
+  new Chart(document.getElementById('priceChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'ETH Price',
+        data: prices,
+        borderColor: '#FAFAF9',
+        borderWidth: 2,
+        pointRadius: 0,
+        fill: true,
+        backgroundColor: (ctx) => {
+          const i = ctx.dataIndex;
+          return data[i]?.lp_active === 'True' ? 'rgba(26,127,100,0.15)' : 'rgba(234,179,8,0.08)';
+        },
+        tension: 0.3,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#78716C', maxTicksLimit: 8 }, grid: { color: '#2A2A2A' } },
+        y: { ticks: { color: '#78716C', callback: v => '$' + v }, grid: { color: '#2A2A2A' } }
+      }
+    }
+  });
+
+  // Vol chart
+  const varData = data.map(d => Number(d.tick_variance) / 1e18);
+  new Chart(document.getElementById('volChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Tick Variance (÷1e18)',
+        data: varData,
+        borderColor: '#3B82F6',
+        borderWidth: 2,
+        pointRadius: 0,
+        fill: true,
+        backgroundColor: 'rgba(59,130,246,0.1)',
+        tension: 0.3,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#78716C', maxTicksLimit: 8 }, grid: { color: '#2A2A2A' } },
+        y: { ticks: { color: '#78716C' }, grid: { color: '#2A2A2A' } }
+      }
+    }
+  });
+
+  // Composition chart
+  const idle = data.map(d => Number(d.idle) / 1e6);
+  const deployed = data.map(d => Number(d.deployed) / 1e6);
+  new Chart(document.getElementById('compChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Idle', data: idle, backgroundColor: '#78716C', borderRadius: 4 },
+        { label: 'Deployed', data: deployed, backgroundColor: '#1A7F64', borderRadius: 4 },
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: '#78716C' } } },
+      scales: {
+        x: { stacked: true, ticks: { color: '#78716C', maxTicksLimit: 8 }, grid: { display: false } },
+        y: { stacked: true, ticks: { color: '#78716C' }, grid: { color: '#2A2A2A' } }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>

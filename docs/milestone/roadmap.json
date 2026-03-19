@@ -4,9 +4,9 @@
     "tagline": "Volatility-aware liquidity management",
     "description": "Treasury-grade LP management that removes positions before impermanent loss hits. Capital preservation with LP-level returns.",
     "eyebrow": "Uniswap V4 Hook",
-    "network": "Sepolia",
+    "network": "Base",
     "twitter": "https://twitter.com",
-    "etherscan_base": "https://sepolia.etherscan.io"
+    "etherscan_base": "https://basescan.org"
   },
   "phases": [
     {
@@ -35,90 +35,93 @@
     {
       "number": "03",
       "name": "Testnet Validation",
-      "status": "active",
-      "description": "Three vaults deployed to Sepolia with equal funding on the same pool. Keeper bot running automated volatility-based LP management cycles.",
+      "status": "complete",
+      "description": "Three vaults deployed to Sepolia. Keeper bot live. 4-round Trail of Bits security audit: 0 Critical, 0 High. Dashboard operational.",
       "items": [
         { "text": "CREATE2 address mining for hook deployment", "status": "done" },
         { "text": "Deploy five contracts to Ethereum Sepolia", "status": "done", "sub": "Hook \u00b7 Vault \u00b7 AlwaysLP \u00b7 HODL \u00b7 SwapHelper" },
         { "text": "Keeper bot first cycle success", "status": "done" },
-        { "text": "Monitor across two or more volatility regime changes", "status": "active", "sub": "IL Alpha vs AlwaysLP vs HODL \u2014 live comparison" },
-        { "text": "Performance comparison report", "status": "pending" },
-        { "text": "Gas cost analysis and oracle accuracy report", "status": "pending" }
+        { "text": "Monitor across two or more volatility regime changes", "status": "done", "sub": "IL Alpha vs AlwaysLP vs HODL \u2014 live comparison" },
+        { "text": "4-round Trail of Bits security audit — 0 Critical, 0 High", "status": "done" },
+        { "text": "Performance dashboard live (Chart.js)", "status": "done" }
       ]
     },
     {
       "number": "04",
-      "name": "Mainnet",
-      "status": "upcoming",
-      "description": "External security audit. Mainnet deployment on Base or Arbitrum. Seed liquidity and public performance dashboard.",
+      "name": "Base Mainnet",
+      "status": "active",
+      "description": "Code freeze complete. Deploying to Base mainnet with $1.2K seed capital. 4-week live operation for real performance data.",
       "items": [
-        { "text": "External security audit", "status": "pending" },
-        { "text": "Mainnet deployment", "status": "pending" },
-        { "text": "Seed liquidity and early partnerships", "status": "pending" },
-        { "text": "Public performance dashboard", "status": "pending" }
+        { "text": "Code freeze — all features complete, 4-round audit clean", "status": "done" },
+        { "text": "Wallet setup (Deployer, Operator, Treasury Safe, Sentinel)", "status": "done" },
+        { "text": "Deploy 5 contracts to Base mainnet", "status": "active" },
+        { "text": "Seed $400×3 vaults on real ETH/USDC pool", "status": "pending" },
+        { "text": "Keeper bot live on Base (1hr cycles)", "status": "pending" },
+        { "text": "Dashboard update — real mainnet data", "status": "pending" },
+        { "text": "4-week live performance monitoring", "status": "pending" }
       ]
     },
     {
       "number": "05",
-      "name": "DAO GTM",
+      "name": "Grants & Audit",
       "status": "upcoming",
-      "description": "DAO treasury acquisition as primary go-to-market. 3-5 partnerships at $1-2M each. Multi-pool expansion starting with safest pairs.",
+      "description": "UFSF audit subsidy application (up to 100% coverage). Hook Design Lab Cohort 2. Professional security audit on frozen code.",
       "items": [
-        { "text": "DAO treasury partnerships ($10M+ idle capital)", "status": "pending" },
-        { "text": "Governance proposal template with testnet data", "status": "pending" },
-        { "text": "wstETH/ETH pool (safest: high correlation, minimal IL)", "status": "pending" },
-        { "text": "USDC/USDT stablepair (IL ≈ 0, pure fee farming)", "status": "pending" },
-        { "text": "Protocol treasury partnerships (reduce IL burn)", "status": "pending" },
-        { "text": "Yield aggregator integrations (Yearn, Beefy)", "status": "pending" }
+        { "text": "UFSF audit subsidy application (Uniswap Foundation Security Fund)", "status": "pending" },
+        { "text": "Hook Design Lab Cohort 2 application", "status": "pending" },
+        { "text": "v4 Hooks Support application", "status": "pending" },
+        { "text": "Professional security audit on code-frozen contracts", "status": "pending" },
+        { "text": "Litepaper publication (5-8 pages)", "status": "pending" }
       ]
     },
     {
       "number": "06",
-      "name": "Moat Building",
+      "name": "DAO GTM",
       "status": "upcoming",
-      "description": "Data advantage from runtime. Custom volatility models beyond EWMA. First-mover position in V4 hook ecosystem. Continuous audit track record.",
+      "description": "DAO treasury acquisition as primary go-to-market. 3-5 partnerships at $1-2M each. Governance proposals with real mainnet performance data.",
       "items": [
-        { "text": "Data moat: longer runtime = more accurate vol oracle", "status": "pending" },
-        { "text": "Custom vol models: implied vol (Deribit), realized vol blend, ML prediction", "status": "pending" },
-        { "text": "V4 hook ecosystem first-mover advantage", "status": "pending" },
-        { "text": "Network effects: TVL ↑ → better performance → more deposits", "status": "pending" },
-        { "text": "Continuous audit + unbroken runtime as trust signal", "status": "pending" }
+        { "text": "Gnosis DAO governance proposal (new treasury manager seeking yield)", "status": "pending" },
+        { "text": "ENS DAO outreach (active treasury forum, karpatkey managed)", "status": "pending" },
+        { "text": "Polygon treasury proposal ($1.3B idle stablecoins)", "status": "pending" },
+        { "text": "First DAO partnership closed ($1M+ TVL)", "status": "pending" },
+        { "text": "Case study published → pitch next 4 DAOs", "status": "pending" },
+        { "text": "Multi-pool expansion: wstETH/ETH, USDC/USDT", "status": "pending" }
       ]
     },
     {
       "number": "07",
-      "name": "Governance",
+      "name": "Moat",
       "status": "upcoming",
-      "description": "Token decision only after product-market fit confirmed and TVL exceeds $5M. Pure revenue model until then — simpler regulatory, operational focus.",
+      "description": "Rehypothecation for idle capital yield. Vault share composability with lending protocols. Data advantage from runtime. V4 hook ecosystem first-mover.",
       "items": [
-        { "text": "PMF confirmation: TVL $5M+, 10+ external depositors, 6mo+ no incidents", "status": "pending" },
-        { "text": "Token vs no-token decision", "status": "pending" },
-        { "text": "If token: community participation, incentive alignment, liquidity bootstrap", "status": "pending" },
-        { "text": "If no token: pure revenue model, simpler regulatory path", "status": "pending" }
+        { "text": "Rehypothecation: LP OFF idle funds → Aave/Compound yield", "status": "pending" },
+        { "text": "Share composability: vault share as collateral on Morpho/Euler", "status": "pending" },
+        { "text": "Data moat: longer runtime = more accurate vol oracle", "status": "pending" },
+        { "text": "Custom vol models beyond EWMA (implied vol, ML prediction)", "status": "pending" },
+        { "text": "Continuous audit + unbroken runtime as trust signal", "status": "pending" }
       ]
     },
     {
       "number": "08",
-      "name": "Multi-Chain",
+      "name": "Governance",
       "status": "upcoming",
-      "description": "Expand from Base to Arbitrum and Ethereum L1. Deploy where V4 activity and TVL justify the gas costs. L1 Ethereum only after TVL exceeds $1M.",
+      "description": "Token decision only after PMF confirmed and TVL exceeds $5M. Pure revenue model until then.",
       "items": [
-        { "text": "Base L1 launch (lowest gas, Coinbase ecosystem, V4 active)", "status": "pending" },
-        { "text": "Arbitrum deployment (second largest V4 ecosystem)", "status": "pending" },
-        { "text": "Ethereum L1 deployment (TVL $1M+ threshold — keeper gas too high for small TVL)", "status": "pending" },
-        { "text": "Cross-chain vault aggregation and unified dashboard", "status": "pending" }
+        { "text": "PMF confirmation: TVL $5M+, 10+ external depositors, 6mo+ no incidents", "status": "pending" },
+        { "text": "Token vs no-token decision", "status": "pending" },
+        { "text": "If token: community participation, flywheel, liquidity bootstrap", "status": "pending" },
+        { "text": "If no token: pure revenue model, simpler regulatory path", "status": "pending" }
       ]
     },
     {
       "number": "09",
-      "name": "Institutional",
+      "name": "Multi-Chain",
       "status": "upcoming",
-      "description": "White-label LP management for protocols and funds. Managed accounts for institutional capital. Singapore entity for regulatory compliance at scale.",
+      "description": "Expand from Base to Arbitrum and Ethereum L1. Deploy where V4 activity and TVL justify the gas costs.",
       "items": [
-        { "text": "White-label vault deployment for token projects", "status": "pending" },
-        { "text": "Managed account service for institutional LPs and funds", "status": "pending" },
-        { "text": "Singapore entity formation (TVL $5-10M threshold)", "status": "pending" },
-        { "text": "Custom vol models per pool (implied vol, ML prediction)", "status": "pending" }
+        { "text": "Arbitrum deployment (second largest V4 ecosystem)", "status": "pending" },
+        { "text": "Ethereum L1 deployment (TVL $1M+ threshold)", "status": "pending" },
+        { "text": "Cross-chain vault aggregation and unified dashboard", "status": "pending" }
       ]
     }
   ],
@@ -252,13 +255,13 @@
       "phases": {
         "01": { "name": "\ubc31\ud14c\uc2a4\ud2b8", "description": "6\uac1c\uc6d4\uac04\uc758 \uc2e4\uc81c ETH/USDC \uac00\uaca9 \ub370\uc774\ud130\ub85c \uc0c1\uc2b9\uc7a5\ubd80\ud130 \ud558\ub77d\uc7a5\uae4c\uc9c0 \uc804\uccb4 \uc2dc\uc7a5 \uc0ac\uc774\ud074\uc744 \ucee4\ubc84. \ub450 \uac00\uc9c0 \ub300\uc870\uad70 \uc804\ub7b5 \ub300\ube44 \uc815\ub7c9\uc801 \uac80\uc99d \uc644\ub8cc." },
         "02": { "name": "\uc2a4\ub9c8\ud2b8 \ucee8\ud2b8\ub799\ud2b8", "description": "\uc628\uccb4\uc778 \ubcc0\ub3d9\uc131 \uc624\ub77c\ud074\uc744 \ud0d1\uc7ac\ud55c Uniswap V4 \ud6c5. \uc608\uce58\uc6a9 ERC-4626 \ubcfc\ud2b8. \uc5c4\ubc00\ud55c \ube44\uad50\ub97c \uc704\ud55c \ub450 \uac1c\uc758 \ub300\uc870\uad70 \ubcfc\ud2b8." },
-        "03": { "name": "\ud14c\uc2a4\ud2b8\ub137 \uac80\uc99d", "description": "\ub3d9\uc77c \ud480\uc5d0 \ub3d9\uc77c \uc790\uae08\uc73c\ub85c 3\uac1c \ubcfc\ud2b8\ub97c Sepolia\uc5d0 \ubc30\ud3ec. \ud0a4\ud37c \ubd07\uc774 \ubcc0\ub3d9\uc131 \uae30\ubc18 LP \uc790\ub3d9 \uad00\ub9ac \uc2e4\ud589 \uc911." },
-        "04": { "name": "\uba54\uc778\ub137", "description": "\uc678\ubd80 \ubcf4\uc548 \uac10\uc0ac. Base \ub610\ub294 Arbitrum\uc5d0 \uba54\uc778\ub137 \ubc30\ud3ec. \ucd08\uae30 \uc720\ub3d9\uc131 \ud655\ubcf4 \ubc0f \ud37c\ube14\ub9ad \ud37c\ud3ec\uba3c\uc2a4 \ub300\uc2dc\ubcf4\ub4dc." },
-        "05": { "name": "DAO GTM", "description": "DAO 트레저리 확보가 핵심 GTM. 3-5개 파트너십 × $1-2M. 안전한 페어부터 멀티풀 확장." },
-        "06": { "name": "\ud574\uc790 \uad6c\ucd95", "description": "\ub7f0\ud0c0\uc784 \ub370\uc774\ud130 \uc6b0\uc704. EWMA \ub108\uba38 \ucee4\uc2a4\ud140 \ubcc0\ub3d9\uc131 \ubaa8\ub378. V4 \ud6c5 \uc0dd\ud0dc\uacc4 \uc120\uc810. \uc9c0\uc18d\uc801 \uac10\uc0ac \uc2e0\ub8b0 \ucd95\uc801." },
-        "07": { "name": "\uac70\ubc84\ub10c\uc2a4", "description": "PMF \ud655\uc778 \ubc0f TVL $5M \ucd08\uacfc \ud6c4\uc5d0\ub9cc \ud1a0\ud070 \uacb0\uc815. \uadf8\uc804\uae4c\uc9c0 \uc21c\uc218 \uc218\uc775 \ubaa8\ub378 \u2014 \uaddc\uc81c \uac04\uc18c\ud654, \uc6b4\uc601 \uc9d1\uc911." },
-        "08": { "name": "멀티체인", "description": "Base에서 Arbitrum, Ethereum L1으로 확장. V4 활동과 TVL이 가스 비용을 정당화하는 곳에 배포. L1 Ethereum은 TVL $1M 이상에서만." },
-        "09": { "name": "기관 서비스", "description": "프로토콜 및 펀드를 위한 화이트라벨 LP 관리. 기관 자본을 위한 매니지드 어카운트. 규모에 맞는 싱가포르 법인 설립." }
+        "03": { "name": "테스트넷 검증", "description": "3개 볼트 Sepolia 배포. 키퍼 봇 가동. 4라운드 Trail of Bits 보안 감사: Critical 0, High 0. 대시보드 운영 중." },
+        "04": { "name": "Base 메인넷", "description": "코드 프리즈 완료. $1.2K 시드로 Base 메인넷 배포. 4주 실운영으로 실제 성과 데이터 확보." },
+        "05": { "name": "그랜트 & 감사", "description": "UFSF 감사 보조금 신청 (최대 100% 커버). Hook Design Lab 코호트 2. 코드 프리즈 상태에서 전문 보안 감사." },
+        "06": { "name": "DAO GTM", "description": "DAO 트레저리 확보가 핵심 GTM. 3-5개 파트너십 × $1-2M. 실제 메인넷 성과 데이터로 거버넌스 제안." },
+        "07": { "name": "해자 구축", "description": "유휴 자본 재활용(rehypothecation). 렌딩 프로토콜과 vault share 결합. 런타임 데이터 우위. V4 훅 생태계 선점." },
+        "08": { "name": "거버넌스", "description": "PMF 확인 및 TVL $5M 초과 후에만 토큰 결정. 그전까지 순수 수익 모델." },
+        "09": { "name": "멀티체인", "description": "Base에서 Arbitrum, Ethereum L1으로 확장. V4 활동과 TVL이 가스 비용을 정당화하는 곳에 배포." }
       },
       "items": {
         "Volatility-based LP on/off signal design": "\ubcc0\ub3d9\uc131 \uae30\ubc18 LP \uc628/\uc624\ud504 \uc2e0\ud638 \uc124\uacc4",
@@ -305,7 +308,32 @@
         "White-label vault deployment for token projects": "토큰 프로젝트용 화이트라벨 볼트 배포",
         "Managed account service for institutional LPs and funds": "기관 LP 및 펀드용 매니지드 어카운트 서비스",
         "Singapore entity formation (TVL $5-10M threshold)": "싱가포르 법인 설립 (TVL $5-10M 기준)",
-        "Custom vol models per pool (implied vol, ML prediction)": "풀별 커스텀 변동성 모델 (내재 변동성, ML 예측)"
+        "Custom vol models per pool (implied vol, ML prediction)": "풀별 커스텀 변동성 모델 (내재 변동성, ML 예측)",
+        "4-round Trail of Bits security audit — 0 Critical, 0 High": "4라운드 Trail of Bits 보안 감사 — Critical 0, High 0",
+        "Performance dashboard live (Chart.js)": "성과 대시보드 라이브 (Chart.js)",
+        "Code freeze — all features complete, 4-round audit clean": "코드 프리즈 — 전 기능 완성, 4라운드 감사 통과",
+        "Wallet setup (Deployer, Operator, Treasury Safe, Sentinel)": "지갑 설정 (Deployer, Operator, Treasury Safe, Sentinel)",
+        "Deploy 5 contracts to Base mainnet": "Base 메인넷에 5개 컨트랙트 배포",
+        "Seed $400×3 vaults on real ETH/USDC pool": "실제 ETH/USDC 풀에 $400×3 볼트 시드",
+        "Keeper bot live on Base (1hr cycles)": "Base에서 키퍼 봇 가동 (1시간 주기)",
+        "Dashboard update — real mainnet data": "대시보드 업데이트 — 실제 메인넷 데이터",
+        "4-week live performance monitoring": "4주 실운영 성과 모니터링",
+        "UFSF audit subsidy application (Uniswap Foundation Security Fund)": "UFSF 감사 보조금 신청 (Uniswap Foundation Security Fund)",
+        "Hook Design Lab Cohort 2 application": "Hook Design Lab 코호트 2 신청",
+        "v4 Hooks Support application": "v4 Hooks Support 신청",
+        "Professional security audit on code-frozen contracts": "코드 프리즈 컨트랙트 전문 보안 감사",
+        "Litepaper publication (5-8 pages)": "라이트페이퍼 출판 (5-8페이지)",
+        "Gnosis DAO governance proposal (new treasury manager seeking yield)": "Gnosis DAO 거버넌스 제안 (새 트레저리 매니저 수익 추구)",
+        "ENS DAO outreach (active treasury forum, karpatkey managed)": "ENS DAO 아웃리치 (활발한 트레저리 포럼, karpatkey 관리)",
+        "Polygon treasury proposal ($1.3B idle stablecoins)": "Polygon 트레저리 제안 ($1.3B 유휴 스테이블코인)",
+        "First DAO partnership closed ($1M+ TVL)": "첫 DAO 파트너십 체결 ($1M+ TVL)",
+        "Case study published → pitch next 4 DAOs": "케이스 스터디 발행 → 다음 4개 DAO 피치",
+        "Multi-pool expansion: wstETH/ETH, USDC/USDT": "멀티풀 확장: wstETH/ETH, USDC/USDT",
+        "Rehypothecation: LP OFF idle funds → Aave/Compound yield": "재활용: LP OFF 유휴 자금 → Aave/Compound 수익",
+        "Share composability: vault share as collateral on Morpho/Euler": "Share 결합성: vault share를 Morpho/Euler 담보로 활용",
+        "Custom vol models beyond EWMA (implied vol, ML prediction)": "EWMA 너머 커스텀 변동성 모델 (내재 변동성, ML 예측)",
+        "If token: community participation, flywheel, liquidity bootstrap": "토큰 발행 시: 커뮤니티 참여, 플라이휠, 유동성 부트스트랩",
+        "Ethereum L1 deployment (TVL $1M+ threshold)": "Ethereum L1 배포 (TVL $1M+ 기준)"
       },
       "subs": {
         "Hook \u00b7 Vault \u00b7 AlwaysLP \u00b7 HODL \u00b7 SwapHelper": "Hook \u00b7 Vault \u00b7 AlwaysLP \u00b7 HODL \u00b7 SwapHelper",

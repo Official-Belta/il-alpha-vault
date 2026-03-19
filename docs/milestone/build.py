@@ -51,7 +51,7 @@ def load_contracts_from_broadcast():
 
 def count_items(phases):
     """Count total tests (Python + Solidity) and total contracts."""
-    total_tests = 99 + 65  # From roadmap descriptions
+    total_tests = 77  # From roadmap descriptions
     deployed = sum(
         1 for p in phases for i in p["items"]
         if i["status"] == "done" and "deploy" in i["text"].lower()
@@ -275,7 +275,7 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
     <a href="../index.html#contracts" class="hm" data-ko="컨트랙트">Contracts</a>
     <a href="../index.html#log" class="hm active" data-ko="빌드 로그">Log</a>
     <a href="../thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
-    <a href="../dashboard/dashboard.html" class="hm nav-live" data-ko="테스트넷 라이브">Testnet Live</a>
+    <a href="../dashboard/dashboard.html" class="hm nav-live" data-ko="라이브">Live</a>
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
@@ -297,7 +297,7 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
   <a href="../index.html#contracts" data-ko="컨트랙트" onclick="this.parentElement.classList.remove('open')">Contracts</a>
   <a href="../index.html#log" data-ko="빌드 로그" onclick="this.parentElement.classList.remove('open')">Log</a>
   <a href="../thesis.html" data-ko="투자 논문">Thesis</a>
-  <a href="../dashboard/dashboard.html" data-ko="테스트넷 라이브">Testnet Live</a>
+  <a href="../dashboard/dashboard.html" data-ko="라이브">Live</a>
 </div>
 
 <section class="hero">
@@ -358,8 +358,8 @@ def build_html(roadmap, contracts):
 
     proj = roadmap["project"]
     phases = roadmap["phases"]
-    total_tests = 99 + 65
-    total_phases = len(phases) + 2  # +2 for Phase 6 (Moat) and 7 (Token)
+    total_tests = 77
+    total_phases = len(phases)
     current_phase = next(
         (i + 1 for i, p in enumerate(phases) if p["status"] == "active"),
         len(phases)
@@ -395,7 +395,7 @@ def build_html(roadmap, contracts):
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{esc(proj["name"])}</title>
 <meta name="description" content="{esc(proj["tagline"])}. {esc(proj["description"])}">
-<meta property="og:title" content="{esc(proj["name"])} — Testnet Milestones">
+<meta property="og:title" content="{esc(proj["name"])} — Milestones">
 <meta property="og:description" content="{esc(proj["tagline"])}. Live on {esc(proj["network"])} testnet.">
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap" rel="stylesheet">
@@ -573,6 +573,9 @@ def build_html(roadmap, contracts):
   .btn-outline {{ display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-weight: 500; font-size: 14px; background: transparent; color: var(--gray-400); padding: 14px 28px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); text-decoration: none; transition: all 300ms var(--ease); }}
   .btn-outline:hover {{ border-color: rgba(255,255,255,0.2); color: var(--white); }}
 
+  .unaudited {{ background: var(--gray-900); color: var(--gray-400); font-family: var(--mono); font-size: 12px; text-align: center; padding: 10px 48px; letter-spacing: 0.06em; border-bottom: 1px solid rgba(255,255,255,0.06); }}
+  .unaudited strong {{ color: var(--white); }}
+
   footer {{ background: var(--black); border-top: 1px solid rgba(255,255,255,0.06); padding: 24px 48px; display: flex; justify-content: space-between; align-items: center; }}
   @media (max-width: 640px) {{ footer {{ padding: 24px; }} }}
   footer span {{ font-family: var(--mono); font-size: 11px; color: var(--gray-700); }}
@@ -584,6 +587,8 @@ def build_html(roadmap, contracts):
 </head>
 <body>
 
+<div class="unaudited" data-ko="⚠️ <strong>UNAUDITED</strong> — 감사 전 소프트웨어. 본인 책임 하에 사용하세요.">⚠️ <strong>UNAUDITED</strong> — Pre-audit software. Use at your own risk.</div>
+
 <nav id="nav">
   <a class="logo" href="#">{esc(proj["name"])}</a>
   <div class="nav-links">
@@ -591,7 +596,7 @@ def build_html(roadmap, contracts):
     <a href="#contracts" class="hm nav-item" data-section="contracts" data-ko="{esc(ko_ui.get('contracts', 'Contracts'))}">Contracts</a>
     <a href="#log" class="hm nav-item" data-section="log" data-ko="빌드 로그">Log</a>
     <a href="thesis.html" class="hm nav-item" data-ko="투자 논문">Thesis</a>
-    <a href="dashboard/dashboard.html" class="hm nav-item nav-live" data-ko="테스트넷 라이브">Testnet Live</a>
+    <a href="dashboard/dashboard.html" class="hm nav-item nav-live" data-ko="라이브">Live</a>
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
@@ -613,11 +618,11 @@ def build_html(roadmap, contracts):
   <a href="#contracts" data-ko="{esc(ko_ui.get('contracts', 'Contracts'))}" onclick="this.parentElement.classList.remove('open')">Contracts</a>
   <a href="#log" data-ko="빌드 로그" onclick="this.parentElement.classList.remove('open')">Log</a>
   <a href="thesis.html" data-ko="투자 논문">Thesis</a>
-  <a href="dashboard/dashboard.html" data-ko="테스트넷 라이브">Testnet Live</a>
+  <a href="dashboard/dashboard.html" data-ko="라이브">Live</a>
 </div>
 
 <section class="hero">
-  <div class="hero-eyebrow">{esc(proj["eyebrow"])} &middot; {esc(proj["network"])} Testnet</div>
+  <div class="hero-eyebrow">{esc(proj["eyebrow"])} &middot; {esc(proj["network"])}</div>
   <h1 class="reveal" data-ko-html="변동성 기반 유동성 <em>관리</em>">{esc(proj["tagline"]).replace("liquidity ", "liquidity <em>").replace("management", "management</em>")}</h1>
   <p class="hero-sub reveal" data-ko="{esc(ko_proj.get('description', proj['description']))}">{esc(proj["description"])}</p>
 </section>

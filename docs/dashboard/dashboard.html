@@ -80,6 +80,8 @@
 </head>
 <body>
 
+<div style="background:#1C1917; color:#78716C; font-family:'Geist Mono','SF Mono',monospace; font-size:12px; text-align:center; padding:10px 48px; letter-spacing:0.06em; border-bottom:1px solid rgba(255,255,255,0.06);" data-ko="⚠️ <strong style='color:#FAFAF9'>UNAUDITED</strong> — 감사 전 소프트웨어. 본인 책임 하에 사용하세요.">⚠️ <strong style="color:#FAFAF9">UNAUDITED</strong> — Pre-audit software. Use at your own risk.</div>
+
 <nav>
   <a class="logo" href="../index.html">IL Alpha</a>
   <div class="nav-links">
@@ -87,7 +89,7 @@
     <a href="../index.html#contracts" class="hm" data-ko="컨트랙트">Contracts</a>
     <a href="../index.html#log" class="hm" data-ko="빌드 로그">Log</a>
     <a href="../thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
-    <a href="dashboard.html" class="hm nav-live active" data-ko="테스트넷 라이브">Testnet Live</a>
+    <a href="dashboard.html" class="hm nav-live active" data-ko="라이브">Live</a>
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
@@ -109,7 +111,7 @@
   <a href="../index.html#contracts" data-ko="컨트랙트" onclick="this.parentElement.classList.remove('open')">Contracts</a>
   <a href="../index.html#log" data-ko="빌드 로그" onclick="this.parentElement.classList.remove('open')">Log</a>
   <a href="../thesis.html" data-ko="투자 논문">Thesis</a>
-  <a href="dashboard.html" data-ko="테스트넷 라이브">Testnet Live</a>
+  <a href="dashboard.html" data-ko="라이브">Live</a>
 </div>
 
 <section class="hero">
@@ -186,6 +188,9 @@ const CSV_DATA = `timestamp,eth_price,tick_variance,on_chain_var,lp_active,total
 2026-03-20 01:49:14,2114.04,4754172488760642502656,4936223704704140341218,True,150000000000,50000000000,100000000000,1041618760850,1499995000049999500
 2026-03-20 02:47:02,2117.07,4632530535003004076032,4845198096732391421937,True,150000000000,50000000000,100000000000,1041618760850,1499995000049999500
 2026-03-20 03:44:26,2115.96,4670200746145086439424,4738864315867697748984,True,150000000000,50000000000,100000000000,1041618760850,1499995000049999500
+2026-03-20 04:40:50,2144.85,4799578006974927732736,4704532531006392094204,True,150000000000,50000000000,100000000000,1041618760850,1499995000049999500
+2026-03-20 05:37:01,2144.11,4589555338743080026112,4752055268990659913470,False,99999999999,99999999999,0,0,999999999990000099
+2026-03-20 06:34:13,2147.62,4480917029278874861568,4670805303866869969791,False,99999999999,99999999999,0,0,999999999990000099
 `;
 
 function parseCSV(csv) {

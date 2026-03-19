@@ -159,17 +159,16 @@
   .log-section { background: var(--black); color: var(--white); padding: 96px 48px; }
   @media (max-width: 640px) { .log-section { padding: 64px 24px; } }
   .log-section .section-eyebrow::after { background: var(--gray-700); }
-  .log-day { margin-bottom: 56px; }
-  .log-date { font-family: var(--display); font-size: 28px; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 32px; color: var(--white); }
-  .log-cards { display: flex; flex-direction: column; border-top: 1px solid rgba(255,255,255,0.08); }
-  .log-card { display: grid; grid-template-columns: 140px 1fr auto; align-items: baseline; gap: 24px; padding: 24px 0; border-bottom: 1px solid rgba(255,255,255,0.08); text-decoration: none; color: inherit; transition: all 200ms var(--ease); opacity: 0.6; }
-  .log-card:hover { opacity: 1; padding-left: 12px; }
-  @media (max-width: 768px) { .log-card { grid-template-columns: 1fr; gap: 8px; } }
-  .log-cat { font-family: var(--mono); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-400); }
-  .log-card-title { font-family: var(--sans); font-size: 16px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.4; color: var(--white); }
-  .log-card-summary { display: none; }
-  .log-card-arrow { font-family: var(--mono); font-size: 13px; color: var(--gray-600); transition: color 200ms var(--ease); }
-  .log-card:hover .log-card-arrow { color: var(--white); }
+  .log-counter { margin-bottom: 32px; }
+  .log-counter-num { font-family: var(--display); font-size: clamp(36px,5vw,56px); font-weight: 400; letter-spacing: -0.025em; color: var(--white); margin-bottom: 8px; }
+  .log-counter-date { font-family: var(--mono); font-size: 13px; color: var(--gray-500); }
+  .log-latest { border-top: 1px solid rgba(255,255,255,0.08); margin-bottom: 32px; }
+  .log-latest-row { display: grid; grid-template-columns: 140px 1fr; gap: 24px; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  @media (max-width: 768px) { .log-latest-row { grid-template-columns: 1fr; gap: 6px; } }
+  .log-latest-cat { font-family: var(--mono); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-500); }
+  .log-latest-title { font-family: var(--sans); font-size: 16px; font-weight: 500; color: var(--white); letter-spacing: -0.01em; }
+  .log-archive-link { font-family: var(--mono); font-size: 14px; color: var(--gray-500); text-decoration: none; transition: color 200ms var(--ease); }
+  .log-archive-link:hover { color: var(--white); }
   .log-filters { display: flex; gap: 8px; margin-bottom: 32px; }
   .log-filter { font-family: var(--mono); font-size: 12px; color: var(--gray-500); background: transparent; border: 1px solid rgba(255,255,255,0.08); border-radius: 100px; padding: 6px 16px; cursor: pointer; transition: all 200ms var(--ease); }
   .log-filter:hover, .log-filter.active { color: var(--white); border-color: rgba(255,255,255,0.2); }
@@ -261,52 +260,25 @@
     <div class="section-eyebrow" data-ko="빌드 로그">Build Log</div>
     <h2 class="section-title reveal" data-ko="오늘 우리가 한 일">What we shipped</h2>
     
-        <div class="log-day reveal">
-          <div class="log-date">2026-03-20</div>
-          <div class="log-cards">
-            <a class="log-card" href="log/2026-03-20.html#dev">
-              <div class="log-cat" data-cat="dev" data-ko="개발">Development</div>
-              <div class="log-card-title" data-ko="코드 프리즈. 77 테스트. 메인넷 준비 완료.">Code Freeze. 77 Tests. Mainnet Ready.</div>
-              <div class="log-card-summary" data-ko="4라운드 Trail of Bits 감사 통과. F-2 가드, TWAP 체크, 볼륨 스파이크 트리거 추가. 코드 프리즈 선언.">4-round Trail of Bits audit clean. F-2 guard, TWAP check, volume spike trigger added. Code freeze declared.</div>
-              <div class="log-card-arrow" data-ko="자세히 보기 &rarr;">Read more &rarr;</div>
-            </a>
-            <a class="log-card" href="log/2026-03-20.html#strategy">
-              <div class="log-cat" data-cat="strategy" data-ko="전략">Strategy</div>
-              <div class="log-card-title" data-ko="B2B 피봇. DAO 트레저리 GTM.">B2B Pivot. DAO Treasury GTM.</div>
-              <div class="log-card-summary" data-ko="타겟을 개인 LP에서 DAO 트레저리로 전환. 20개 타겟 DAO 선정. 거버넌스 제안서 템플릿 완성. 그랜트 전략 확정.">Target shifted from retail LPs to DAO treasuries. 20 target DAOs identified. Governance proposal templates ready. Grant strategy locked.</div>
-              <div class="log-card-arrow" data-ko="자세히 보기 &rarr;">Read more &rarr;</div>
-            </a>
-            <a class="log-card" href="log/2026-03-20.html#design">
-              <div class="log-cat" data-cat="design" data-ko="디자인 &amp; 홍보">Design &amp; Marketing</div>
-              <div class="log-card-title" data-ko="볼트 페이지. 메인넷 사이트. 페이즈 재구성.">Vault Page. Mainnet Site. Phase Restructure.</div>
-              <div class="log-card-summary" data-ko="Web3 입출금 볼트 페이지. 위험 고지 게이트. 9단계 로드맵 메인넷 기준 재구성. Sepolia → Base 전환.">Vault deposit/withdraw page with Web3. Risk gate. 9-phase roadmap restructured for mainnet. Sepolia → Base transition.</div>
-              <div class="log-card-arrow" data-ko="자세히 보기 &rarr;">Read more &rarr;</div>
-            </a>
-          </div>
+    <div class="log-counter reveal">
+      <div class="log-counter-num" data-ko="Day 2 · 34개 마일스톤">Day 2 · 34 milestones</div>
+      <div class="log-counter-date">2026-03-20</div>
+    </div>
+    <div class="log-latest reveal">
+        <div class="log-latest-row">
+          <span class="log-latest-cat" data-ko="개발">Development</span>
+          <span class="log-latest-title" data-ko="코드 프리즈. 77 테스트. 메인넷 준비 완료.">Code Freeze. 77 Tests. Mainnet Ready.</span>
         </div>
-        <div class="log-day reveal">
-          <div class="log-date">2026-03-19</div>
-          <div class="log-cards">
-            <a class="log-card" href="log/2026-03-19.html#dev">
-              <div class="log-cat" data-cat="dev" data-ko="개발">Development</div>
-              <div class="log-card-title" data-ko="Phase 2 → 3 완료. LP 활성화 성공.">Phase 2 → 3 Complete. LP Activated.</div>
-              <div class="log-card-summary" data-ko="솔리디티 컨트랙트 완성. Sepolia 배포. 키퍼 봇 가동. 최초 온체인 LP 활성화.">Solidity contracts shipped. Sepolia deployed. Keeper bot live. First LP activation on-chain.</div>
-              <div class="log-card-arrow" data-ko="자세히 보기 &rarr;">Read more &rarr;</div>
-            </a>
-            <a class="log-card" href="log/2026-03-19.html#strategy">
-              <div class="log-cat" data-cat="strategy" data-ko="전략">Strategy</div>
-              <div class="log-card-title" data-ko="포지셔닝 확정. Arrakis 분석 완료.">Positioning Locked. Arrakis Analyzed.</div>
-              <div class="log-card-summary" data-ko="프로덕트 포지셔닝 확정. 경쟁사 분석 완료. 수수료 구조 및 GTM 전략 확정.">Product positioning defined. Competitive analysis complete. Fee structure and go-to-market locked.</div>
-              <div class="log-card-arrow" data-ko="자세히 보기 &rarr;">Read more &rarr;</div>
-            </a>
-            <a class="log-card" href="log/2026-03-19.html#design">
-              <div class="log-cat" data-cat="design" data-ko="디자인 &amp; 홍보">Design &amp; Marketing</div>
-              <div class="log-card-title" data-ko="디자인 시스템 + 공개 사이트 라이브.">Design System + Public Site Live.</div>
-              <div class="log-card-summary" data-ko="Blackstone 스타일 디자인 시스템. 마일스톤 사이트 배포. 브랜드명 IL Alpha로 변경.">Blackstone-inspired design system. Milestone site deployed. Brand renamed to IL Alpha.</div>
-              <div class="log-card-arrow" data-ko="자세히 보기 &rarr;">Read more &rarr;</div>
-            </a>
-          </div>
+        <div class="log-latest-row">
+          <span class="log-latest-cat" data-ko="전략">Strategy</span>
+          <span class="log-latest-title" data-ko="B2B 피봇. DAO 트레저리 GTM.">B2B Pivot. DAO Treasury GTM.</span>
         </div>
+        <div class="log-latest-row">
+          <span class="log-latest-cat" data-ko="디자인 &amp; 홍보">Design &amp; Marketing</span>
+          <span class="log-latest-title" data-ko="볼트 페이지. 메인넷 사이트. 페이즈 재구성.">Vault Page. Mainnet Site. Phase Restructure.</span>
+        </div>
+    </div>
+    <a class="log-archive-link" href="log/" data-ko="전체 빌드 로그 보기 →">View full build log →</a>
   </div>
 </section>
 

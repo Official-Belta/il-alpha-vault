@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IL Alpha — Build Log</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet">
+<style>
+  :root { --black:#0C0C0C; --white:#FAFAF9; --gray-100:#F5F5F4; --gray-200:#E7E5E4; --gray-300:#D6D3D1; --gray-400:#A8A29E; --gray-500:#78716C; --gray-600:#57534E; --gray-700:#44403C; --gray-900:#1C1917; --accent:#1A7F64; --display:'Playfair Display',Georgia,serif; --sans:'Geist Sans','Satoshi',system-ui,sans-serif; --mono:'Geist Mono','SF Mono',monospace; --ease:cubic-bezier(0.25,0.46,0.45,0.94); }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:var(--sans); background:var(--white); color:var(--black); -webkit-font-smoothing:antialiased; }
+  ::selection { background:var(--black); color:var(--white); }
+
+  nav { position:sticky; top:0; z-index:100; padding:0 48px; height:64px; display:flex; align-items:center; justify-content:space-between; background:rgba(250,250,249,0.92); backdrop-filter:blur(20px); border-bottom:1px solid var(--gray-200); }
+  .logo { font-family:var(--sans); font-weight:700; font-size:18px; letter-spacing:-0.03em; color:var(--black); text-decoration:none; }
+  .nav-links { display:flex; align-items:center; gap:28px; }
+  .nav-links a { font-size:15px; font-weight:500; color:var(--gray-600); text-decoration:none; transition:color 300ms var(--ease); }
+  .nav-links a:hover { color:var(--black); }
+  .nav-links a.active { color:var(--black); font-weight:700; border-bottom:2px solid var(--accent); padding-bottom:2px; }
+  .hamburger { display:none; background:none; border:none; cursor:pointer; padding:8px; color:var(--gray-600); }
+  .hamburger svg { width:24px; height:24px; }
+  @media (max-width:640px) { .nav-links a.hm { display:none; } .hamburger { display:block; } nav { padding:0 24px; } }
+
+  .lang-btn { position:relative; display:flex; align-items:center; gap:6px; font-family:var(--sans); font-size:14px; font-weight:500; color:var(--gray-500); background:transparent; border:1px solid var(--gray-200); border-radius:100px; padding:6px 14px; cursor:pointer; transition:all 200ms var(--ease); }
+  .lang-btn:hover { color:var(--black); border-color:var(--gray-400); }
+  .lang-btn svg { width:16px; height:16px; }
+  .lang-dropdown { position:absolute; top:calc(100% + 8px); right:0; background:var(--white); border:1px solid var(--gray-200); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); overflow:hidden; opacity:0; transform:translateY(-4px); pointer-events:none; transition:all 200ms var(--ease); min-width:140px; z-index:200; }
+  .lang-dropdown.open { opacity:1; transform:translateY(0); pointer-events:auto; }
+  .lang-option { display:flex; align-items:center; gap:10px; padding:12px 16px; font-size:14px; font-weight:500; color:var(--gray-600); cursor:pointer; transition:background 150ms var(--ease); }
+  .lang-option:hover { background:var(--gray-100); }
+  .lang-option.active { color:var(--accent); }
+
+  .mobile-menu { display:none; position:fixed; top:64px; left:0; right:0; background:var(--white); border-bottom:1px solid var(--gray-200); padding:16px 24px; z-index:99; flex-direction:column; gap:16px; }
+  .mobile-menu.open { display:flex; }
+  .mobile-menu a { font-size:16px; font-weight:500; color:var(--gray-600); text-decoration:none; padding:8px 0; }
+
+  .archive { max-width:760px; margin:0 auto; padding:96px 48px 64px; }
+  @media (max-width:640px) { .archive { padding:80px 24px 48px; } }
+  .arc-eyebrow { font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:16px; }
+  .arc-h1 { font-family:var(--display); font-size:clamp(36px,5vw,56px); font-weight:400; letter-spacing:-0.025em; margin-bottom:8px; }
+  .arc-stat { font-family:var(--mono); font-size:14px; color:var(--gray-500); margin-bottom:48px; }
+
+  .arc-day { margin-bottom:48px; }
+  .arc-date { font-family:var(--mono); font-size:14px; font-weight:600; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid var(--gray-200); }
+  .arc-entry { cursor:pointer; border-bottom:1px solid var(--gray-200); }
+  .arc-row { display:grid; grid-template-columns:130px 1fr 24px; gap:20px; padding:16px 0; align-items:baseline; transition:opacity 200ms var(--ease); }
+  .arc-entry:hover .arc-row { opacity:0.7; }
+  @media (max-width:640px) { .arc-row { grid-template-columns:1fr auto; gap:8px; } .arc-cat { display:none; } }
+  .arc-cat { font-family:var(--mono); font-size:13px; font-weight:500; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray-500); }
+  .arc-title { font-family:var(--sans); font-size:17px; font-weight:500; letter-spacing:-0.01em; color:var(--black); }
+  .arc-toggle { font-family:var(--mono); font-size:18px; color:var(--gray-400); transition:transform 200ms var(--ease); }
+  .arc-entry.open .arc-toggle { transform:rotate(45deg); }
+  .arc-detail { max-height:0; overflow:hidden; transition:max-height 300ms var(--ease); }
+  .arc-entry.open .arc-detail { max-height:800px; }
+  .arc-items { padding:0 0 24px 150px; list-style:none; }
+  @media (max-width:640px) { .arc-items { padding:0 0 24px 0; } }
+  .arc-items li { font-size:15px; color:var(--gray-600); line-height:1.75; padding:8px 0; border-bottom:1px solid var(--gray-100); }
+  .arc-items li:last-child { border-bottom:none; }
+
+  footer { padding:24px 48px; border-top:1px solid var(--gray-200); }
+  footer span { font-family:var(--mono); font-size:11px; color:var(--gray-500); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="../index.html">IL Alpha</a>
+  <div class="nav-links">
+    <a href="../index.html#roadmap" class="hm" data-ko="로드맵">Roadmap</a>
+    <a href="../vault.html" class="hm" data-ko="볼트">Vault</a>
+    <a href="./" class="hm active" data-ko="빌드 로그">Log</a>
+    <a href="../thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
+    <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div style="position:relative;">
+      <button class="lang-btn" onclick="document.querySelector('.lang-dropdown').classList.toggle('open')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span id="langLabel">EN</span>
+      </button>
+      <div class="lang-dropdown">
+        <div class="lang-option active" data-lang="en" onclick="setLang('en')">English</div>
+        <div class="lang-option" data-lang="ko" onclick="setLang('ko')">한국어</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-menu">
+  <a href="../index.html#roadmap" data-ko="로드맵" onclick="this.parentElement.classList.remove('open')">Roadmap</a>
+  <a href="../vault.html" data-ko="볼트">Vault</a>
+  <a href="./" class="active" data-ko="빌드 로그">Log</a>
+  <a href="../thesis.html" data-ko="투자 논문">Thesis</a>
+</div>
+
+<div class="archive">
+  <div class="arc-eyebrow" data-ko="빌드 로그">Build Log</div>
+  <h1 class="arc-h1" data-ko="빌드 히스토리">Build history</h1>
+  <div class="arc-stat" data-ko="Day 2 · 34개 마일스톤">Day 2 · 34 milestones shipped</div>
+  
+    <div class="arc-day">
+      <div class="arc-date">2026-03-20</div>
+      
+      <div class="arc-entry" onclick="this.classList.toggle('open')">
+        <div class="arc-row">
+          <span class="arc-cat" data-ko="개발">Development</span>
+          <span class="arc-title" data-ko="코드 프리즈. 77 테스트. 메인넷 준비 완료.">Code Freeze. 77 Tests. Mainnet Ready.</span>
+          <span class="arc-toggle">+</span>
+        </div>
+        <div class="arc-detail">
+          <ul class="arc-items"><li data-ko="코드 프리즈 선언: 77 테스트 (Hook 31 + Vault 37 + Controls 9), 0 실패. 더 이상 컨트랙트 변경 없음.">Code freeze declared: 77 tests (Hook 31 + Vault 37 + Controls 9), 0 failures. No more contract changes.</li><li data-ko="4라운드 Trail of Bits 보안 감사: Critical 0, High 0. 준비 점수 89/100.">4-round Trail of Bits security audit: 0 Critical, 0 High. Readiness score 89/100.</li><li data-ko="F-2 setLPRange 가드 추가 — LP 배포 중 range 변경 방지.">F-2 setLPRange guard added — prevents range change while LP deployed.</li><li data-ko="TWAP 체크 — 입출금 시 샌드위치 공격 차단 (±5% 임계값).">TWAP check on deposit/withdraw — blocks sandwich attacks (±5% threshold).</li><li data-ko="볼륨 스파이크 트리거 — 비정상 볼륨 시 쿨다운 무시하고 긴급 LP 제거.">Volume spike trigger — emergency LP removal bypasses cooldown on abnormal volume.</li><li data-ko="ERC-4626 준수를 위해 출금 수수료 제거.">Withdrawal fee removed for ERC-4626 compliance and simplicity.</li><li data-ko="Base 메인넷 지갑 설정: Deployer, Operator, Treasury Safe (Gnosis 2/3), Sentinel.">Base mainnet wallet setup: Deployer, Operator, Treasury Safe (Gnosis 2/3), Sentinel.</li></ul>
+        </div>
+      </div>
+      <div class="arc-entry" onclick="this.classList.toggle('open')">
+        <div class="arc-row">
+          <span class="arc-cat" data-ko="전략">Strategy</span>
+          <span class="arc-title" data-ko="B2B 피봇. DAO 트레저리 GTM.">B2B Pivot. DAO Treasury GTM.</span>
+          <span class="arc-toggle">+</span>
+        </div>
+        <div class="arc-detail">
+          <ul class="arc-items"><li data-ko="B2B 피봇: DAO 트레저리 (1순위), 개인 LP (2순위). $24.5B 유휴, 67%가 0% 수익률.">B2B pivot: DAO treasuries (primary) over retail LPs (secondary). $24.5B idle, 67% at 0% yield.</li><li data-ko="20개 타겟 DAO 3개 티어로 선정. Top 3: Gnosis (새 트레저리 매니저), ENS (활발한 포럼), Polygon ($1.3B 유휴).">20 target DAOs selected across 3 tiers. Top 3: Gnosis (new treasury manager), ENS (active forum), Polygon ($1.3B idle).</li><li data-ko="거버넌스 제안서 템플릿 (EN/KO) — Sharpe 3.66, DD -12%, 성과보수만, ERC-4626.">Governance proposal template created (EN/KO) — Sharpe 3.66, DD -12%, perf-fee-only, ERC-4626.</li><li data-ko="그랜트 전략: UFSF 감사 보조금 (100% 커버), Hook Design Lab 코호트 2, v4 Hooks Support.">Grant strategy: UFSF audit subsidy (100% coverage), Hook Design Lab Cohort 2, v4 Hooks Support.</li><li data-ko="메인넷 직행: 테스트넷 연장 없이 → Base 메인넷 $1.2K 시드, 캡 제한, 4주 실데이터.">Mainnet direct: skip extended testnet → Base mainnet with $1.2K seed, capped deposit, 4-week live data.</li><li data-ko="Thesis 페이지 전면 교체: DAO 트레저리 피치 + 백테스트 데이터, 시장 규모, 수익 모델, 타이밍 (Bunni 빈자리).">Thesis page rewritten: DAO treasury pitch with backtest data, market sizing, revenue model, timing (Bunni vacancy).</li></ul>
+        </div>
+      </div>
+      <div class="arc-entry" onclick="this.classList.toggle('open')">
+        <div class="arc-row">
+          <span class="arc-cat" data-ko="디자인 &amp; 홍보">Design &amp; Marketing</span>
+          <span class="arc-title" data-ko="볼트 페이지. 메인넷 사이트. 페이즈 재구성.">Vault Page. Mainnet Site. Phase Restructure.</span>
+          <span class="arc-toggle">+</span>
+        </div>
+        <div class="arc-detail">
+          <ul class="arc-items"><li data-ko="볼트 페이지: ethers.js v6으로 ERC-4626 입출금. Rabby/MetaMask, Base 자동 전환, 실시간 통계.">Vault page: ERC-4626 deposit/withdraw with ethers.js v6. Rabby/MetaMask, Base auto-switch, real-time stats.</li><li data-ko="위험 고지 게이트: 볼트 진입 전 다크 풀스크린 경고. 세션 기반 (탭 닫으면 리셋).">Risk disclosure gate: dark fullscreen warning before vault access. Session-based (resets per tab).</li><li data-ko="로드맵 재구성: Phase 3→완료, 4→Base 메인넷 (진행 중), 5→그랜트&amp;감사, 6→DAO GTM, 7→해자, 8→거버넌스, 9→멀티체인.">Roadmap restructured: Phase 3→complete, 4→Base Mainnet (active), 5→Grants &amp; Audit, 6→DAO GTM, 7→Moat, 8→Governance, 9→Multi-Chain.</li><li data-ko="네트워크 전환: Sepolia → Base. etherscan → basescan.org. 테스트 164 → 77. beforeSwap → afterSwap.">Network transition: Sepolia → Base. etherscan → basescan.org. Tests 164 → 77. beforeSwap → afterSwap.</li><li data-ko="UNAUDITED 배너: 볼트에만 (메인/thesis/대시보드에서 제거). 플로팅 Vault FAB 버튼 전 페이지.">UNAUDITED banner: vault-only (removed from main/thesis/dashboard). Floating Vault FAB button on all pages.</li><li data-ko="타이포그래피: Playfair Display 제목 복원, Geist Sans 본문, 볼트·로드맵 폰트 확대.">Typography: Playfair Display restored for titles, Geist Sans body, font sizes enlarged across vault and roadmap.</li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="arc-day">
+      <div class="arc-date">2026-03-19</div>
+      
+      <div class="arc-entry" onclick="this.classList.toggle('open')">
+        <div class="arc-row">
+          <span class="arc-cat" data-ko="개발">Development</span>
+          <span class="arc-title" data-ko="Phase 2 → 3 완료. LP 활성화 성공.">Phase 2 → 3 Complete. LP Activated.</span>
+          <span class="arc-toggle">+</span>
+        </div>
+        <div class="arc-detail">
+          <ul class="arc-items"><li data-ko="Solidity 컨트랙트 완성: ILAlphaHook (V4 hook + EWMA 변동성 오라클), ILAlphaVault (ERC-4626), BaseVault, 대조군 2개. 44 → 65 테스트 전부 통과.">Solidity contracts complete: ILAlphaHook (V4 hook + EWMA vol oracle), ILAlphaVault (ERC-4626), BaseVault, 2 control vaults. 44 → 65 tests, all passing.</li><li data-ko="Ethereum Sepolia 배포 — 3회 시도. 문제: Sepolia에 V4 PoolManager 미배포. 해결: 자체 PoolManager 배포.">Deployed to Ethereum Sepolia — 3 attempts. Problem: V4 PoolManager not available on Sepolia. Solution: deployed our own PoolManager.</li><li data-ko="CREATE2 hook 배포 실패 — owner가 proxy 주소. 수정: constructor에 owner 파라미터 추가.">CREATE2 hook deployment failed — owner was proxy address. Fix: added explicit owner parameter to constructor.</li><li data-ko="키퍼 봇 가동 (1시간 간격). 첫 사이클: feeYield &gt; ilCost → LP ON. 100K tUSDC가 V4 풀에 배포됨.">Keeper bot live (1hr intervals). First cycle: feeYield &gt; ilCost → LP ON. 100K tUSDC deployed to V4 pool.</li><li data-ko="SwapHelper 배포로 테스트넷 볼륨 생성. CSV 메트릭 로깅 추가.">SwapHelper deployed for testnet volume generation. CSV metrics logging added.</li></ul>
+        </div>
+      </div>
+      <div class="arc-entry" onclick="this.classList.toggle('open')">
+        <div class="arc-row">
+          <span class="arc-cat" data-ko="전략">Strategy</span>
+          <span class="arc-title" data-ko="포지셔닝 확정. Arrakis 분석 완료.">Positioning Locked. Arrakis Analyzed.</span>
+          <span class="arc-toggle">+</span>
+        </div>
+        <div class="arc-detail">
+          <ul class="arc-items"><li data-ko="우리는 아님: 스테이킹 대안, 렌딩 대안, 유동성 보장. 우리임: 15%+ 수익을 원하는 자본을 위한 IL 방어 LP 관리.">We are NOT: staking alt, lending alt, liquidity guarantee. We ARE: IL-defended LP management for capital seeking 15%+ returns.</li><li data-ko="새 토큰 프로젝트 = 최고 ROI 세그먼트. 피치: &#x27;트레저리가 6개월 대신 12개월 유지.&#x27; &#x27;유동성 공급&#x27;이 아님.">New token projects identified as highest ROI segment. Pitch: &#x27;your treasury lasts 12mo instead of 6mo.&#x27; NOT &#x27;we supply liquidity.&#x27;</li><li data-ko="Arrakis 심층 분석: 토큰 발행자용 B2B 동적 수수료 (LP 유지) vs 우리 트레저리 보호 B2B (LP 제거). 시장 안 겹침.">Arrakis deep dive: B2B dynamic fees for token issuers (keeps LP in) vs our B2B treasury protection (LP removal). Non-overlapping markets.</li><li data-ko="생존 확률: $10K→$1M 약 17%. 메인넷 Day 1에 첫 고객 확보 필수 (Arrakis 플레이북).">Survival math: $10K→$1M probability ~17%. Must secure Day 1 customer at mainnet launch (Arrakis playbook).</li><li data-ko="수수료 구조 확정: Stage 1 = 성과보수 10%, 관리보수 0%. 수익 없으면 수수료 0원.">Fee structure finalized: Stage 1 = 10% performance, 0% management. No fees if no profit.</li></ul>
+        </div>
+      </div>
+      <div class="arc-entry" onclick="this.classList.toggle('open')">
+        <div class="arc-row">
+          <span class="arc-cat" data-ko="디자인 &amp; 홍보">Design &amp; Marketing</span>
+          <span class="arc-title" data-ko="디자인 시스템 + 공개 사이트 라이브.">Design System + Public Site Live.</span>
+          <span class="arc-toggle">+</span>
+        </div>
+        <div class="arc-detail">
+          <ul class="arc-items"><li data-ko="경쟁사 비주얼 리서치: Arrakis, Lido, EigenLayer, Sommelier 스크린샷 + 분석.">Competitive visual research: Arrakis, Lido, EigenLayer, Sommelier screenshotted and analyzed.</li><li data-ko="디자인 시스템 생성 (DESIGN.md). 방향: Blackstone 스타일 기관 금융. Playfair Display + Satoshi + Geist Mono.">Design system created (DESIGN.md). Direction: Blackstone-inspired institutional finance. Playfair Display + Satoshi + Geist Mono.</li><li data-ko="마일스톤 페이지 빌드 파이프라인: roadmap.json → build.py → index.html. 컨트랙트별 Etherscan 실시간 tx count.">Milestone page built with build.py pipeline: roadmap.json → index.html. Live Etherscan tx count per contract.</li><li data-ko="GitHub Pages 배포: official-belta.github.io/il-alpha-site. 지구본 드롭다운으로 한영 전환.">Deployed to GitHub Pages: official-belta.github.io/il-alpha-site. English/Korean toggle with globe dropdown.</li><li data-ko="이름 변경: &#x27;IL Alpha Vault&#x27; → &#x27;IL Alpha&#x27;. Vault는 너무 일반적 — 우리는 프로토콜.">Name changed: &#x27;IL Alpha Vault&#x27; → &#x27;IL Alpha&#x27;. Vault is generic — we&#x27;re a protocol, not a container.</li></ul>
+        </div>
+      </div>
+    </div>
+</div>
+
+<footer><span>&copy; 2026 IL Alpha</span></footer>
+
+<script>
+let currentLang = localStorage.getItem('lang') || 'en';
+const langLabel = document.getElementById('langLabel');
+const dropdown = document.querySelector('.lang-dropdown');
+function setLang(lang) { currentLang = lang; localStorage.setItem('lang', lang); dropdown.classList.remove('open'); applyLang(); }
+function applyLang() {
+  langLabel.textContent = currentLang === 'en' ? 'EN' : 'KR';
+  document.documentElement.lang = currentLang === 'ko' ? 'ko' : 'en';
+  document.querySelectorAll('.lang-option').forEach(o => o.classList.toggle('active', o.dataset.lang === currentLang));
+  document.querySelectorAll('[data-ko],[data-ko-html]').forEach(el => {
+    if (!el.dataset.en) el.dataset.en = el.innerHTML;
+    if (currentLang === 'ko') {
+      if (el.dataset.koHtml) el.innerHTML = el.dataset.koHtml;
+      else if (el.dataset.ko) el.textContent = el.dataset.ko;
+    } else if (el.dataset.en) { el.innerHTML = el.dataset.en; }
+  });
+}
+document.addEventListener('click', e => { if (!e.target.closest('.lang-btn') && !e.target.closest('.lang-dropdown')) dropdown.classList.remove('open'); });
+if (currentLang === 'ko') applyLang();
+</script>
+</body>
+</html>

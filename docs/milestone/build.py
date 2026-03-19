@@ -141,38 +141,36 @@ def render_contract(name, address, meta, etherscan_base):
 
 
 def render_log_summary(log_entries):
-    """Render summary cards for main page."""
+    """Render compact build counter for main page — latest day only."""
+    total_days = len(log_entries)
+    total_items = sum(len(e.get("items", [])) for d in log_entries for e in d["entries"])
+    latest = log_entries[0] if log_entries else None
+    if not latest:
+        return ""
+
     category_labels = {"dev": "Development", "strategy": "Strategy", "design": "Design & Marketing"}
     category_labels_ko = {"dev": "개발", "strategy": "전략", "design": "디자인 & 홍보"}
 
-    days_html = ""
-    for day in log_entries:
-        cards_html = ""
-        for entry in day["entries"]:
-            cat = entry["category"]
-            label_en = category_labels.get(cat, cat)
-            label_ko = category_labels_ko.get(cat, cat)
-            title_ko = entry.get("title_ko", entry["title"])
-            summary = entry.get("summary", "")
-            summary_ko = entry.get("summary_ko", summary)
-            detail_url = f"log/{day['date']}.html#{cat}"
-
-            cards_html += f"""
-            <a class="log-card" href="{detail_url}">
-              <div class="log-cat" data-cat="{cat}" data-ko="{esc(label_ko)}">{esc(label_en)}</div>
-              <div class="log-card-title" data-ko="{esc(title_ko)}">{esc(entry["title"])}</div>
-              <div class="log-card-summary" data-ko="{esc(summary_ko)}">{esc(summary)}</div>
-              <div class="log-card-arrow" data-ko="자세히 보기 &rarr;">Read more &rarr;</div>
-            </a>"""
-
-        days_html += f"""
-        <div class="log-day reveal">
-          <div class="log-date">{esc(day["date"])}</div>
-          <div class="log-cards">{cards_html}
-          </div>
+    latest_lines = ""
+    for entry in latest["entries"]:
+        cat = entry["category"]
+        label_en = category_labels.get(cat, cat)
+        label_ko = category_labels_ko.get(cat, cat)
+        title_ko = entry.get("title_ko", entry["title"])
+        latest_lines += f"""
+        <div class="log-latest-row">
+          <span class="log-latest-cat" data-ko="{esc(label_ko)}">{esc(label_en)}</span>
+          <span class="log-latest-title" data-ko="{esc(title_ko)}">{esc(entry["title"])}</span>
         </div>"""
 
-    return days_html
+    return f"""
+    <div class="log-counter reveal">
+      <div class="log-counter-num" data-ko="Day {total_days} · {total_items}개 마일스톤">Day {total_days} · {total_items} milestones</div>
+      <div class="log-counter-date">{esc(latest["date"])}</div>
+    </div>
+    <div class="log-latest reveal">{latest_lines}
+    </div>
+    <a class="log-archive-link" href="log/" data-ko="전체 빌드 로그 보기 →">View full build log →</a>"""
 
 
 def render_log_detail_page(day, proj, ko_ui, ko_proj):
@@ -334,6 +332,179 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
   }}
   document.addEventListener('click', e => {{ if (!e.target.closest('.lang-btn') && !e.target.closest('.lang-dropdown')) dropdown.classList.remove('open'); }});
   if (currentLang === 'ko') applyLang();
+</script>
+</body>
+</html>"""
+
+
+def render_log_archive(log_entries, proj, ko_ui, ko_proj):
+    """Generate the full build log archive page with inline expansion."""
+    category_labels = {"dev": "Development", "strategy": "Strategy", "design": "Design & Marketing"}
+    category_labels_ko = {"dev": "개발", "strategy": "전략", "design": "디자인 & 홍보"}
+    total_days = len(log_entries)
+    total_items = sum(len(e.get("items", [])) for d in log_entries for e in d["entries"])
+
+    days_html = ""
+    for day in log_entries:
+        entries_html = ""
+        for entry in day["entries"]:
+            cat = entry["category"]
+            label_en = category_labels.get(cat, cat)
+            label_ko = category_labels_ko.get(cat, cat)
+            title_ko = entry.get("title_ko", entry["title"])
+            items_en = entry.get("items", [])
+            items_ko = entry.get("items_ko", items_en)
+
+            items_html = ""
+            for i, item in enumerate(items_en):
+                ko = items_ko[i] if i < len(items_ko) else item
+                ko_attr = f' data-ko="{esc(ko)}"' if ko != item else ""
+                items_html += f'<li{ko_attr}>{esc(item)}</li>'
+
+            entries_html += f"""
+      <div class="arc-entry" onclick="this.classList.toggle('open')">
+        <div class="arc-row">
+          <span class="arc-cat" data-ko="{esc(label_ko)}">{esc(label_en)}</span>
+          <span class="arc-title" data-ko="{esc(title_ko)}">{esc(entry["title"])}</span>
+          <span class="arc-toggle">+</span>
+        </div>
+        <div class="arc-detail">
+          <ul class="arc-items">{items_html}</ul>
+        </div>
+      </div>"""
+
+        days_html += f"""
+    <div class="arc-day">
+      <div class="arc-date">{esc(day["date"])}</div>
+      {entries_html}
+    </div>"""
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{esc(proj["name"])} — Build Log</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet">
+<style>
+  :root {{ --black:#0C0C0C; --white:#FAFAF9; --gray-100:#F5F5F4; --gray-200:#E7E5E4; --gray-300:#D6D3D1; --gray-400:#A8A29E; --gray-500:#78716C; --gray-600:#57534E; --gray-700:#44403C; --gray-900:#1C1917; --accent:#1A7F64; --display:'Playfair Display',Georgia,serif; --sans:'Geist Sans','Satoshi',system-ui,sans-serif; --mono:'Geist Mono','SF Mono',monospace; --ease:cubic-bezier(0.25,0.46,0.45,0.94); }}
+  * {{ margin:0; padding:0; box-sizing:border-box; }}
+  body {{ font-family:var(--sans); background:var(--white); color:var(--black); -webkit-font-smoothing:antialiased; }}
+  ::selection {{ background:var(--black); color:var(--white); }}
+
+  nav {{ position:sticky; top:0; z-index:100; padding:0 48px; height:64px; display:flex; align-items:center; justify-content:space-between; background:rgba(250,250,249,0.92); backdrop-filter:blur(20px); border-bottom:1px solid var(--gray-200); }}
+  .logo {{ font-family:var(--sans); font-weight:700; font-size:18px; letter-spacing:-0.03em; color:var(--black); text-decoration:none; }}
+  .nav-links {{ display:flex; align-items:center; gap:28px; }}
+  .nav-links a {{ font-size:15px; font-weight:500; color:var(--gray-600); text-decoration:none; transition:color 300ms var(--ease); }}
+  .nav-links a:hover {{ color:var(--black); }}
+  .nav-links a.active {{ color:var(--black); font-weight:700; border-bottom:2px solid var(--accent); padding-bottom:2px; }}
+  .hamburger {{ display:none; background:none; border:none; cursor:pointer; padding:8px; color:var(--gray-600); }}
+  .hamburger svg {{ width:24px; height:24px; }}
+  @media (max-width:640px) {{ .nav-links a.hm {{ display:none; }} .hamburger {{ display:block; }} nav {{ padding:0 24px; }} }}
+
+  .lang-btn {{ position:relative; display:flex; align-items:center; gap:6px; font-family:var(--sans); font-size:14px; font-weight:500; color:var(--gray-500); background:transparent; border:1px solid var(--gray-200); border-radius:100px; padding:6px 14px; cursor:pointer; transition:all 200ms var(--ease); }}
+  .lang-btn:hover {{ color:var(--black); border-color:var(--gray-400); }}
+  .lang-btn svg {{ width:16px; height:16px; }}
+  .lang-dropdown {{ position:absolute; top:calc(100% + 8px); right:0; background:var(--white); border:1px solid var(--gray-200); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); overflow:hidden; opacity:0; transform:translateY(-4px); pointer-events:none; transition:all 200ms var(--ease); min-width:140px; z-index:200; }}
+  .lang-dropdown.open {{ opacity:1; transform:translateY(0); pointer-events:auto; }}
+  .lang-option {{ display:flex; align-items:center; gap:10px; padding:12px 16px; font-size:14px; font-weight:500; color:var(--gray-600); cursor:pointer; transition:background 150ms var(--ease); }}
+  .lang-option:hover {{ background:var(--gray-100); }}
+  .lang-option.active {{ color:var(--accent); }}
+
+  .mobile-menu {{ display:none; position:fixed; top:64px; left:0; right:0; background:var(--white); border-bottom:1px solid var(--gray-200); padding:16px 24px; z-index:99; flex-direction:column; gap:16px; }}
+  .mobile-menu.open {{ display:flex; }}
+  .mobile-menu a {{ font-size:16px; font-weight:500; color:var(--gray-600); text-decoration:none; padding:8px 0; }}
+
+  .archive {{ max-width:760px; margin:0 auto; padding:96px 48px 64px; }}
+  @media (max-width:640px) {{ .archive {{ padding:80px 24px 48px; }} }}
+  .arc-eyebrow {{ font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:16px; }}
+  .arc-h1 {{ font-family:var(--display); font-size:clamp(36px,5vw,56px); font-weight:400; letter-spacing:-0.025em; margin-bottom:8px; }}
+  .arc-stat {{ font-family:var(--mono); font-size:14px; color:var(--gray-500); margin-bottom:48px; }}
+
+  .arc-day {{ margin-bottom:48px; }}
+  .arc-date {{ font-family:var(--mono); font-size:14px; font-weight:600; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid var(--gray-200); }}
+  .arc-entry {{ cursor:pointer; border-bottom:1px solid var(--gray-200); }}
+  .arc-row {{ display:grid; grid-template-columns:130px 1fr 24px; gap:20px; padding:16px 0; align-items:baseline; transition:opacity 200ms var(--ease); }}
+  .arc-entry:hover .arc-row {{ opacity:0.7; }}
+  @media (max-width:640px) {{ .arc-row {{ grid-template-columns:1fr auto; gap:8px; }} .arc-cat {{ display:none; }} }}
+  .arc-cat {{ font-family:var(--mono); font-size:13px; font-weight:500; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray-500); }}
+  .arc-title {{ font-family:var(--sans); font-size:17px; font-weight:500; letter-spacing:-0.01em; color:var(--black); }}
+  .arc-toggle {{ font-family:var(--mono); font-size:18px; color:var(--gray-400); transition:transform 200ms var(--ease); }}
+  .arc-entry.open .arc-toggle {{ transform:rotate(45deg); }}
+  .arc-detail {{ max-height:0; overflow:hidden; transition:max-height 300ms var(--ease); }}
+  .arc-entry.open .arc-detail {{ max-height:800px; }}
+  .arc-items {{ padding:0 0 24px 150px; list-style:none; }}
+  @media (max-width:640px) {{ .arc-items {{ padding:0 0 24px 0; }} }}
+  .arc-items li {{ font-size:15px; color:var(--gray-600); line-height:1.75; padding:8px 0; border-bottom:1px solid var(--gray-100); }}
+  .arc-items li:last-child {{ border-bottom:none; }}
+
+  footer {{ padding:24px 48px; border-top:1px solid var(--gray-200); }}
+  footer span {{ font-family:var(--mono); font-size:11px; color:var(--gray-500); }}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="../index.html">{esc(proj["name"])}</a>
+  <div class="nav-links">
+    <a href="../index.html#roadmap" class="hm" data-ko="로드맵">Roadmap</a>
+    <a href="../vault.html" class="hm" data-ko="볼트">Vault</a>
+    <a href="./" class="hm active" data-ko="빌드 로그">Log</a>
+    <a href="../thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
+    <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div style="position:relative;">
+      <button class="lang-btn" onclick="document.querySelector('.lang-dropdown').classList.toggle('open')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span id="langLabel">EN</span>
+      </button>
+      <div class="lang-dropdown">
+        <div class="lang-option active" data-lang="en" onclick="setLang('en')">English</div>
+        <div class="lang-option" data-lang="ko" onclick="setLang('ko')">한국어</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-menu">
+  <a href="../index.html#roadmap" data-ko="로드맵" onclick="this.parentElement.classList.remove('open')">Roadmap</a>
+  <a href="../vault.html" data-ko="볼트">Vault</a>
+  <a href="./" class="active" data-ko="빌드 로그">Log</a>
+  <a href="../thesis.html" data-ko="투자 논문">Thesis</a>
+</div>
+
+<div class="archive">
+  <div class="arc-eyebrow" data-ko="빌드 로그">Build Log</div>
+  <h1 class="arc-h1" data-ko="빌드 히스토리">Build history</h1>
+  <div class="arc-stat" data-ko="Day {total_days} · {total_items}개 마일스톤">Day {total_days} · {total_items} milestones shipped</div>
+  {days_html}
+</div>
+
+<footer><span>&copy; 2026 {esc(proj["name"])}</span></footer>
+
+<script>
+let currentLang = localStorage.getItem('lang') || 'en';
+const langLabel = document.getElementById('langLabel');
+const dropdown = document.querySelector('.lang-dropdown');
+function setLang(lang) {{ currentLang = lang; localStorage.setItem('lang', lang); dropdown.classList.remove('open'); applyLang(); }}
+function applyLang() {{
+  langLabel.textContent = currentLang === 'en' ? 'EN' : 'KR';
+  document.documentElement.lang = currentLang === 'ko' ? 'ko' : 'en';
+  document.querySelectorAll('.lang-option').forEach(o => o.classList.toggle('active', o.dataset.lang === currentLang));
+  document.querySelectorAll('[data-ko],[data-ko-html]').forEach(el => {{
+    if (!el.dataset.en) el.dataset.en = el.innerHTML;
+    if (currentLang === 'ko') {{
+      if (el.dataset.koHtml) el.innerHTML = el.dataset.koHtml;
+      else if (el.dataset.ko) el.textContent = el.dataset.ko;
+    }} else if (el.dataset.en) {{ el.innerHTML = el.dataset.en; }}
+  }});
+}}
+document.addEventListener('click', e => {{ if (!e.target.closest('.lang-btn') && !e.target.closest('.lang-dropdown')) dropdown.classList.remove('open'); }});
+if (currentLang === 'ko') applyLang();
 </script>
 </body>
 </html>"""
@@ -546,17 +717,16 @@ def build_html(roadmap, contracts):
   .log-section {{ background: var(--black); color: var(--white); padding: 96px 48px; }}
   @media (max-width: 640px) {{ .log-section {{ padding: 64px 24px; }} }}
   .log-section .section-eyebrow::after {{ background: var(--gray-700); }}
-  .log-day {{ margin-bottom: 56px; }}
-  .log-date {{ font-family: var(--display); font-size: 28px; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 32px; color: var(--white); }}
-  .log-cards {{ display: flex; flex-direction: column; border-top: 1px solid rgba(255,255,255,0.08); }}
-  .log-card {{ display: grid; grid-template-columns: 140px 1fr auto; align-items: baseline; gap: 24px; padding: 24px 0; border-bottom: 1px solid rgba(255,255,255,0.08); text-decoration: none; color: inherit; transition: all 200ms var(--ease); opacity: 0.6; }}
-  .log-card:hover {{ opacity: 1; padding-left: 12px; }}
-  @media (max-width: 768px) {{ .log-card {{ grid-template-columns: 1fr; gap: 8px; }} }}
-  .log-cat {{ font-family: var(--mono); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-400); }}
-  .log-card-title {{ font-family: var(--sans); font-size: 16px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.4; color: var(--white); }}
-  .log-card-summary {{ display: none; }}
-  .log-card-arrow {{ font-family: var(--mono); font-size: 13px; color: var(--gray-600); transition: color 200ms var(--ease); }}
-  .log-card:hover .log-card-arrow {{ color: var(--white); }}
+  .log-counter {{ margin-bottom: 32px; }}
+  .log-counter-num {{ font-family: var(--display); font-size: clamp(36px,5vw,56px); font-weight: 400; letter-spacing: -0.025em; color: var(--white); margin-bottom: 8px; }}
+  .log-counter-date {{ font-family: var(--mono); font-size: 13px; color: var(--gray-500); }}
+  .log-latest {{ border-top: 1px solid rgba(255,255,255,0.08); margin-bottom: 32px; }}
+  .log-latest-row {{ display: grid; grid-template-columns: 140px 1fr; gap: 24px; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }}
+  @media (max-width: 768px) {{ .log-latest-row {{ grid-template-columns: 1fr; gap: 6px; }} }}
+  .log-latest-cat {{ font-family: var(--mono); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-500); }}
+  .log-latest-title {{ font-family: var(--sans); font-size: 16px; font-weight: 500; color: var(--white); letter-spacing: -0.01em; }}
+  .log-archive-link {{ font-family: var(--mono); font-size: 14px; color: var(--gray-500); text-decoration: none; transition: color 200ms var(--ease); }}
+  .log-archive-link:hover {{ color: var(--white); }}
   .log-filters {{ display: flex; gap: 8px; margin-bottom: 32px; }}
   .log-filter {{ font-family: var(--mono); font-size: 12px; color: var(--gray-500); background: transparent; border: 1px solid rgba(255,255,255,0.08); border-radius: 100px; padding: 6px 16px; cursor: pointer; transition: all 200ms var(--ease); }}
   .log-filter:hover, .log-filter.active {{ color: var(--white); border-color: rgba(255,255,255,0.2); }}
@@ -863,6 +1033,12 @@ def main():
         detail_file = log_dir / f"{day['date']}.html"
         detail_file.write_text(detail_html)
         print(f"Written to {detail_file}")
+
+    # Build log archive
+    archive_html = render_log_archive(roadmap.get("log", []), roadmap["project"], ko_ui, ko_proj)
+    archive_file = log_dir / "index.html"
+    archive_file.write_text(archive_html)
+    print(f"Written to {archive_file}")
 
     print("Done.")
 

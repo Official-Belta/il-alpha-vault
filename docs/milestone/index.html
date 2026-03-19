@@ -157,10 +157,10 @@
   @media (max-width: 768px) { .log-cards { grid-template-columns: 1fr; } }
   .log-card { padding: 32px; background: var(--gray-900); transition: background 300ms var(--ease); cursor: pointer; text-decoration: none; color: inherit; display: block; }
   .log-card:hover { background: var(--gray-800); }
-  .log-cat { font-family: var(--sans); font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--white); background: var(--accent); display: inline-block; padding: 5px 14px; border-radius: 100px; margin-bottom: 14px; }
-  .log-cat[data-cat="dev"] { background:#1A7F64; }
-  .log-cat[data-cat="strategy"] { background:#4A6CF7; }
-  .log-cat[data-cat="design"] { background:#E06B5E; }
+  .log-cat { font-family: var(--mono); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; display: inline-block; padding: 6px 14px; border-radius: 9999px; margin-bottom: 14px; }
+  .log-cat[data-cat="dev"] { color: #00E5A0; background: rgba(0,229,160,0.12); border: 1px solid rgba(0,229,160,0.25); }
+  .log-cat[data-cat="strategy"] { color: #F5A623; background: rgba(245,166,35,0.12); border: 1px solid rgba(245,166,35,0.25); }
+  .log-cat[data-cat="design"] { color: #60A5FA; background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.25); }
   .log-card-title { font-family: var(--sans); font-size: 18px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px; line-height: 1.3; color: var(--white); }
   .log-card-summary { font-size: 14px; color: var(--gray-400); line-height: 1.6; }
   .log-card-arrow { font-family: var(--mono); font-size: 13px; color: var(--gray-500); margin-top: 16px; transition: color 200ms var(--ease); }

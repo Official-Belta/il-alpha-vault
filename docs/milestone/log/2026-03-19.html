@@ -46,13 +46,18 @@
   .detail-section + .detail-section { border-top:1px solid var(--gray-200); margin-top:16px; padding-top:48px; }
   @media (max-width:640px) { .detail-section { padding:32px 24px; } }
   .detail-card { background:var(--gray-100); border-radius:12px; padding:48px; margin-bottom:0; }
-  .detail-cat { display:inline-block; font-family:var(--sans); font-size:16px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--white); background:var(--accent); padding:8px 20px; border-radius:100px; margin-bottom:24px; }
-  .detail-cat[data-cat="dev"] { background:#1A7F64; }
-  .detail-cat[data-cat="strategy"] { background:#4A6CF7; }
-  .detail-cat[data-cat="design"] { background:#E06B5E; }
+  .detail-cat { display:inline-block; font-family:var(--mono); font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; padding:8px 20px; border-radius:9999px; margin-bottom:24px; }
+  .detail-cat[data-cat="dev"] { color:#00E5A0; background:rgba(0,229,160,0.12); border:1px solid rgba(0,229,160,0.25); }
+  .detail-cat[data-cat="strategy"] { color:#F5A623; background:rgba(245,166,35,0.12); border:1px solid rgba(245,166,35,0.25); }
+  .detail-cat[data-cat="design"] { color:#60A5FA; background:rgba(96,165,250,0.12); border:1px solid rgba(96,165,250,0.25); }
   .detail-title { font-family:var(--serif); font-size:clamp(32px,5vw,48px); font-weight:400; letter-spacing:-0.02em; margin-bottom:36px; line-height:1.2; }
   .detail-items { padding-left:20px; display:flex; flex-direction:column; gap:24px; }
   .detail-items li { font-size:18px; color:var(--gray-600); line-height:1.8; }
+
+  .fab-back { position:fixed; bottom:32px; right:32px; z-index:90; font-family:var(--sans); font-size:15px; font-weight:600; color:var(--white); background:var(--black); text-decoration:none; display:flex; align-items:center; gap:8px; padding:14px 24px; border-radius:9999px; box-shadow:0 4px 20px rgba(0,0,0,0.2); transition:all 200ms var(--ease); opacity:0; transform:translateY(12px); pointer-events:none; }
+  .fab-back.visible { opacity:1; transform:translateY(0); pointer-events:auto; }
+  .fab-back:hover { background:var(--accent); transform:translateY(-2px); box-shadow:0 6px 28px rgba(0,0,0,0.25); }
+  @media (max-width:640px) { .fab-back { bottom:24px; right:24px; font-size:14px; padding:12px 20px; } }
 
   footer { padding:32px 48px; border-top:1px solid var(--gray-200); }
   footer span { font-family:var(--mono); font-size:11px; color:var(--gray-500); }
@@ -117,9 +122,17 @@
       </div>
     </section>
 
+<a class="fab-back" href="../index.html" id="fabBack">&larr; <span data-ko="메인으로">Home</span></a>
+
 <footer><span>&copy; 2026 IL Alpha</span></footer>
 
 <script>
+  // Floating back button
+  const fabBack = document.getElementById('fabBack');
+  window.addEventListener('scroll', () => {
+    fabBack.classList.toggle('visible', window.scrollY > 300);
+  });
+
   let currentLang = localStorage.getItem('lang') || 'en';
   const langLabel = document.getElementById('langLabel');
   const dropdown = document.querySelector('.lang-dropdown');

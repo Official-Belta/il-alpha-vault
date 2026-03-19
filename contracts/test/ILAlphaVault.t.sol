@@ -472,5 +472,92 @@ contract ILAlphaVaultTest is Test {
         assertTrue(bobAssets >= bobAmt * 99 / 100, "Bob should recover 99%+");
     }
 
+    // ─── Security: Deposit Cap ─────────────────────────────────────
+
+    function test_depositCap_enforced() public {
+        vault.setDepositCap(500 ether);
+        token0.approve(address(vault), 600 ether);
+        vault.deposit(400 ether, address(this)); // OK
+
+        vm.expectRevert(ILAlphaVault.DepositCapExceeded.selector);
+        vault.deposit(200 ether, address(this)); // Over cap
+    }
+
+    function test_depositCap_maxDeposit() public {
+        vault.setDepositCap(500 ether);
+        token0.approve(address(vault), 500 ether);
+        vault.deposit(300 ether, address(this));
+        assertEq(vault.maxDeposit(address(this)), 200 ether);
+    }
+
+    function test_setDepositCap_onlyOwner() public {
+        vm.prank(address(0xdead));
+        vm.expectRevert(ILAlphaVault.OnlyOwner.selector);
+        vault.setDepositCap(1000 ether);
+    }
+
+    // ─── Security: Keeper-Only Rebalance ─────────────────────────────
+
+    function test_rebalance_onlyKeeper() public {
+        vm.prank(address(0xdead));
+        vm.expectRevert(ILAlphaVault.OnlyKeeper.selector);
+        vault.rebalance();
+    }
+
+    function test_setKeeper_vault() public {
+        address newKeeper = address(0xbeef);
+        vault.setKeeper(newKeeper);
+        assertEq(vault.keeper(), newKeeper);
+
+        // New keeper can rebalance
+        vm.prank(newKeeper);
+        vault.rebalance(); // should not revert
+    }
+
+    function test_setKeeper_vault_onlyOwner() public {
+        vm.prank(address(0xdead));
+        vm.expectRevert(ILAlphaVault.OnlyOwner.selector);
+        vault.setKeeper(address(0xbeef));
+    }
+
+    // ─── Security: Withdrawal Fee ────────────────────────────────────
+
+    function test_withdrawalFee_recorded() public {
+        token0.approve(address(vault), 1000 ether);
+        vault.deposit(1000 ether, address(this));
+
+        uint256 sharesBefore = vault.balanceOf(address(this));
+        vault.redeem(sharesBefore, address(this), address(this));
+
+        // Fee is recorded in accumulatedFees (accounting-only for now)
+        // Actual fee deduction requires audit review on ERC4626 integration
+        assertTrue(vault.accumulatedFees() > 0, "Fees should be recorded");
+    }
+
+    function test_claimFees_onlyOwner() public {
+        vm.prank(address(0xdead));
+        vm.expectRevert(ILAlphaVault.OnlyOwner.selector);
+        vault.claimFees(address(0xdead));
+    }
+
+    function test_setWithdrawalFee_onlyOwner() public {
+        vm.prank(address(0xdead));
+        vm.expectRevert(ILAlphaVault.OnlyOwner.selector);
+        vault.setWithdrawalFeeBps(50);
+    }
+
+    function test_setWithdrawalFee_maxCap() public {
+        vm.expectRevert("Max 1%");
+        vault.setWithdrawalFeeBps(101); // > 100 bps = > 1%
+    }
+
+    // ─── Security: TWAP Check ────────────────────────────────────────
+
+    function test_setTwapThreshold_onlyOwner() public {
+        vm.prank(address(0xdead));
+        vm.expectRevert(ILAlphaVault.OnlyOwner.selector);
+        vault.setTwapThreshold(100);
+    }
+
     receive() external payable {}
 }

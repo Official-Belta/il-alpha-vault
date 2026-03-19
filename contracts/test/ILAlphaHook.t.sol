@@ -268,7 +268,8 @@ contract ILAlphaHookTest is Test {
         hook.pushVolEstimate(poolKey, externalVar);
 
         (uint128 ewmaVar,,,) = hook.volOracles(poolId);
-        assertEq(ewmaVar, 50e18, "Vol should be blended with external estimate");
+        // H-4: baseline=0 → maxExternal=1e18 → blend=(0+1e18)/2=5e17
+        assertEq(ewmaVar, 5e17, "Vol capped to 1e18 then blended when baseline is 0");
     }
 
     function test_keeper_pushVolEstimate_onlyKeeper() public {

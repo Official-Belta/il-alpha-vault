@@ -362,8 +362,9 @@ contract ILAlphaHook is IHooks {
 
         // Rate limit: external estimate can't be more than 2x current on-chain var
         // This limits damage from a compromised keeper key
+        // H-4 FIX: rate limit to 2x (not 4x), cap zero baseline to 1e18
         uint256 currentVar = uint256(vo.ewmaVar);
-        uint256 maxExternal = currentVar == 0 ? type(uint128).max : currentVar * 4;
+        uint256 maxExternal = currentVar == 0 ? uint256(1e18) : currentVar * 2;
         if (externalVar > maxExternal) {
             externalVar = maxExternal;
         }

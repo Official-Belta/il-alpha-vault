@@ -44,6 +44,8 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     error Reentrancy();
     error InvalidPoolKey();
     error PriceManipulated();
+    error LPStillDeployed();
+    error TwapThresholdOutOfRange();
 
     // ─── Events ──────────────────────────────────────────────────────
     event Rebalanced(
@@ -56,6 +58,12 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     event EmergencyWithdraw(uint256 amount);
     event OwnershipTransferStarted(address indexed currentOwner, address indexed pendingOwner);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event KeeperUpdated(address indexed oldKeeper, address indexed newKeeper);
+    event DepositCapUpdated(uint256 oldCap, uint256 newCap);
+    event TwapThresholdUpdated(int24 oldThreshold, int24 newThreshold);
+    event WithdrawalFeeUpdated(uint256 oldFee, uint256 newFee);
+    event PoolKeyUpdated();
+    event PauseUpdated(bool paused);
 
     // ─── Unaudited Notice ─────────────────────────────────────────────
     /// @notice This contract has NOT been audited. Use at your own risk.
@@ -160,6 +168,21 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
         if (totalAssets() + assets > depositCap) revert DepositCapExceeded();
         _checkTWAP();
         shares = super.deposit(assets, receiver);
+    }
+
+    /// @notice C-2 FIX: mint() must have same guards as deposit()
+    function mint(uint256 shares, address receiver)
+        public
+        override
+        whenNotPaused
+        nonReentrant
+        returns (uint256 assets)
+    {
+        assets = previewMint(shares);
+        if (assets < VIRTUAL_ASSETS) revert DepositTooSmall();
+        if (totalAssets() + assets > depositCap) revert DepositCapExceeded();
+        _checkTWAP();
+        assets = super.mint(shares, receiver);
     }
 
     /// @notice ERC-4626 maxDeposit — enforces deposit cap
@@ -294,21 +317,64 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
         deployedLiquidity = 0;
     }
 
-    // ─── Withdraw Hook ───────────────────────────────────────────────
+    // ─── Withdraw Overrides (C-1, H-5 FIX) ─────────────────────────
 
-    function beforeWithdraw(uint256 assets, uint256 /* shares */) internal override {
-        _checkTWAP(); // Prevent withdrawal at manipulated price
+    /// @notice C-1 FIX: withdraw with actual fee deduction + H-5: reentrancy guard
+    /// @dev No whenNotPaused — users must be able to withdraw after emergency
+    function withdraw(uint256 assets, address receiver, address owner_)
+        public override nonReentrant returns (uint256 shares)
+    {
+        _checkTWAP();
+        _ensureIdle(assets);
 
-        // Apply withdrawal fee (protects existing depositors from sandwich)
-        if (withdrawalFeeBps > 0) {
-            uint256 fee = (assets * withdrawalFeeBps) / 10_000;
-            accumulatedFees += fee;
+        uint256 fee = (assets * withdrawalFeeBps) / 10_000;
+        accumulatedFees += fee;
+
+        // User requests `assets` but receives `assets - fee`
+        shares = previewWithdraw(assets);
+        if (msg.sender != owner_) {
+            uint256 allowed = allowance[owner_][msg.sender];
+            if (allowed != type(uint256).max) allowance[owner_][msg.sender] = allowed - shares;
         }
+        _burn(owner_, shares);
+        emit Withdraw(msg.sender, receiver, owner_, assets, shares);
+        asset.safeTransfer(receiver, assets - fee);
+    }
 
+    /// @notice C-1 FIX: redeem with actual fee deduction + H-5: reentrancy guard
+    /// @dev No whenNotPaused — users must be able to withdraw after emergency
+    function redeem(uint256 shares, address receiver, address owner_)
+        public override nonReentrant returns (uint256 assets)
+    {
+        _checkTWAP();
+        if (msg.sender != owner_) {
+            uint256 allowed = allowance[owner_][msg.sender];
+            if (allowed != type(uint256).max) allowance[owner_][msg.sender] = allowed - shares;
+        }
+        assets = previewRedeem(shares);
+        require(assets != 0, "ZERO_ASSETS");
+
+        _ensureIdle(assets);
+
+        uint256 fee = (assets * withdrawalFeeBps) / 10_000;
+        accumulatedFees += fee;
+
+        _burn(owner_, shares);
+        emit Withdraw(msg.sender, receiver, owner_, assets, shares);
+        asset.safeTransfer(receiver, assets - fee);
+    }
+
+    /// @dev Pull LP if idle balance insufficient
+    function _ensureIdle(uint256 needed) internal {
         uint256 idle = asset.balanceOf(address(this));
-        if (idle < assets && deployedLiquidity > 0) {
+        if (idle < needed && deployedLiquidity > 0) {
             _removeLiquidity();
         }
+    }
+
+    /// @dev beforeWithdraw no longer needed — withdraw/redeem fully overridden
+    function beforeWithdraw(uint256, uint256) internal override {
+        // intentionally empty — logic moved to withdraw()/redeem() overrides
     }
 
     // ─── Internal: Real-time LP Valuation ────────────────────────────
@@ -401,7 +467,8 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     }
 
     function setPoolKey(PoolKey calldata _poolKey) external onlyOwner {
-        // Validate that the asset token is one of the pool currencies
+        // C-3 FIX: cannot change pool while LP is deployed (funds would be stranded)
+        if (deployedLiquidity > 0) revert LPStillDeployed();
         address assetAddr = address(asset);
         if (
             Currency.unwrap(_poolKey.currency0) != assetAddr &&
@@ -412,22 +479,29 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
 
     function setPaused(bool _paused) external onlyOwner {
         paused = _paused;
+        emit PauseUpdated(_paused);
     }
 
     function setKeeper(address _keeper) external onlyOwner {
+        emit KeeperUpdated(keeper, _keeper);
         keeper = _keeper;
     }
 
     function setDepositCap(uint256 _cap) external onlyOwner {
+        emit DepositCapUpdated(depositCap, _cap);
         depositCap = _cap;
     }
 
     function setTwapThreshold(int24 _threshold) external onlyOwner {
+        // C-4 FIX: 0 bricks vault, too high disables protection
+        if (_threshold < 10 || _threshold > 2000) revert TwapThresholdOutOfRange();
+        emit TwapThresholdUpdated(twapThreshold, _threshold);
         twapThreshold = _threshold;
     }
 
     function setWithdrawalFeeBps(uint256 _feeBps) external onlyOwner {
-        require(_feeBps <= 100, "Max 1%"); // Cap at 1%
+        require(_feeBps <= 100, "Max 1%");
+        emit WithdrawalFeeUpdated(withdrawalFeeBps, _feeBps);
         withdrawalFeeBps = _feeBps;
     }
 

@@ -464,6 +464,7 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     // ─── Admin: Two-Step Ownership ───────────────────────────────────
 
     function transferOwnership(address newOwner) external onlyOwner {
+        require(newOwner != address(0), "Zero address");
         pendingOwner = newOwner;
         emit OwnershipTransferStarted(owner, newOwner);
     }
@@ -492,6 +493,7 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     }
 
     function setKeeper(address _keeper) external onlyOwner {
+        require(_keeper != address(0), "Zero address");
         emit KeeperUpdated(keeper, _keeper);
         keeper = _keeper;
     }
@@ -520,9 +522,14 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     }
 
     function claimFees(address to) external onlyOwner {
+        require(to != address(0), "Zero address");
         uint256 fees = accumulatedFees;
-        accumulatedFees = 0;
-        asset.safeTransfer(to, fees);
+        require(fees > 0, "No fees");
+        // L-6: only transfer what vault actually has
+        uint256 available = asset.balanceOf(address(this));
+        uint256 claimable = fees > available ? available : fees;
+        accumulatedFees = fees - claimable;
+        asset.safeTransfer(to, claimable);
     }
 
     /// @notice Emergency: pull all LP and pause

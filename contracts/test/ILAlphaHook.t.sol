@@ -417,9 +417,13 @@ contract ILAlphaHookTest is Test {
     }
 
     function testFuzz_setLPRange_lowerMustBeLessThanUpper(int24 lower, int24 upper) public {
-        // Bound to valid tick range to avoid int24 overflow in tickUpper - tickLower
+        // Bound to valid tick range and align to tick spacing (60)
+        int24 spacing = poolKey.tickSpacing;
         lower = int24(bound(int256(lower), -887220, 887220));
         upper = int24(bound(int256(upper), -887220, 887220));
+        // Align to tick spacing
+        lower = (lower / spacing) * spacing;
+        upper = (upper / spacing) * spacing;
 
         if (lower >= upper) {
             vm.expectRevert(ILAlphaHook.InvalidTickRange.selector);

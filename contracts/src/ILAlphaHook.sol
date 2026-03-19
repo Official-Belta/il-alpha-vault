@@ -177,6 +177,8 @@ contract ILAlphaHook is IHooks {
         int24 spacing = key.tickSpacing;
         int24 lower = ((tick - halfRange) / spacing) * spacing;
         int24 upper = ((tick + halfRange) / spacing) * spacing;
+        // M-4: ensure lower < upper (edge case when tick near boundary)
+        if (lower >= upper) upper = lower + spacing;
 
         poolStates[poolId] = PoolState({
             isLPActive: false,
@@ -406,6 +408,9 @@ contract ILAlphaHook is IHooks {
     /// @notice Update LP range for a pool
     function setLPRange(PoolKey calldata key, int24 tickLower, int24 tickUpper) external onlyOwner {
         if (tickLower >= tickUpper) revert InvalidTickRange();
+        // M-3: validate tick spacing alignment
+        int24 spacing = key.tickSpacing;
+        require(tickLower % spacing == 0 && tickUpper % spacing == 0, "Tick not aligned to spacing");
         PoolId poolId = key.toId();
         poolStates[poolId].tickLower = tickLower;
         poolStates[poolId].tickUpper = tickUpper;
@@ -478,6 +483,7 @@ contract ILAlphaHook is IHooks {
     // ─── Admin: Two-Step Ownership ───────────────────────────────────
 
     function transferOwnership(address newOwner) external onlyOwner {
+        require(newOwner != address(0), "Zero address");
         pendingOwner = newOwner;
         emit OwnershipTransferStarted(owner, newOwner);
     }
@@ -490,6 +496,7 @@ contract ILAlphaHook is IHooks {
     }
 
     function setKeeper(address _keeper) external onlyOwner {
+        require(_keeper != address(0), "Zero address");
         keeper = _keeper;
     }
 

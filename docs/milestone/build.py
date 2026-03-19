@@ -226,6 +226,8 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
   .nav-links a {{ font-size:15px; font-weight:500; color:var(--gray-600); text-decoration:none; transition:color 300ms var(--ease); }}
   .nav-links a:hover {{ color:var(--black); }}
   .nav-links a.active {{ color:var(--black); font-weight:700; border-bottom:2px solid var(--accent); padding-bottom:2px; }}
+  .nav-live::before {{ content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-right:6px; animation:pulse 2s ease-in-out infinite; }}
+  @keyframes pulse {{ 0%,100% {{ opacity:1; }} 50% {{ opacity:0.4; }} }}
   .hamburger {{ display:none; background:none; border:none; cursor:pointer; padding:8px; color:var(--gray-600); }}
   .hamburger svg {{ width:24px; height:24px; }}
   .mobile-menu {{ display:none; position:fixed; top:64px; left:0; right:0; background:var(--white); border-bottom:1px solid var(--gray-200); padding:16px 24px; z-index:99; flex-direction:column; gap:16px; }}
@@ -251,7 +253,7 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
   .detail-section + .detail-section {{ border-top:1px solid var(--gray-200); margin-top:16px; padding-top:48px; }}
   @media (max-width:640px) {{ .detail-section {{ padding:32px 24px; }} }}
   .detail-card {{ background:var(--gray-100); border-radius:12px; padding:48px; margin-bottom:0; }}
-  .detail-cat {{ display:inline-block; font-family:var(--mono); font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); padding:6px 0; margin-bottom:20px; border-bottom:1px solid var(--gray-300); }}
+  .detail-cat {{ display:inline-block; font-family:var(--sans); font-size:18px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--black); padding:0 0 8px; margin-bottom:24px; border-bottom:2px solid var(--black); }}
   .detail-title {{ font-family:var(--display); font-size:clamp(32px,5vw,48px); font-weight:400; letter-spacing:-0.02em; margin-bottom:36px; line-height:1.2; }}
   .detail-items {{ padding-left:20px; display:flex; flex-direction:column; gap:24px; }}
   .detail-items li {{ font-size:18px; color:var(--gray-600); line-height:1.8; }}
@@ -273,6 +275,7 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
     <a href="../index.html#contracts" class="hm" data-ko="컨트랙트">Contracts</a>
     <a href="../index.html#log" class="hm active" data-ko="빌드 로그">Log</a>
     <a href="../thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
+    <a href="../dashboard/dashboard.html" class="hm nav-live" data-ko="테스트넷 라이브">Testnet Live</a>
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
@@ -294,6 +297,7 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
   <a href="../index.html#contracts" data-ko="컨트랙트" onclick="this.parentElement.classList.remove('open')">Contracts</a>
   <a href="../index.html#log" data-ko="빌드 로그" onclick="this.parentElement.classList.remove('open')">Log</a>
   <a href="../thesis.html" data-ko="투자 논문">Thesis</a>
+  <a href="../dashboard/dashboard.html" data-ko="테스트넷 라이브">Testnet Live</a>
 </div>
 
 <section class="hero">
@@ -546,7 +550,7 @@ def build_html(roadmap, contracts):
   .log-card {{ display: grid; grid-template-columns: 140px 1fr auto; align-items: baseline; gap: 24px; padding: 24px 0; border-bottom: 1px solid rgba(255,255,255,0.08); text-decoration: none; color: inherit; transition: opacity 200ms var(--ease); }}
   .log-card:hover {{ opacity: 0.7; }}
   @media (max-width: 768px) {{ .log-card {{ grid-template-columns: 1fr; gap: 8px; }} }}
-  .log-cat {{ font-family: var(--mono); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); }}
+  .log-cat {{ font-family: var(--mono); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-400); }}
   .log-card-title {{ font-family: var(--sans); font-size: 16px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.4; color: var(--white); }}
   .log-card-summary {{ display: none; }}
   .log-card-arrow {{ font-family: var(--mono); font-size: 13px; color: var(--gray-600); transition: color 200ms var(--ease); }}

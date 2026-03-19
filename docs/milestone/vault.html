@@ -47,8 +47,8 @@
   .vault-header { margin-bottom:48px; }
   .vault-eyebrow { font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
   .vault-eyebrow .dot { width:8px; height:8px; border-radius:50%; background:var(--accent); animation:pulse 2s ease-in-out infinite; }
-  .vault-title { font-family:var(--display); font-size:clamp(32px,5vw,48px); font-weight:400; letter-spacing:-0.025em; margin-bottom:16px; }
-  .vault-sub { font-size:17px; color:var(--gray-500); line-height:1.6; }
+  .vault-title { font-family:var(--display); font-size:clamp(40px,6vw,64px); font-weight:400; letter-spacing:-0.025em; margin-bottom:20px; }
+  .vault-sub { font-size:20px; color:var(--gray-500); line-height:1.6; }
 
   .connect-btn { font-family:var(--sans); font-size:15px; font-weight:600; background:var(--black); color:var(--white); border:none; padding:14px 28px; border-radius:4px; cursor:pointer; transition:opacity 200ms var(--ease); margin-bottom:48px; display:inline-block; }
   .connect-btn:hover { opacity:0.85; }
@@ -59,19 +59,19 @@
   .stat { padding:24px; border-right:1px solid var(--gray-200); }
   .stat:last-child { border-right:none; }
   @media (max-width:640px) { .stat { border-right:none; border-bottom:1px solid var(--gray-200); } .stat:last-child { border-bottom:none; } }
-  .stat-label { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:6px; }
-  .stat-value { font-family:var(--mono); font-size:22px; font-weight:700; letter-spacing:-0.02em; }
-  .stat-sub { font-family:var(--mono); font-size:12px; color:var(--gray-400); margin-top:4px; }
+  .stat-label { font-family:var(--mono); font-size:13px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:8px; }
+  .stat-value { font-family:var(--mono); font-size:32px; font-weight:700; letter-spacing:-0.02em; }
+  .stat-sub { font-family:var(--mono); font-size:13px; color:var(--gray-400); margin-top:6px; }
 
   .action-section { margin-bottom:48px; }
-  .action-label { font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:16px; display:flex; align-items:center; gap:12px; }
+  .action-label { font-family:var(--mono); font-size:14px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:16px; display:flex; align-items:center; gap:12px; }
   .action-label::after { content:''; flex:1; max-width:48px; height:1px; background:var(--gray-300); }
   .action-row { display:flex; gap:12px; align-items:stretch; }
   @media (max-width:640px) { .action-row { flex-direction:column; } }
-  .action-input { flex:1; font-family:var(--mono); font-size:18px; padding:16px 20px; border:1px solid var(--gray-200); border-radius:4px; background:var(--white); color:var(--black); outline:none; transition:border-color 200ms var(--ease); }
+  .action-input { flex:1; font-family:var(--mono); font-size:24px; padding:20px 24px; border:1px solid var(--gray-200); border-radius:4px; background:var(--white); color:var(--black); outline:none; transition:border-color 200ms var(--ease); }
   .action-input:focus { border-color:var(--black); }
   .action-input::placeholder { color:var(--gray-400); }
-  .action-btn { font-family:var(--sans); font-size:15px; font-weight:600; padding:16px 32px; border:none; border-radius:4px; cursor:pointer; transition:all 200ms var(--ease); white-space:nowrap; }
+  .action-btn { font-family:var(--sans); font-size:17px; font-weight:600; padding:20px 36px; border:none; border-radius:4px; cursor:pointer; transition:all 200ms var(--ease); white-space:nowrap; }
   .action-btn:disabled { opacity:0.4; cursor:not-allowed; }
   .btn-deposit { background:var(--black); color:var(--white); }
   .btn-deposit:hover:not(:disabled) { opacity:0.85; }
@@ -96,18 +96,18 @@
   .vault-nav-btn { font-family:var(--sans); font-size:14px; font-weight:600; color:var(--white); background:var(--black); padding:8px 18px; border-radius:4px; text-decoration:none; transition:opacity 200ms var(--ease); margin-right:8px; }
   .vault-nav-btn:hover { opacity:0.8; color:var(--white); }
 
-  .gate-overlay { position:fixed; inset:0; z-index:1000; background:var(--white); display:flex; align-items:center; justify-content:center; }
-  .gate-card { max-width:520px; padding:64px 48px; text-align:center; }
-  .gate-icon { font-size:48px; margin-bottom:24px; }
-  .gate-title { font-family:var(--display); font-size:32px; font-weight:400; letter-spacing:-0.02em; margin-bottom:16px; }
-  .gate-body { font-size:16px; color:var(--gray-600); line-height:1.7; margin-bottom:32px; }
-  .gate-body strong { color:var(--black); }
-  .gate-items { text-align:left; font-size:15px; color:var(--gray-600); line-height:1.8; margin-bottom:32px; padding-left:20px; }
-  .gate-items li { margin-bottom:8px; }
-  .gate-accept { font-family:var(--sans); font-size:15px; font-weight:600; background:var(--black); color:var(--white); border:none; padding:16px 40px; border-radius:4px; cursor:pointer; transition:opacity 200ms var(--ease); }
+  .gate-overlay { position:fixed; inset:0; z-index:1000; background:var(--black); color:var(--white); display:flex; align-items:center; justify-content:center; }
+  .gate-card { max-width:560px; padding:64px 48px; }
+  .gate-eyebrow { font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:24px; }
+  .gate-title { font-family:var(--display); font-size:clamp(32px,5vw,48px); font-weight:400; letter-spacing:-0.025em; margin-bottom:24px; line-height:1.15; }
+  .gate-body { font-size:17px; color:var(--gray-400); line-height:1.75; margin-bottom:40px; }
+  .gate-body strong { color:var(--white); }
+  .gate-items { font-family:var(--mono); font-size:13px; color:var(--gray-500); line-height:2.2; margin-bottom:48px; padding:0; list-style:none; border-top:1px solid rgba(255,255,255,0.08); }
+  .gate-items li { padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.08); }
+  .gate-accept { font-family:var(--sans); font-size:15px; font-weight:600; background:var(--white); color:var(--black); border:none; padding:16px 40px; border-radius:4px; cursor:pointer; transition:opacity 200ms var(--ease); }
   .gate-accept:hover { opacity:0.85; }
-  .gate-back { font-family:var(--sans); font-size:14px; color:var(--gray-500); text-decoration:none; display:inline-block; margin-top:16px; }
-  .gate-back:hover { color:var(--black); }
+  .gate-back { font-family:var(--mono); font-size:13px; color:var(--gray-600); text-decoration:none; display:inline-block; margin-left:24px; }
+  .gate-back:hover { color:var(--white); }
 
   footer { padding:24px 48px; border-top:1px solid var(--gray-200); }
   footer span { font-family:var(--mono); font-size:11px; color:var(--gray-500); }
@@ -117,23 +117,21 @@
 
 <div class="gate-overlay" id="gate">
   <div class="gate-card">
-    <div class="gate-icon">⚠️</div>
-    <h2 class="gate-title" data-ko="위험 고지">Risk Disclosure</h2>
-    <p class="gate-body" data-ko="이 소프트웨어는 <strong>감사 전</strong>입니다. 스마트 컨트랙트는 버그, 취약점, 또는 자금 손실의 위험이 있습니다.">This software is <strong>unaudited</strong>. Smart contracts may contain bugs, vulnerabilities, or result in loss of funds.</p>
+    <div class="gate-eyebrow" data-ko="위험 고지">Risk Disclosure</div>
+    <h2 class="gate-title" data-ko-html="이 소프트웨어는<br><strong style='color:var(--white)'>감사 전</strong>입니다">This software is<br><strong style="color:var(--white)">unaudited</strong></h2>
+    <p class="gate-body" data-ko="스마트 컨트랙트는 버그, 취약점, 또는 자금의 전부 손실 위험이 있습니다. 감당할 수 없는 금액을 예치하지 마세요.">Smart contracts may contain bugs, vulnerabilities, or result in total loss of funds. Do not deposit more than you can afford to lose.</p>
     <ul class="gate-items">
-      <li data-ko="컨트랙트가 전문 보안 감사를 받지 않았습니다">Contracts have not undergone professional security audit</li>
-      <li data-ko="예치한 자금의 전부 또는 일부를 잃을 수 있습니다">You may lose some or all deposited funds</li>
-      <li data-ko="감당할 수 없는 금액을 예치하지 마세요">Do not deposit more than you can afford to lose</li>
+      <li data-ko="전문 보안 감사 미완료">No professional security audit completed</li>
+      <li data-ko="예치 자금의 전부 손실 가능">Deposited funds may be lost entirely</li>
+      <li data-ko="본인 책임 하에 사용">Use at your own risk</li>
     </ul>
-    <button class="gate-accept" onclick="acceptRisk()" data-ko="위험을 이해하고 진행합니다">I understand the risks. Proceed.</button>
-    <br>
-    <a class="gate-back" href="index.html" data-ko="← 돌아가기">← Go back</a>
+    <button class="gate-accept" onclick="acceptRisk()" data-ko="위험을 이해하고 진행">I accept the risk</button>
+    <a class="gate-back" href="index.html" data-ko="돌아가기">Go back</a>
   </div>
 </div>
 
 <nav>
   <a class="logo" href="index.html">IL Alpha</a>
-  <a class="vault-nav-btn" href="vault.html" data-ko="볼트">Vault</a>
   <div class="nav-links">
     <a href="index.html#roadmap" class="hm" data-ko="로드맵">Roadmap</a>
     <a href="index.html#log" class="hm" data-ko="빌드 로그">Log</a>

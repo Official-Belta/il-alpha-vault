@@ -270,7 +270,6 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
 <body>
 <nav>
   <a class="logo" href="../index.html">{esc(proj["name"])}</a>
-  <a class="nav-vault-btn" href="../vault.html" style="font-family:var(--sans);font-size:14px;font-weight:600;color:var(--white);background:var(--black);padding:8px 18px;border-radius:4px;text-decoration:none;margin-left:16px;" data-ko="볼트">Vault</a>
   <div class="nav-links">
     <a href="../index.html#roadmap" class="hm" data-ko="로드맵">Roadmap</a>
     <a href="../index.html#log" class="hm active" data-ko="빌드 로그">Log</a>
@@ -431,9 +430,9 @@ def build_html(roadmap, contracts):
   .nav-dark .nav-links a:hover {{ color: var(--gray-400); }}
   .nav-dark .nav-status {{ color: var(--gray-400); border-color: rgba(255,255,255,0.1); }}
   .logo {{ font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: -0.03em; color: var(--black); text-decoration: none; }}
-  .nav-vault-btn {{ font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--white); background: var(--black); padding: 8px 18px; border-radius: 4px; text-decoration: none; transition: opacity 200ms var(--ease); margin-left: 16px; }}
-  .nav-vault-btn:hover {{ opacity: 0.8; }}
-  .nav-dark .nav-vault-btn {{ background: var(--white); color: var(--black); }}
+  .fab-vault {{ position: fixed; bottom: 32px; right: 32px; z-index: 90; font-family: var(--sans); font-size: 15px; font-weight: 600; color: var(--white); background: var(--black); text-decoration: none; display: flex; align-items: center; gap: 8px; padding: 16px 28px; border-radius: 9999px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); transition: all 200ms var(--ease); }}
+  .fab-vault:hover {{ background: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 28px rgba(0,0,0,0.3); }}
+  @media (max-width: 640px) {{ .fab-vault {{ bottom: 24px; right: 24px; padding: 14px 24px; font-size: 14px; }} }}
   .nav-links {{ display: flex; align-items: center; gap: 28px; }}
   .nav-links a {{ font-size: 15px; font-weight: 500; color: var(--gray-600); text-decoration: none; transition: color 300ms var(--ease); }}
   .nav-links a:hover {{ color: var(--black); }}
@@ -590,7 +589,6 @@ def build_html(roadmap, contracts):
 
 <nav id="nav">
   <a class="logo" href="#">{esc(proj["name"])}</a>
-  <a class="nav-vault-btn" href="vault.html" data-ko="볼트">Vault</a>
   <div class="nav-links">
     <a href="#roadmap" class="hm nav-item" data-section="roadmap" data-ko="{esc(ko_ui.get('roadmap', 'Roadmap'))}">Roadmap</a>
     <a href="#log" class="hm nav-item" data-section="log" data-ko="빌드 로그">Log</a>
@@ -718,6 +716,8 @@ def build_html(roadmap, contracts):
     <a class="btn-outline" href="{esc(proj["twitter"])}" target="_blank" rel="noopener" data-ko="{esc(ko_ui.get('follow_x', 'Follow on X'))}">Follow on X</a>
   </div>
 </section>
+
+<a class="fab-vault" href="vault.html" data-ko="볼트 열기 →">Open Vault →</a>
 
 <footer>
   <span>&copy; 2026 {esc(proj["name"])}</span>

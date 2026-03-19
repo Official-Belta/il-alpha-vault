@@ -92,6 +92,15 @@ contract ILAlphaHook is IHooks {
     /// @notice This contract has NOT been audited. Use at your own risk.
     bool public constant UNAUDITED = true;
 
+    /// @notice H-1 FIX: Tick accumulator for TWAP calculation
+    /// @dev Stores last TWAP_WINDOW tick observations for time-weighted average
+    uint8 public constant TWAP_WINDOW = 10;
+
+    struct TickObservation {
+        int24 tick;
+        uint40 timestamp;
+    }
+
     // ─── Storage ─────────────────────────────────────────────────────
     IPoolManager public immutable poolManager;
     address public owner;
@@ -100,6 +109,10 @@ contract ILAlphaHook is IHooks {
 
     mapping(PoolId => VolOracle) public volOracles;
     mapping(PoolId => PoolState) public poolStates;
+
+    /// @notice Circular buffer of tick observations for TWAP
+    mapping(PoolId => TickObservation[10]) public tickObservations;
+    mapping(PoolId => uint8) public observationIndex;
 
     // ─── Modifiers ───────────────────────────────────────────────────
     modifier onlyPoolManager() {
@@ -245,6 +258,9 @@ contract ILAlphaHook is IHooks {
 
         // ── Update EWMA vol oracle ──
         _updateVolOracle(vo, currentTick, poolId);
+
+        // ── H-1: Record tick observation for TWAP ──
+        _recordTickObservation(poolId, currentTick);
 
         // ── Volume spike: emergency LP off (bypasses cooldown) ──
         if (isSpike && ps.isLPActive) {
@@ -420,6 +436,43 @@ contract ILAlphaHook is IHooks {
         tickLower = ps.tickLower;
         tickUpper = ps.tickUpper;
         (feeYield, ilCost) = _computeFeeAndIL(ps, vo);
+    }
+
+    // ─── H-1: TWAP Oracle ──────────────────────────────────────────
+
+    function _recordTickObservation(PoolId poolId, int24 tick) internal {
+        uint8 idx = observationIndex[poolId];
+        tickObservations[poolId][idx] = TickObservation({
+            tick: tick,
+            timestamp: uint40(block.timestamp)
+        });
+        observationIndex[poolId] = (idx + 1) % TWAP_WINDOW;
+    }
+
+    /// @notice Get time-weighted average tick from recent observations
+    /// @return twapTick The TWAP tick, or current lastTick if insufficient data
+    function getTwapTick(PoolId poolId) public view returns (int24 twapTick) {
+        int256 weightedSum;
+        uint256 totalWeight;
+
+        for (uint8 i = 0; i < TWAP_WINDOW; i++) {
+            TickObservation memory obs = tickObservations[poolId][i];
+            if (obs.timestamp == 0) continue;
+
+            // Weight by recency: newer observations get more weight
+            uint256 age = block.timestamp - obs.timestamp;
+            if (age > 3600) continue; // ignore observations older than 1 hour
+            uint256 weight = 3600 - age; // newer = higher weight
+
+            weightedSum += int256(obs.tick) * int256(weight);
+            totalWeight += weight;
+        }
+
+        if (totalWeight == 0) {
+            return volOracles[poolId].lastTick; // fallback to lastTick
+        }
+
+        twapTick = int24(int256(weightedSum / int256(totalWeight)));
     }
 
     // ─── Admin: Two-Step Ownership ───────────────────────────────────

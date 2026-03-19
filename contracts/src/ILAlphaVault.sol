@@ -46,6 +46,7 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     error PriceManipulated();
     error LPStillDeployed();
     error TwapThresholdOutOfRange();
+    error SlippageExceeded();
 
     // ─── Events ──────────────────────────────────────────────────────
     event Rebalanced(
@@ -85,6 +86,9 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
 
     /// @notice Maximum total deposits allowed (default $10K USDC = 10_000e6)
     uint256 public depositCap = 10_000e6;
+
+    /// @notice Max slippage on LP add/remove in basis points (default 100 = 1%)
+    uint256 public maxSlippageBps = 100;
 
     /// @notice TWAP manipulation threshold (max tick deviation, default ±500 ticks ≈ ±5%)
     int24 public twapThreshold = 500;
@@ -141,6 +145,10 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     /// @notice Total assets = idle balance + real-time LP value (not stale deployedAssets)
     /// @dev Uses LiquidityAmounts to compute current LP value based on pool tick.
     ///      This prevents the share price inflation bug (ref: Gamma hack Jan 2024, $6.4M).
+    /// @notice H-7 FIX: totalAssets counts only the vault's asset token
+    /// @dev LP position value in the non-asset token is excluded to prevent
+    ///      cross-token valuation errors. This is conservative — understates
+    ///      totalAssets when LP holds the other token, protecting share price.
     function totalAssets() public view override returns (uint256) {
         uint256 idle = asset.balanceOf(address(this));
 
@@ -148,13 +156,15 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
             return idle;
         }
 
-        // Compute real-time value of deployed LP position
         (uint256 lpValue0, uint256 lpValue1) = _getDeployedLPValue();
 
-        // Return idle + LP value in asset token terms
-        // For simplicity, sum both token values (assumes ~1:1 for testnet pairs)
-        // Production: use oracle for cross-token valuation
-        return idle + lpValue0 + lpValue1;
+        // Only count the value in our asset token
+        address assetAddr = address(asset);
+        if (Currency.unwrap(poolKey.currency0) == assetAddr) {
+            return idle + lpValue0;
+        } else {
+            return idle + lpValue1;
+        }
     }
 
     function deposit(uint256 assets, address receiver)
@@ -245,47 +255,51 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     }
 
     function _executeAddLiquidity(uint256 assets) internal {
-        PoolId poolId = poolKey.toId();
-        (uint160 sqrtPriceX96,,,) = poolManager.getSlot0(poolId);
+        // Compute liquidity from pool state + LP range
+        uint128 liquidity = _computeLiquidity(assets);
+        if (liquidity == 0) return;
 
         (,int24 tickLower, int24 tickUpper,,) = hook.getPoolStrategy(poolKey);
 
-        uint160 sqrtPriceAX96 = TickMath.getSqrtPriceAtTick(tickLower);
-        uint160 sqrtPriceBX96 = TickMath.getSqrtPriceAtTick(tickUpper);
+        (BalanceDelta delta,) = poolManager.modifyLiquidity(poolKey,
+            IPoolManager.ModifyLiquidityParams({
+                tickLower: tickLower, tickUpper: tickUpper,
+                liquidityDelta: int256(uint256(liquidity)), salt: bytes32(0)
+            }), "");
 
-        // Split assets 50/50 for two-sided LP (simplified for same-decimal pairs)
-        uint256 amount0 = assets / 2;
-        uint256 amount1 = assets / 2;
+        // Settle and take
+        _settleDelta(delta);
 
-        // Compute proper liquidity from token amounts and price range
-        uint128 liquidity = LiquidityAmounts.getLiquidityForAmounts(
-            sqrtPriceX96, sqrtPriceAX96, sqrtPriceBX96, amount0, amount1
+        // H-2: slippage check
+        _checkSlippage(delta.amount0(), delta.amount1(), assets);
+
+        deployedLiquidity += liquidity;
+    }
+
+    /// @dev Compute LP liquidity from asset amount + current pool state
+    /// @dev H-3 NOTE: 50/50 split assumes vault holds both tokens. Phase 4: pre-swap.
+    function _computeLiquidity(uint256 assets) internal view returns (uint128) {
+        PoolId poolId = poolKey.toId();
+        (uint160 sqrtPriceX96,,,) = poolManager.getSlot0(poolId);
+        (,int24 tickLower, int24 tickUpper,,) = hook.getPoolStrategy(poolKey);
+
+        return LiquidityAmounts.getLiquidityForAmounts(
+            sqrtPriceX96,
+            TickMath.getSqrtPriceAtTick(tickLower),
+            TickMath.getSqrtPriceAtTick(tickUpper),
+            assets / 2, assets / 2
         );
+    }
 
-        if (liquidity == 0) return;
-
-        IPoolManager.ModifyLiquidityParams memory params = IPoolManager.ModifyLiquidityParams({
-            tickLower: tickLower,
-            tickUpper: tickUpper,
-            liquidityDelta: int256(uint256(liquidity)),
-            salt: bytes32(0)
-        });
-
-        (BalanceDelta delta,) = poolManager.modifyLiquidity(poolKey, params, "");
-
-        // Settle negative deltas (vault owes tokens to pool)
-        // Negative amount in delta = vault must pay that amount
+    /// @dev Settle negative deltas (pay) and take positive deltas (receive)
+    function _settleDelta(BalanceDelta delta) internal {
         int128 d0 = delta.amount0();
         int128 d1 = delta.amount1();
 
         if (d0 < 0) _settleCurrency(poolKey.currency0, uint256(uint128(-d0)));
         if (d1 < 0) _settleCurrency(poolKey.currency1, uint256(uint128(-d1)));
-
-        // Take positive deltas (pool owes tokens to vault) — e.g., fee credits
         if (d0 > 0) poolManager.take(poolKey.currency0, address(this), uint256(uint128(d0)));
         if (d1 > 0) poolManager.take(poolKey.currency1, address(this), uint256(uint128(d1)));
-
-        deployedLiquidity += liquidity;
     }
 
     /// @dev Settle a currency debt: sync, transfer tokens to PoolManager, then settle
@@ -298,22 +312,13 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     function _executeRemoveLiquidity() internal {
         (,int24 tickLower, int24 tickUpper,,) = hook.getPoolStrategy(poolKey);
 
-        IPoolManager.ModifyLiquidityParams memory params = IPoolManager.ModifyLiquidityParams({
-            tickLower: tickLower,
-            tickUpper: tickUpper,
-            liquidityDelta: -int256(uint256(deployedLiquidity)),
-            salt: bytes32(0)
-        });
+        (BalanceDelta delta,) = poolManager.modifyLiquidity(poolKey,
+            IPoolManager.ModifyLiquidityParams({
+                tickLower: tickLower, tickUpper: tickUpper,
+                liquidityDelta: -int256(uint256(deployedLiquidity)), salt: bytes32(0)
+            }), "");
 
-        (BalanceDelta delta,) = poolManager.modifyLiquidity(poolKey, params, "");
-
-        // Take back tokens (positive delta = owed to caller)
-        int128 d0 = delta.amount0();
-        int128 d1 = delta.amount1();
-
-        if (d0 > 0) poolManager.take(poolKey.currency0, address(this), uint256(uint128(d0)));
-        if (d1 > 0) poolManager.take(poolKey.currency1, address(this), uint256(uint128(d1)));
-
+        _settleDelta(delta);
         deployedLiquidity = 0;
     }
 
@@ -364,6 +369,13 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
         asset.safeTransfer(receiver, assets - fee);
     }
 
+    /// @dev H-2: Check slippage on LP operations
+    function _checkSlippage(int128 d0, int128 d1, uint256 expected) internal view {
+        uint256 actualCost = (d0 < 0 ? uint256(uint128(-d0)) : 0) + (d1 < 0 ? uint256(uint128(-d1)) : 0);
+        uint256 maxCost = expected + (expected * maxSlippageBps) / 10_000;
+        if (actualCost > maxCost) revert SlippageExceeded();
+    }
+
     /// @dev Pull LP if idle balance insufficient
     function _ensureIdle(uint256 needed) internal {
         uint256 idle = asset.balanceOf(address(this));
@@ -397,25 +409,22 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
         );
     }
 
-    /// @dev Check that current spot price is within TWAP threshold.
+    /// @dev H-1 FIX: Check spot price against real TWAP from tick accumulator.
     ///      Reverts if price appears manipulated (sandwich/flashloan attack).
-    ///      Conservative threshold — Gamma's lax check led to $6.4M exploit.
     function _checkTWAP() internal view {
-        if (deployedLiquidity == 0) return; // No position, no risk
+        if (deployedLiquidity == 0) return;
 
         PoolId poolId = poolKey.toId();
         (uint160 sqrtPriceX96, int24 spotTick,,) = poolManager.getSlot0(poolId);
 
         if (sqrtPriceX96 == 0) return;
 
-        // V4 doesn't have built-in observe() for TWAP, so we use the hook's
-        // lastTick as a proxy for recent historical price
-        (,int24 lastOracleTick,,) = hook.volOracles(poolId);
+        // Use real TWAP from hook's tick accumulator (not just lastTick)
+        int24 twapTick = hook.getTwapTick(poolId);
 
-        // Check deviation: |spotTick - lastOracleTick| < threshold
-        int24 deviation = spotTick > lastOracleTick
-            ? spotTick - lastOracleTick
-            : lastOracleTick - spotTick;
+        int24 deviation = spotTick > twapTick
+            ? spotTick - twapTick
+            : twapTick - spotTick;
 
         if (deviation > twapThreshold) revert PriceManipulated();
     }
@@ -497,6 +506,11 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
         if (_threshold < 10 || _threshold > 2000) revert TwapThresholdOutOfRange();
         emit TwapThresholdUpdated(twapThreshold, _threshold);
         twapThreshold = _threshold;
+    }
+
+    function setMaxSlippageBps(uint256 _bps) external onlyOwner {
+        require(_bps <= 500, "Max 5%");
+        maxSlippageBps = _bps;
     }
 
     function setWithdrawalFeeBps(uint256 _feeBps) external onlyOwner {

@@ -71,44 +71,17 @@ contract ControlVaultsTest is Test {
         assertApproxEqRel(received, 100e6, 0.01e18);
     }
 
-    function test_alwaysLP_rebalance_tracksDeployment() public {
+    function test_alwaysLP_totalAssets_noDoubleCount() public {
+        // H-6 FIX: totalAssets = balance only, no double-counting
         token.approve(address(alwaysLP), 100e6);
         alwaysLP.deposit(100e6, address(this));
-        assertEq(alwaysLP.deployedAssets(), 0);
+        assertEq(alwaysLP.totalAssets(), 100e6);
 
-        alwaysLP.rebalance();
-
-        // Simulated deploy: tokens stay in vault, deployedAssets tracks "would be" deployed
-        assertEq(alwaysLP.deployedAssets(), 100e6, "Should track deployed amount");
-        // totalAssets = idle(100e6) + deployed(100e6) = 200e6 in simulation
-        // (real V4 LP would move tokens out, making idle=0)
+        alwaysLP.rebalance(); // no-op, just emits event
+        assertEq(alwaysLP.totalAssets(), 100e6, "Rebalance should not change totalAssets");
     }
 
-    function test_alwaysLP_withdraw_noDeploy() public {
-        token.approve(address(alwaysLP), 100e6);
-        uint256 shares = alwaysLP.deposit(100e6, address(this));
-
-        uint256 before = token.balanceOf(address(this));
-        alwaysLP.redeem(shares, address(this), address(this));
-        uint256 received = token.balanceOf(address(this)) - before;
-        assertApproxEqRel(received, 100e6, 0.01e18);
-    }
-
-    function test_alwaysLP_rebalance_accumulates() public {
-        token.approve(address(alwaysLP), 200e6);
-        alwaysLP.deposit(100e6, address(this));
-
-        alwaysLP.rebalance();
-        assertEq(alwaysLP.deployedAssets(), 100e6);
-
-        alwaysLP.deposit(100e6, address(this));
-        alwaysLP.rebalance();
-        // Simulated: idle includes first deposit's tokens (never moved) + second deposit
-        // So rebalance adds all current idle (200e6) to deployed → 100+200=300
-        assertEq(alwaysLP.deployedAssets(), 300e6, "Should accumulate all idle each rebalance");
-    }
-
-    // ─── Fuzz: Both vaults ───────────────────────────────────────────
+    // ─── Fuzz ────────────────────────────────────────────────────────
 
     function testFuzz_hodl_roundTrip(uint256 amount) public {
         amount = bound(amount, 1e6, 1_000_000e6);

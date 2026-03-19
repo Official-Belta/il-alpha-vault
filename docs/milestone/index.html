@@ -224,7 +224,7 @@
 
 <section class="hero">
   <div class="hero-eyebrow">Uniswap V4 Hook &middot; Sepolia Testnet</div>
-  <h1 class="reveal" data-ko="변동성 기반 유동성 관리" data-ko-html="변동성 기반 유동성 관리">Volatility-aware liquidity <em>management</em></h1>
+  <h1 class="reveal" data-ko-html="변동성 기반 유동성 <em>관리</em>">Volatility-aware liquidity <em>management</em></h1>
   <p class="hero-sub reveal" data-ko="비영구적 손실이 발생하기 전에 LP 포지션을 제거하는 최초의 프로토콜. 범위 조정이 아닌 완전 제거.">The first protocol that removes your LP position before impermanent loss hits. Not range adjustment. Full removal.</p>
 </section>
 
@@ -609,10 +609,11 @@
     document.querySelectorAll('.lang-option').forEach(o => {
       o.classList.toggle('active', o.dataset.lang === currentLang);
     });
-    document.querySelectorAll('[data-ko]').forEach(el => {
+    document.querySelectorAll('[data-ko],[data-ko-html]').forEach(el => {
       if (!el.dataset.en) el.dataset.en = el.innerHTML;
-      if (currentLang === 'ko' && el.dataset.ko) {
-        el.textContent = el.dataset.ko;
+      if (currentLang === 'ko') {
+        if (el.dataset.koHtml) el.innerHTML = el.dataset.koHtml;
+        else if (el.dataset.ko) el.textContent = el.dataset.ko;
       } else if (el.dataset.en) {
         el.innerHTML = el.dataset.en;
       }

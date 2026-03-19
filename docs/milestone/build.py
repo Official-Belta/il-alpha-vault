@@ -323,10 +323,14 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
     langLabel.textContent = currentLang === 'en' ? 'EN' : 'KR';
     document.documentElement.lang = currentLang === 'ko' ? 'ko' : 'en';
     document.querySelectorAll('.lang-option').forEach(o => o.classList.toggle('active', o.dataset.lang === currentLang));
-    document.querySelectorAll('[data-ko]').forEach(el => {{
+    document.querySelectorAll('[data-ko],[data-ko-html]').forEach(el => {{
       if (!el.dataset.en) el.dataset.en = el.innerHTML;
-      if (currentLang === 'ko' && el.dataset.ko) el.textContent = el.dataset.ko;
-      else if (el.dataset.en) el.innerHTML = el.dataset.en;
+      if (currentLang === 'ko') {{
+        if (el.dataset.koHtml) el.innerHTML = el.dataset.koHtml;
+        else if (el.dataset.ko) el.textContent = el.dataset.ko;
+      }} else if (el.dataset.en) {{
+        el.innerHTML = el.dataset.en;
+      }}
     }});
   }}
   document.addEventListener('click', e => {{ if (!e.target.closest('.lang-btn') && !e.target.closest('.lang-dropdown')) dropdown.classList.remove('open'); }});
@@ -608,7 +612,7 @@ def build_html(roadmap, contracts):
 
 <section class="hero">
   <div class="hero-eyebrow">{esc(proj["eyebrow"])} &middot; {esc(proj["network"])} Testnet</div>
-  <h1 class="reveal" data-ko="{esc(ko_proj.get('tagline', proj['tagline']))}" data-ko-html="{esc(ko_proj.get('tagline', ''))}">{esc(proj["tagline"]).replace("liquidity ", "liquidity <em>").replace("management", "management</em>")}</h1>
+  <h1 class="reveal" data-ko-html="변동성 기반 유동성 <em>관리</em>">{esc(proj["tagline"]).replace("liquidity ", "liquidity <em>").replace("management", "management</em>")}</h1>
   <p class="hero-sub reveal" data-ko="{esc(ko_proj.get('description', proj['description']))}">{esc(proj["description"])}</p>
 </section>
 
@@ -787,10 +791,11 @@ def build_html(roadmap, contracts):
     document.querySelectorAll('.lang-option').forEach(o => {{
       o.classList.toggle('active', o.dataset.lang === currentLang);
     }});
-    document.querySelectorAll('[data-ko]').forEach(el => {{
+    document.querySelectorAll('[data-ko],[data-ko-html]').forEach(el => {{
       if (!el.dataset.en) el.dataset.en = el.innerHTML;
-      if (currentLang === 'ko' && el.dataset.ko) {{
-        el.textContent = el.dataset.ko;
+      if (currentLang === 'ko') {{
+        if (el.dataset.koHtml) el.innerHTML = el.dataset.koHtml;
+        else if (el.dataset.ko) el.textContent = el.dataset.ko;
       }} else if (el.dataset.en) {{
         el.innerHTML = el.dataset.en;
       }}

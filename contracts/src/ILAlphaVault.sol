@@ -57,6 +57,10 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     event OwnershipTransferStarted(address indexed currentOwner, address indexed pendingOwner);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
+    // ─── Unaudited Notice ─────────────────────────────────────────────
+    /// @notice This contract has NOT been audited. Use at your own risk.
+    bool public constant UNAUDITED = true;
+
     // ─── Storage ─────────────────────────────────────────────────────
     IPoolManager public immutable poolManager;
     ILAlphaHook public immutable hook;
@@ -167,8 +171,9 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     // ─── Rebalance ───────────────────────────────────────────────────
 
     /// @notice Rebalance vault: add/remove LP based on hook signal
-    /// @dev Restricted to keeper/owner — prevents random callers from timing rebalances
-    function rebalance() external onlyKeeper whenNotPaused nonReentrant {
+    /// @dev Public — anyone can call. Result is deterministic (hook signal only).
+    ///      Keeper liveness is not a single point of failure.
+    function rebalance() external whenNotPaused nonReentrant {
         bool shouldLP = hook.isLPActive(poolKey);
         uint256 totalBefore = totalAssets();
         uint128 liquidityBefore = deployedLiquidity;

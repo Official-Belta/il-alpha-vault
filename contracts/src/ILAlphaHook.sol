@@ -88,6 +88,10 @@ contract ILAlphaHook is IHooks {
     /// @dev Volume spike multiplier: if single swap volume > SPIKE_MULTIPLIER * ewmaVolume → emergency LP off
     uint16 public constant SPIKE_MULTIPLIER = 3; // 3x average = spike
 
+    // ─── Unaudited Notice ─────────────────────────────────────────────
+    /// @notice This contract has NOT been audited. Use at your own risk.
+    bool public constant UNAUDITED = true;
+
     // ─── Storage ─────────────────────────────────────────────────────
     IPoolManager public immutable poolManager;
     address public owner;

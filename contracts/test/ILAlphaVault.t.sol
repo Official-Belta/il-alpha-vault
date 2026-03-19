@@ -299,6 +299,28 @@ contract ILAlphaVaultTest is Test {
         vault.emergencyWithdraw();
     }
 
+    function test_emergencyWithdraw_e2e() public {
+        // 1. Deposit
+        token0.approve(address(vault), 100 ether);
+        vault.deposit(100 ether, address(this));
+
+        // 2. Emergency
+        vault.emergencyWithdraw();
+        assertTrue(vault.paused());
+        assertEq(vault.deployedLiquidity(), 0);
+
+        // 3. Existing depositors can still withdraw
+        uint256 shares = vault.balanceOf(address(this));
+        uint256 balBefore = token0.balanceOf(address(this));
+        vault.redeem(shares, address(this), address(this));
+        assertTrue(token0.balanceOf(address(this)) > balBefore, "Should receive tokens");
+
+        // 4. New deposits blocked
+        token0.approve(address(vault), 100 ether);
+        vm.expectRevert(ILAlphaVault.Paused.selector);
+        vault.deposit(100 ether, address(this));
+    }
+
     // ─── Access Control ──────────────────────────────────────────────
 
     function test_setPoolKey_onlyOwner() public {
@@ -498,20 +520,16 @@ contract ILAlphaVaultTest is Test {
 
     // ─── Security: Keeper-Only Rebalance ─────────────────────────────
 
-    function test_rebalance_onlyKeeper() public {
+    function test_rebalance_publicCallable() public {
+        // Anyone can call rebalance — not keeper-only
         vm.prank(address(0xdead));
-        vm.expectRevert(ILAlphaVault.OnlyKeeper.selector);
-        vault.rebalance();
+        vault.rebalance(); // should not revert
     }
 
     function test_setKeeper_vault() public {
         address newKeeper = address(0xbeef);
         vault.setKeeper(newKeeper);
         assertEq(vault.keeper(), newKeeper);
-
-        // New keeper can rebalance
-        vm.prank(newKeeper);
-        vault.rebalance(); // should not revert
     }
 
     function test_setKeeper_vault_onlyOwner() public {

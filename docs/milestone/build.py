@@ -275,7 +275,6 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
     <a href="../vault.html" class="hm" data-ko="볼트">Vault</a>
     <a href="../index.html#log" class="hm active" data-ko="빌드 로그">Log</a>
     <a href="../thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
-    <a href="../dashboard/dashboard.html" class="hm nav-live" data-ko="라이브">Live</a>
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
@@ -297,7 +296,6 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
   <a href="../vault.html" data-ko="볼트" onclick="this.parentElement.classList.remove('open')">Vault</a>
   <a href="../index.html#log" data-ko="빌드 로그" onclick="this.parentElement.classList.remove('open')">Log</a>
   <a href="../thesis.html" data-ko="투자 논문">Thesis</a>
-  <a href="../dashboard/dashboard.html" data-ko="라이브">Live</a>
 </div>
 
 <section class="hero">
@@ -594,7 +592,6 @@ def build_html(roadmap, contracts):
     <a href="vault.html" class="hm nav-item" data-ko="볼트">Vault</a>
     <a href="#log" class="hm nav-item" data-section="log" data-ko="빌드 로그">Log</a>
     <a href="thesis.html" class="hm nav-item" data-ko="투자 논문">Thesis</a>
-    <a href="dashboard/dashboard.html" class="hm nav-item nav-live" data-ko="라이브">Live</a>
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
@@ -616,7 +613,6 @@ def build_html(roadmap, contracts):
   <a href="vault.html" data-ko="볼트">Vault</a>
   <a href="#log" data-ko="빌드 로그" onclick="this.parentElement.classList.remove('open')">Log</a>
   <a href="thesis.html" data-ko="투자 논문">Thesis</a>
-  <a href="dashboard/dashboard.html" data-ko="라이브">Live</a>
 </div>
 
 <section class="hero">

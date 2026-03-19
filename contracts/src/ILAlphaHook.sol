@@ -408,10 +408,11 @@ contract ILAlphaHook is IHooks {
     /// @notice Update LP range for a pool
     function setLPRange(PoolKey calldata key, int24 tickLower, int24 tickUpper) external onlyOwner {
         if (tickLower >= tickUpper) revert InvalidTickRange();
-        // M-3: validate tick spacing alignment
         int24 spacing = key.tickSpacing;
         require(tickLower % spacing == 0 && tickUpper % spacing == 0, "Tick not aligned to spacing");
         PoolId poolId = key.toId();
+        // F-2: LP 활성 시 range 변경 금지 (유동성 고립 방지)
+        require(!poolStates[poolId].isLPActive, "LP active, remove first");
         poolStates[poolId].tickLower = tickLower;
         poolStates[poolId].tickUpper = tickUpper;
     }

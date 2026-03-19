@@ -4,87 +4,167 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IL Alpha — Testnet Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-  :root { --bg:#0C0C0C; --surface:#1A1A1A; --border:#2A2A2A; --text:#FAFAF9; --muted:#78716C; --accent:#1A7F64; --red:#EF4444; --yellow:#EAB308; --blue:#3B82F6; }
+  :root { --black:#0C0C0C; --white:#FAFAF9; --gray-100:#F5F5F4; --gray-200:#E7E5E4; --gray-300:#D6D3D1; --gray-400:#A8A29E; --gray-500:#78716C; --gray-600:#57534E; --gray-700:#44403C; --gray-800:#292524; --gray-900:#1C1917; --accent:#1A7F64; --red:#EF4444; --display:'Playfair Display',Georgia,serif; --sans:'Geist Sans','Satoshi',system-ui,sans-serif; --mono:'Geist Mono','SF Mono',monospace; --ease:cubic-bezier(0.25,0.46,0.45,0.94); }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Satoshi',system-ui,sans-serif; background:var(--bg); color:var(--text); padding:2rem; max-width:1100px; margin:0 auto; }
-  h1 { font-size:1.8rem; font-weight:700; letter-spacing:-0.03em; margin-bottom:4px; }
-  .sub { color:var(--muted); font-size:0.9rem; margin-bottom:2rem; }
-  .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2rem; }
-  .card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1.2rem; }
-  .card .label { color:var(--muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; }
-  .card .value { font-size:1.6rem; font-weight:700; margin-top:4px; font-family:'Geist Mono',monospace; }
-  .card .delta { font-size:0.8rem; margin-top:4px; }
-  .green { color:var(--accent); }
-  .red { color:var(--red); }
-  .chart-container { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; }
-  .chart-title { font-size:0.85rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:1rem; }
+  body { font-family:var(--sans); background:var(--white); color:var(--black); -webkit-font-smoothing:antialiased; }
+  ::selection { background:var(--black); color:var(--white); }
+
+  nav { position:sticky; top:0; z-index:100; padding:0 48px; height:64px; display:flex; align-items:center; justify-content:space-between; background:rgba(250,250,249,0.92); backdrop-filter:blur(20px); border-bottom:1px solid var(--gray-200); }
+  .logo { font-family:var(--sans); font-weight:700; font-size:18px; letter-spacing:-0.03em; color:var(--black); text-decoration:none; }
+  .nav-links { display:flex; align-items:center; gap:28px; }
+  .nav-links a { font-size:15px; font-weight:500; color:var(--gray-600); text-decoration:none; transition:color 300ms var(--ease); }
+  .nav-links a:hover { color:var(--black); }
+  .nav-links a.active { color:var(--black); font-weight:700; border-bottom:2px solid var(--accent); padding-bottom:2px; }
+  .nav-live::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-right:6px; animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+  .hamburger { display:none; background:none; border:none; cursor:pointer; padding:8px; color:var(--gray-600); }
+  .hamburger svg { width:24px; height:24px; }
+  .mobile-menu { display:none; position:fixed; top:64px; left:0; right:0; background:var(--white); border-bottom:1px solid var(--gray-200); padding:16px 24px; z-index:99; flex-direction:column; gap:16px; }
+  .mobile-menu.open { display:flex; }
+  .mobile-menu a { font-size:16px; font-weight:500; color:var(--gray-600); text-decoration:none; padding:8px 0; }
+  @media (max-width:640px) { .nav-links a.hm { display:none; } .hamburger { display:block; } nav { padding:0 24px; } }
+
+  .lang-btn { position:relative; display:flex; align-items:center; gap:6px; font-family:var(--sans); font-size:14px; font-weight:500; color:var(--gray-500); background:transparent; border:1px solid var(--gray-200); border-radius:100px; padding:6px 14px; cursor:pointer; transition:all 200ms var(--ease); }
+  .lang-btn:hover { color:var(--black); border-color:var(--gray-400); }
+  .lang-btn svg { width:16px; height:16px; }
+  .lang-dropdown { position:absolute; top:calc(100% + 8px); right:0; background:var(--white); border:1px solid var(--gray-200); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); overflow:hidden; opacity:0; transform:translateY(-4px); pointer-events:none; transition:all 200ms var(--ease); min-width:140px; z-index:200; }
+  .lang-dropdown.open { opacity:1; transform:translateY(0); pointer-events:auto; }
+  .lang-option { display:flex; align-items:center; gap:10px; padding:12px 16px; font-size:14px; font-weight:500; color:var(--gray-600); cursor:pointer; transition:background 150ms var(--ease); }
+  .lang-option:hover { background:var(--gray-100); }
+  .lang-option.active { color:var(--accent); }
+
+  .hero { padding:120px 48px 64px; }
+  @media (max-width:640px) { .hero { padding:96px 24px 48px; } }
+  .hero-eyebrow { font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:20px; display:flex; align-items:center; gap:12px; }
+  .hero-eyebrow .dot { width:8px; height:8px; border-radius:50%; background:var(--accent); animation:pulse 2s ease-in-out infinite; }
+  .hero h1 { font-family:var(--display); font-weight:400; font-size:clamp(36px,5vw,56px); letter-spacing:-0.025em; line-height:1.15; margin-bottom:16px; }
+  .hero-sub { font-size:17px; color:var(--gray-500); }
+
+  .metrics { padding:0 48px 64px; display:grid; grid-template-columns:repeat(4,1fr); gap:0; border-top:1px solid var(--gray-200); border-bottom:1px solid var(--gray-200); }
+  @media (max-width:768px) { .metrics { grid-template-columns:1fr 1fr; } }
+  @media (max-width:640px) { .metrics { padding:0 24px 48px; } }
+  .metric { padding:32px 0; border-right:1px solid var(--gray-200); padding-right:32px; }
+  .metric:last-child { border-right:none; }
+  .metric:nth-child(n+3) { padding-left:32px; }
+  @media (max-width:768px) { .metric { padding-left:0!important; } .metric:nth-child(2) { border-right:none; } .metric:nth-child(n+3) { border-top:1px solid var(--gray-200); padding-left:0!important; } }
+  .metric-label { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:8px; }
+  .metric-value { font-family:var(--mono); font-size:28px; font-weight:700; letter-spacing:-0.02em; }
+  .metric-delta { font-family:var(--mono); font-size:13px; margin-top:4px; }
+  .up { color:var(--accent); }
+  .down { color:var(--red); }
+
+  .status-row { padding:24px 48px; display:flex; gap:24px; align-items:center; border-bottom:1px solid var(--gray-200); }
+  @media (max-width:640px) { .status-row { padding:20px 24px; flex-wrap:wrap; gap:16px; } }
+  .status-item { font-family:var(--mono); font-size:13px; color:var(--gray-500); display:flex; align-items:center; gap:8px; }
+  .status-dot { width:8px; height:8px; border-radius:50%; }
+  .dot-on { background:var(--accent); }
+  .dot-off { background:var(--gray-400); }
+
+  .charts { padding:64px 48px; max-width:960px; }
+  @media (max-width:640px) { .charts { padding:48px 24px; } }
+  .chart-section { margin-bottom:56px; }
+  .chart-label { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:20px; }
   canvas { width:100%!important; }
-  .status-bar { display:flex; gap:1rem; margin-bottom:2rem; }
-  .status-pill { display:flex; align-items:center; gap:6px; padding:6px 14px; border-radius:100px; font-size:0.8rem; font-weight:600; border:1px solid var(--border); }
-  .status-pill .dot { width:8px; height:8px; border-radius:50%; }
-  .dot-green { background:var(--accent); }
-  .dot-yellow { background:var(--yellow); }
-  .footer { color:var(--muted); font-size:0.75rem; text-align:center; margin-top:2rem; padding-top:1rem; border-top:1px solid var(--border); }
-  @media(max-width:640px) { .cards { grid-template-columns:1fr 1fr; } body { padding:1rem; } }
+
+  footer { padding:24px 48px; border-top:1px solid var(--gray-200); }
+  footer span { font-family:var(--mono); font-size:11px; color:var(--gray-500); }
+  footer a { color:var(--gray-500); text-decoration:none; }
+  footer a:hover { color:var(--black); }
 </style>
 </head>
 <body>
 
-<h1>IL Alpha — Testnet Dashboard</h1>
-<p class="sub">Live monitoring · Ethereum Sepolia · Auto-updated from keeper metrics</p>
-
-<div class="status-bar">
-  <div class="status-pill"><span class="dot dot-green"></span> Keeper Running</div>
-  <div class="status-pill"><span class="dot" id="lpDot"></span> <span id="lpStatus">LP: —</span></div>
-  <div class="status-pill" id="cycleCount">Cycles: —</div>
-</div>
-
-<div class="cards">
-  <div class="card">
-    <div class="label">ETH Price</div>
-    <div class="value" id="ethPrice">—</div>
-    <div class="delta" id="ethDelta"></div>
+<nav>
+  <a class="logo" href="../index.html">IL Alpha</a>
+  <div class="nav-links">
+    <a href="../index.html#roadmap" class="hm" data-ko="로드맵">Roadmap</a>
+    <a href="../index.html#contracts" class="hm" data-ko="컨트랙트">Contracts</a>
+    <a href="../index.html#log" class="hm" data-ko="빌드 로그">Log</a>
+    <a href="../thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
+    <a href="dashboard.html" class="hm nav-live active" data-ko="테스트넷 라이브">Testnet Live</a>
+    <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div style="position:relative;">
+      <button class="lang-btn" onclick="document.querySelector('.lang-dropdown').classList.toggle('open')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span id="langLabel">EN</span>
+      </button>
+      <div class="lang-dropdown">
+        <div class="lang-option active" data-lang="en" onclick="setLang('en')">English</div>
+        <div class="lang-option" data-lang="ko" onclick="setLang('ko')">한국어</div>
+      </div>
+    </div>
   </div>
-  <div class="card">
-    <div class="label">Total Assets</div>
-    <div class="value" id="totalAssets">—</div>
+</nav>
+
+<div class="mobile-menu">
+  <a href="../index.html#roadmap" data-ko="로드맵" onclick="this.parentElement.classList.remove('open')">Roadmap</a>
+  <a href="../index.html#contracts" data-ko="컨트랙트" onclick="this.parentElement.classList.remove('open')">Contracts</a>
+  <a href="../index.html#log" data-ko="빌드 로그" onclick="this.parentElement.classList.remove('open')">Log</a>
+  <a href="../thesis.html" data-ko="투자 논문">Thesis</a>
+  <a href="dashboard.html" data-ko="테스트넷 라이브">Testnet Live</a>
+</div>
+
+<section class="hero">
+  <div class="hero-eyebrow"><span class="dot"></span> <span data-ko="라이브 모니터링 · Ethereum Sepolia">Live Monitoring · Ethereum Sepolia</span></div>
+  <h1 data-ko="테스트넷 대시보드">Testnet Dashboard</h1>
+  <p class="hero-sub" data-ko="키퍼 메트릭에서 자동 업데이트">Auto-updated from keeper metrics</p>
+</section>
+
+<div class="status-row">
+  <div class="status-item"><span class="status-dot dot-on"></span> <span data-ko="키퍼 가동 중">Keeper Running</span></div>
+  <div class="status-item"><span class="status-dot" id="lpDot"></span> <span id="lpStatus">LP: —</span></div>
+  <div class="status-item" id="cycleCount" data-ko="사이클: —">Cycles: —</div>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-label">ETH Price</div>
+    <div class="metric-value" id="ethPrice">—</div>
+    <div class="metric-delta" id="ethDelta"></div>
   </div>
-  <div class="card">
-    <div class="label">Share Price</div>
-    <div class="value" id="sharePrice">—</div>
-    <div class="delta" id="shareDelta"></div>
+  <div class="metric">
+    <div class="metric-label">Total Assets</div>
+    <div class="metric-value" id="totalAssets">—</div>
   </div>
-  <div class="card">
-    <div class="label">LP Uptime</div>
-    <div class="value" id="lpUptime">—</div>
+  <div class="metric">
+    <div class="metric-label">Share Price</div>
+    <div class="metric-value" id="sharePrice">—</div>
+    <div class="metric-delta" id="shareDelta"></div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">LP Uptime</div>
+    <div class="metric-value" id="lpUptime">—</div>
   </div>
 </div>
 
-<div class="chart-container">
-  <div class="chart-title">ETH Price + LP Status</div>
-  <canvas id="priceChart" height="200"></canvas>
+<div class="charts">
+  <div class="chart-section">
+    <div class="chart-label" data-ko="ETH 가격 + LP 상태">ETH Price + LP Status</div>
+    <canvas id="priceChart" height="200"></canvas>
+  </div>
+  <div class="chart-section">
+    <div class="chart-label" data-ko="틱 분산 (EWMA 변동성 오라클)">Tick Variance (EWMA Vol Oracle)</div>
+    <canvas id="volChart" height="160"></canvas>
+  </div>
+  <div class="chart-section">
+    <div class="chart-label" data-ko="볼트 구성">Vault Composition</div>
+    <canvas id="compChart" height="160"></canvas>
+  </div>
 </div>
 
-<div class="chart-container">
-  <div class="chart-title">Tick Variance (EWMA Vol Oracle)</div>
-  <canvas id="volChart" height="160"></canvas>
-</div>
-
-<div class="chart-container">
-  <div class="chart-title">Vault Composition</div>
-  <canvas id="compChart" height="160"></canvas>
-</div>
-
-<div class="footer">
-  IL Alpha · Sepolia Testnet · Data from keeper/metrics.csv · <a href="https://github.com/Official-Belta/il-alpha-vault" style="color:var(--accent)">GitHub</a>
-</div>
+<footer>
+  <span>&copy; 2026 IL Alpha · Sepolia Testnet · <a href="https://github.com/Official-Belta/il-alpha-vault">GitHub</a></span>
+</footer>
 
 <script>
-// Parse CSV data (embedded at build time or fetched)
 const CSV_DATA = `timestamp,eth_price,tick_variance,on_chain_var,lp_active,total_assets,idle,deployed,liquidity,share_price
 2026-03-19 05:51:26,2189.57,5208725822368266584064,2598830284991434055549,True,150000000000,50000000000,100000000000,1041618760850,1499995000049999500
 2026-03-19 06:57:00,2206.49,5305022017235826245632,4855681061201506040815,True,150000000000,50000000000,100000000000,1041618760850,1499995000049999500
@@ -124,15 +204,14 @@ function formatNum(n, decimals=2) {
 
 const data = parseCSV(CSV_DATA);
 if (data.length === 0) {
-  document.body.innerHTML = '<h1 style="text-align:center;margin-top:4rem;">No data yet. Keeper is collecting...</h1>';
+  document.querySelector('.metrics').innerHTML = '<div class="metric" style="grid-column:1/-1;text-align:center;padding:48px 0;"><div class="metric-label">Status</div><div class="metric-value" style="font-size:18px;">Keeper is collecting data...</div></div>';
 } else {
   const latest = data[data.length - 1];
   const first = data[0];
 
-  // Cards
   document.getElementById('ethPrice').textContent = '$' + formatNum(latest.eth_price);
   const ethChange = ((latest.eth_price - first.eth_price) / first.eth_price * 100);
-  document.getElementById('ethDelta').innerHTML = `<span class="${ethChange >= 0 ? 'green' : 'red'}">${ethChange >= 0 ? '+' : ''}${ethChange.toFixed(2)}%</span> since start`;
+  document.getElementById('ethDelta').innerHTML = `<span class="${ethChange >= 0 ? 'up' : 'down'}">${ethChange >= 0 ? '+' : ''}${ethChange.toFixed(2)}%</span>`;
 
   const totalAssetsUSD = Number(latest.total_assets) / 1e6;
   document.getElementById('totalAssets').textContent = formatNum(totalAssetsUSD, 0) + ' tUSDC';
@@ -141,23 +220,24 @@ if (data.length === 0) {
   document.getElementById('sharePrice').textContent = '$' + sp.toFixed(4);
   const spFirst = Number(first.share_price) / 1e18;
   const spChange = ((sp - spFirst) / spFirst * 100);
-  document.getElementById('shareDelta').innerHTML = `<span class="${spChange >= 0 ? 'green' : 'red'}">${spChange >= 0 ? '+' : ''}${spChange.toFixed(4)}%</span>`;
+  document.getElementById('shareDelta').innerHTML = `<span class="${spChange >= 0 ? 'up' : 'down'}">${spChange >= 0 ? '+' : ''}${spChange.toFixed(4)}%</span>`;
 
   const lpOnCount = data.filter(d => d.lp_active === 'True').length;
   const lpPct = (lpOnCount / data.length * 100).toFixed(0);
   document.getElementById('lpUptime').textContent = lpPct + '%';
 
   const lpActive = latest.lp_active === 'True';
-  document.getElementById('lpDot').className = 'dot ' + (lpActive ? 'dot-green' : 'dot-yellow');
-  document.getElementById('lpStatus').textContent = 'LP: ' + (lpActive ? 'ACTIVE' : 'INACTIVE');
+  document.getElementById('lpDot').className = 'status-dot ' + (lpActive ? 'dot-on' : 'dot-off');
+  document.getElementById('lpStatus').textContent = 'LP: ' + (lpActive ? 'ACTIVE' : 'REMOVED');
   document.getElementById('cycleCount').textContent = 'Cycles: ' + data.length;
 
-  // Charts
   const labels = data.map(d => d.timestamp.split(' ')[1]?.substring(0,5) || d.timestamp);
   const prices = data.map(d => Number(d.eth_price));
-  const lpColors = data.map(d => d.lp_active === 'True' ? 'rgba(26,127,100,0.2)' : 'rgba(234,179,8,0.1)');
 
-  // Price chart
+  const chartFont = { family:"'Geist Mono','SF Mono',monospace", size:11 };
+  const gridColor = '#E7E5E4';
+  const tickColor = '#78716C';
+
   new Chart(document.getElementById('priceChart'), {
     type: 'line',
     data: {
@@ -165,13 +245,13 @@ if (data.length === 0) {
       datasets: [{
         label: 'ETH Price',
         data: prices,
-        borderColor: '#FAFAF9',
-        borderWidth: 2,
+        borderColor: '#0C0C0C',
+        borderWidth: 1.5,
         pointRadius: 0,
         fill: true,
         backgroundColor: (ctx) => {
           const i = ctx.dataIndex;
-          return data[i]?.lp_active === 'True' ? 'rgba(26,127,100,0.15)' : 'rgba(234,179,8,0.08)';
+          return data[i]?.lp_active === 'True' ? 'rgba(26,127,100,0.08)' : 'rgba(168,162,158,0.06)';
         },
         tension: 0.3,
       }]
@@ -180,26 +260,25 @@ if (data.length === 0) {
       responsive: true,
       plugins: { legend: { display: false } },
       scales: {
-        x: { ticks: { color: '#78716C', maxTicksLimit: 8 }, grid: { color: '#2A2A2A' } },
-        y: { ticks: { color: '#78716C', callback: v => '$' + v }, grid: { color: '#2A2A2A' } }
+        x: { ticks: { color:tickColor, font:chartFont, maxTicksLimit:8 }, grid: { color:gridColor } },
+        y: { ticks: { color:tickColor, font:chartFont, callback: v => '$' + v }, grid: { color:gridColor } }
       }
     }
   });
 
-  // Vol chart
   const varData = data.map(d => Number(d.tick_variance) / 1e18);
   new Chart(document.getElementById('volChart'), {
     type: 'line',
     data: {
       labels,
       datasets: [{
-        label: 'Tick Variance (÷1e18)',
+        label: 'Tick Variance',
         data: varData,
-        borderColor: '#3B82F6',
-        borderWidth: 2,
+        borderColor: '#57534E',
+        borderWidth: 1.5,
         pointRadius: 0,
         fill: true,
-        backgroundColor: 'rgba(59,130,246,0.1)',
+        backgroundColor: 'rgba(87,83,78,0.06)',
         tension: 0.3,
       }]
     },
@@ -207,13 +286,12 @@ if (data.length === 0) {
       responsive: true,
       plugins: { legend: { display: false } },
       scales: {
-        x: { ticks: { color: '#78716C', maxTicksLimit: 8 }, grid: { color: '#2A2A2A' } },
-        y: { ticks: { color: '#78716C' }, grid: { color: '#2A2A2A' } }
+        x: { ticks: { color:tickColor, font:chartFont, maxTicksLimit:8 }, grid: { color:gridColor } },
+        y: { ticks: { color:tickColor, font:chartFont }, grid: { color:gridColor } }
       }
     }
   });
 
-  // Composition chart
   const idle = data.map(d => Number(d.idle) / 1e6);
   const deployed = data.map(d => Number(d.deployed) / 1e6);
   new Chart(document.getElementById('compChart'), {
@@ -221,20 +299,42 @@ if (data.length === 0) {
     data: {
       labels,
       datasets: [
-        { label: 'Idle', data: idle, backgroundColor: '#78716C', borderRadius: 4 },
-        { label: 'Deployed', data: deployed, backgroundColor: '#1A7F64', borderRadius: 4 },
+        { label: 'Idle', data: idle, backgroundColor: '#A8A29E', borderRadius: 2 },
+        { label: 'Deployed', data: deployed, backgroundColor: '#1A7F64', borderRadius: 2 },
       ]
     },
     options: {
       responsive: true,
-      plugins: { legend: { labels: { color: '#78716C' } } },
+      plugins: { legend: { labels: { color:tickColor, font:chartFont } } },
       scales: {
-        x: { stacked: true, ticks: { color: '#78716C', maxTicksLimit: 8 }, grid: { display: false } },
-        y: { stacked: true, ticks: { color: '#78716C' }, grid: { color: '#2A2A2A' } }
+        x: { stacked:true, ticks: { color:tickColor, font:chartFont, maxTicksLimit:8 }, grid: { display:false } },
+        y: { stacked:true, ticks: { color:tickColor, font:chartFont }, grid: { color:gridColor } }
       }
     }
   });
 }
+
+// i18n
+let currentLang = localStorage.getItem('lang') || 'en';
+const langLabel = document.getElementById('langLabel');
+const dropdown = document.querySelector('.lang-dropdown');
+function setLang(lang) { currentLang = lang; localStorage.setItem('lang', lang); dropdown.classList.remove('open'); applyLang(); }
+function applyLang() {
+  langLabel.textContent = currentLang === 'en' ? 'EN' : 'KR';
+  document.documentElement.lang = currentLang === 'ko' ? 'ko' : 'en';
+  document.querySelectorAll('.lang-option').forEach(o => o.classList.toggle('active', o.dataset.lang === currentLang));
+  document.querySelectorAll('[data-ko],[data-ko-html]').forEach(el => {
+    if (!el.dataset.en) el.dataset.en = el.innerHTML;
+    if (currentLang === 'ko') {
+      if (el.dataset.koHtml) el.innerHTML = el.dataset.koHtml;
+      else if (el.dataset.ko) el.textContent = el.dataset.ko;
+    } else if (el.dataset.en) {
+      el.innerHTML = el.dataset.en;
+    }
+  });
+}
+document.addEventListener('click', e => { if (!e.target.closest('.lang-btn') && !e.target.closest('.lang-dropdown')) dropdown.classList.remove('open'); });
+if (currentLang === 'ko') applyLang();
 </script>
 </body>
 </html>

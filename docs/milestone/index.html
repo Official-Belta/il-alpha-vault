@@ -62,6 +62,8 @@
   .lang-option.active { color: var(--accent); }
   .nav-links a.active { color: var(--black); font-weight: 700; border-bottom: 2px solid var(--accent); padding-bottom: 2px; }
   .nav-dark .nav-links a.active { color: var(--white); font-weight: 700; border-bottom: 2px solid var(--accent); padding-bottom: 2px; }
+  .nav-live::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-right: 6px; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
   .hamburger { display:none; background:none; border:none; cursor:pointer; padding:8px; color:var(--gray-600); }
   .hamburger svg { width:24px; height:24px; }
   .nav-dark .hamburger { color:var(--gray-400); }
@@ -158,10 +160,7 @@
   .log-card { display: grid; grid-template-columns: 140px 1fr auto; align-items: baseline; gap: 24px; padding: 24px 0; border-bottom: 1px solid rgba(255,255,255,0.08); text-decoration: none; color: inherit; transition: opacity 200ms var(--ease); }
   .log-card:hover { opacity: 0.7; }
   @media (max-width: 768px) { .log-card { grid-template-columns: 1fr; gap: 8px; } }
-  .log-cat { font-family: var(--mono); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }
-  .log-cat[data-cat="dev"] { color: #00E5A0; }
-  .log-cat[data-cat="strategy"] { color: #F5A623; }
-  .log-cat[data-cat="design"] { color: #60A5FA; }
+  .log-cat { font-family: var(--mono); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); }
   .log-card-title { font-family: var(--sans); font-size: 16px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.4; color: var(--white); }
   .log-card-summary { display: none; }
   .log-card-arrow { font-family: var(--mono); font-size: 13px; color: var(--gray-600); transition: color 200ms var(--ease); }
@@ -200,6 +199,7 @@
     <a href="#contracts" class="hm nav-item" data-section="contracts" data-ko="컨트랙트">Contracts</a>
     <a href="#log" class="hm nav-item" data-section="log" data-ko="빌드 로그">Log</a>
     <a href="thesis.html" class="hm nav-item" data-ko="투자 논문">Thesis</a>
+    <a href="dashboard/dashboard.html" class="hm nav-item nav-live" data-ko="테스트넷 라이브">Testnet Live</a>
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
@@ -221,6 +221,7 @@
   <a href="#contracts" data-ko="컨트랙트" onclick="this.parentElement.classList.remove('open')">Contracts</a>
   <a href="#log" data-ko="빌드 로그" onclick="this.parentElement.classList.remove('open')">Log</a>
   <a href="thesis.html" data-ko="투자 논문">Thesis</a>
+  <a href="dashboard/dashboard.html" data-ko="테스트넷 라이브">Testnet Live</a>
 </div>
 
 <section class="hero">
@@ -312,7 +313,7 @@
         <div class="phase-body">
           <p class="phase-desc" data-ko="온체인 변동성 오라클을 탑재한 Uniswap V4 훅. 예치용 ERC-4626 볼트. 엄밀한 비교를 위한 두 개의 대조군 볼트.">Uniswap V4 hook with on-chain volatility oracle. ERC-4626 vault for deposits. Two control vaults for rigorous apples-to-apples comparison.</p>
           <div class="items">
-            <div class="item"><div class="item-icon icon-done">&#10003;</div><div><div class="text-done" data-ko="ILAlphaHook — beforeSwap 변동성 검사">ILAlphaHook — beforeSwap volatility check</div></div></div>
+            <div class="item"><div class="item-icon icon-done">&#10003;</div><div><div class="text-done" data-ko="ILAlphaHook — afterSwap 변동성 검사">ILAlphaHook — afterSwap volatility check</div></div></div>
             <div class="item"><div class="item-icon icon-done">&#10003;</div><div><div class="text-done" data-ko="ILAlphaVault — ERC-4626 예치 및 인출">ILAlphaVault — ERC-4626 deposit and withdraw</div></div></div>
             <div class="item"><div class="item-icon icon-done">&#10003;</div><div><div class="text-done" data-ko="AlwaysLPVault + HODLVault — 대조군">AlwaysLPVault + HODLVault — control groups</div></div></div>
             <div class="item"><div class="item-icon icon-done">&#10003;</div><div><div class="text-done" data-ko="65개 Solidity 테스트 (퍼즈 포함) — 실패 0">65 Solidity tests including fuzz — zero failures</div></div></div>

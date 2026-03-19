@@ -251,10 +251,7 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
   .detail-section + .detail-section {{ border-top:1px solid var(--gray-200); margin-top:16px; padding-top:48px; }}
   @media (max-width:640px) {{ .detail-section {{ padding:32px 24px; }} }}
   .detail-card {{ background:var(--gray-100); border-radius:12px; padding:48px; margin-bottom:0; }}
-  .detail-cat {{ display:inline-block; font-family:var(--mono); font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; padding:8px 20px; border-radius:9999px; margin-bottom:24px; }}
-  .detail-cat[data-cat="dev"] {{ color:#00E5A0; background:rgba(0,229,160,0.12); border:1px solid rgba(0,229,160,0.25); }}
-  .detail-cat[data-cat="strategy"] {{ color:#F5A623; background:rgba(245,166,35,0.12); border:1px solid rgba(245,166,35,0.25); }}
-  .detail-cat[data-cat="design"] {{ color:#60A5FA; background:rgba(96,165,250,0.12); border:1px solid rgba(96,165,250,0.25); }}
+  .detail-cat {{ display:inline-block; font-family:var(--mono); font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); padding:6px 0; margin-bottom:20px; border-bottom:1px solid var(--gray-300); }}
   .detail-title {{ font-family:var(--display); font-size:clamp(32px,5vw,48px); font-weight:400; letter-spacing:-0.02em; margin-bottom:36px; line-height:1.2; }}
   .detail-items {{ padding-left:20px; display:flex; flex-direction:column; gap:24px; }}
   .detail-items li {{ font-size:18px; color:var(--gray-600); line-height:1.8; }}
@@ -451,6 +448,8 @@ def build_html(roadmap, contracts):
   .lang-option.active {{ color: var(--accent); }}
   .nav-links a.active {{ color: var(--black); font-weight: 700; border-bottom: 2px solid var(--accent); padding-bottom: 2px; }}
   .nav-dark .nav-links a.active {{ color: var(--white); font-weight: 700; border-bottom: 2px solid var(--accent); padding-bottom: 2px; }}
+  .nav-live::before {{ content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-right: 6px; animation: pulse 2s ease-in-out infinite; }}
+  @keyframes pulse {{ 0%,100% {{ opacity:1; }} 50% {{ opacity:0.4; }} }}
   .hamburger {{ display:none; background:none; border:none; cursor:pointer; padding:8px; color:var(--gray-600); }}
   .hamburger svg {{ width:24px; height:24px; }}
   .nav-dark .hamburger {{ color:var(--gray-400); }}
@@ -547,10 +546,7 @@ def build_html(roadmap, contracts):
   .log-card {{ display: grid; grid-template-columns: 140px 1fr auto; align-items: baseline; gap: 24px; padding: 24px 0; border-bottom: 1px solid rgba(255,255,255,0.08); text-decoration: none; color: inherit; transition: opacity 200ms var(--ease); }}
   .log-card:hover {{ opacity: 0.7; }}
   @media (max-width: 768px) {{ .log-card {{ grid-template-columns: 1fr; gap: 8px; }} }}
-  .log-cat {{ font-family: var(--mono); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }}
-  .log-cat[data-cat="dev"] {{ color: #00E5A0; }}
-  .log-cat[data-cat="strategy"] {{ color: #F5A623; }}
-  .log-cat[data-cat="design"] {{ color: #60A5FA; }}
+  .log-cat {{ font-family: var(--mono); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); }}
   .log-card-title {{ font-family: var(--sans); font-size: 16px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.4; color: var(--white); }}
   .log-card-summary {{ display: none; }}
   .log-card-arrow {{ font-family: var(--mono); font-size: 13px; color: var(--gray-600); transition: color 200ms var(--ease); }}
@@ -589,6 +585,7 @@ def build_html(roadmap, contracts):
     <a href="#contracts" class="hm nav-item" data-section="contracts" data-ko="{esc(ko_ui.get('contracts', 'Contracts'))}">Contracts</a>
     <a href="#log" class="hm nav-item" data-section="log" data-ko="빌드 로그">Log</a>
     <a href="thesis.html" class="hm nav-item" data-ko="투자 논문">Thesis</a>
+    <a href="dashboard/dashboard.html" class="hm nav-item nav-live" data-ko="테스트넷 라이브">Testnet Live</a>
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
@@ -610,6 +607,7 @@ def build_html(roadmap, contracts):
   <a href="#contracts" data-ko="{esc(ko_ui.get('contracts', 'Contracts'))}" onclick="this.parentElement.classList.remove('open')">Contracts</a>
   <a href="#log" data-ko="빌드 로그" onclick="this.parentElement.classList.remove('open')">Log</a>
   <a href="thesis.html" data-ko="투자 논문">Thesis</a>
+  <a href="dashboard/dashboard.html" data-ko="테스트넷 라이브">Testnet Live</a>
 </div>
 
 <section class="hero">

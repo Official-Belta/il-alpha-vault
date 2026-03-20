@@ -531,8 +531,12 @@ contract ILAlphaHook is IHooks {
         keeper = _keeper;
     }
 
+    event VaultUpdated(address indexed oldVault, address indexed newVault);
+
     /// @notice Arb C-2: set vault reference for deployedLiquidity check in setLPRange
     function setVault(address _vault) external onlyOwner {
+        require(_vault != address(0), "Zero address");
+        emit VaultUpdated(vault, _vault);
         vault = _vault;
     }
 

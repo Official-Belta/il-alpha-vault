@@ -89,6 +89,9 @@ contract DeployArbitrum is Script {
         });
         vault.setPoolKey(poolKey);
 
+        // Arb C-2: register vault on hook for deployedLiquidity check
+        hook.setVault(address(vault));
+
         vm.stopBroadcast();
 
         console.log("");

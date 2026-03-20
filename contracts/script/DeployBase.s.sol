@@ -87,6 +87,7 @@ contract DeployBase is Script {
             hooks: IHooks(address(hook))
         });
         vault.setPoolKey(poolKey);
+        hook.setVault(address(vault));
 
         vm.stopBroadcast();
 

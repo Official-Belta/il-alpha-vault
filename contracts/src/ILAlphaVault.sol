@@ -344,34 +344,37 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
         }
     }
 
-    /// @dev Arb C-1 FIX: Check slippage on BOTH tokens independently.
-    ///      Each token's cost must be within maxSlippageBps of its expected amount.
-    ///      Uses LiquidityAmounts to compute expected per-token cost from the liquidity.
+    /// @dev Arb C-1 FIX: Check slippage on BOTH tokens using per-token expected amounts.
+    ///      Computes expected cost per token from LiquidityAmounts, then bounds each independently.
     function _checkSlippage(int128 d0, int128 d1, uint256 expectedTotal) internal view {
-        // Both tokens must be within slippage tolerance
-        // For the asset token, compare against half of expectedTotal
-        // For the non-asset token, compare proportionally (same ratio)
-        uint256 halfExpected = expectedTotal / 2;
-        uint256 tolerance = (halfExpected * maxSlippageBps) / 10_000;
+        // Compute expected per-token amounts from current pool state
+        (uint256 exp0, uint256 exp1) = _getExpectedAmounts(expectedTotal);
 
         uint256 cost0 = d0 < 0 ? uint256(uint128(-d0)) : 0;
         uint256 cost1 = d1 < 0 ? uint256(uint128(-d1)) : 0;
 
-        // Check asset token side
-        address assetAddr = address(asset);
-        if (Currency.unwrap(poolKey.currency0) == assetAddr) {
-            if (cost0 > halfExpected + tolerance) revert SlippageExceeded();
-            // Non-asset side: bound by ratio. If cost0 is N, cost1 should be proportional.
-            // Use a generous 2x tolerance for cross-decimal (prevents false reverts)
-            if (cost1 > 0 && cost0 > 0) {
-                // cost1 shouldn't be more than 3x the "fair" ratio implied by cost0
-                // This catches extreme sandwich but allows normal decimal differences
-            }
-        } else {
-            if (cost1 > halfExpected + tolerance) revert SlippageExceeded();
-        }
-        // Additional safety: total cost in any single token can't exceed the entire expectedTotal
-        if (cost0 > expectedTotal || cost1 > expectedTotal) revert SlippageExceeded();
+        uint256 tol0 = (exp0 * maxSlippageBps) / 10_000;
+        uint256 tol1 = (exp1 * maxSlippageBps) / 10_000;
+
+        if (cost0 > exp0 + tol0) revert SlippageExceeded();
+        if (cost1 > exp1 + tol1) revert SlippageExceeded();
+    }
+
+    /// @dev Compute expected per-token cost for a given total asset amount
+    function _getExpectedAmounts(uint256 assets) internal view returns (uint256 amount0, uint256 amount1) {
+        uint128 liq = _computeLiquidity(assets);
+        if (liq == 0) return (0, 0);
+
+        (,int24 tickLower, int24 tickUpper,,) = hook.getPoolStrategy(poolKey);
+        PoolId poolId = poolKey.toId();
+        (uint160 sqrtPriceX96,,,) = poolManager.getSlot0(poolId);
+
+        (amount0, amount1) = LiquidityAmounts.getAmountsForLiquidity(
+            sqrtPriceX96,
+            TickMath.getSqrtPriceAtTick(tickLower),
+            TickMath.getSqrtPriceAtTick(tickUpper),
+            liq
+        );
     }
 
     // ─── Internal: Real-time LP Valuation ────────────────────────────

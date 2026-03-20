@@ -49,9 +49,9 @@
   .arc-row { display:grid; grid-template-columns:130px 1fr 24px; gap:20px; padding:16px 0; align-items:baseline; transition:opacity 200ms var(--ease); }
   .arc-entry:hover .arc-row { opacity:0.7; }
   @media (max-width:640px) { .arc-row { grid-template-columns:1fr auto; gap:8px; } .arc-cat { display:none; } }
-  .arc-cat { font-family:var(--mono); font-size:13px; font-weight:500; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray-500); }
-  .arc-title { font-family:var(--sans); font-size:17px; font-weight:500; letter-spacing:-0.01em; color:var(--black); }
-  .arc-toggle { font-family:var(--mono); font-size:18px; color:var(--gray-400); transition:transform 200ms var(--ease); }
+  .arc-cat { font-family:var(--mono); font-size:15px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray-500); }
+  .arc-title { font-family:var(--sans); font-size:20px; font-weight:500; letter-spacing:-0.01em; color:var(--black); }
+  .arc-toggle { font-family:var(--mono); font-size:20px; color:var(--gray-400); transition:transform 200ms var(--ease); }
   .arc-entry.open .arc-toggle { transform:rotate(45deg); }
   .arc-detail { max-height:0; overflow:hidden; transition:max-height 300ms var(--ease); }
   .arc-entry.open .arc-detail { max-height:800px; }
@@ -103,7 +103,7 @@
     <div class="arc-day">
       <div class="arc-date">2026-03-20</div>
       
-      <div class="arc-entry" onclick="this.classList.toggle('open')">
+      <div class="arc-entry" id="dev-2026-03-20" onclick="this.classList.toggle('open')">
         <div class="arc-row">
           <span class="arc-cat" data-ko="개발">Development</span>
           <span class="arc-title" data-ko="코드 프리즈. 77 테스트. 메인넷 준비 완료.">Code Freeze. 77 Tests. Mainnet Ready.</span>
@@ -113,7 +113,7 @@
           <ul class="arc-items"><li data-ko="코드 프리즈 선언: 77 테스트 (Hook 31 + Vault 37 + Controls 9), 0 실패. 더 이상 컨트랙트 변경 없음.">Code freeze declared: 77 tests (Hook 31 + Vault 37 + Controls 9), 0 failures. No more contract changes.</li><li data-ko="4라운드 Trail of Bits 보안 감사: Critical 0, High 0. 준비 점수 89/100.">4-round Trail of Bits security audit: 0 Critical, 0 High. Readiness score 89/100.</li><li data-ko="F-2 setLPRange 가드 추가 — LP 배포 중 range 변경 방지.">F-2 setLPRange guard added — prevents range change while LP deployed.</li><li data-ko="TWAP 체크 — 입출금 시 샌드위치 공격 차단 (±5% 임계값).">TWAP check on deposit/withdraw — blocks sandwich attacks (±5% threshold).</li><li data-ko="볼륨 스파이크 트리거 — 비정상 볼륨 시 쿨다운 무시하고 긴급 LP 제거.">Volume spike trigger — emergency LP removal bypasses cooldown on abnormal volume.</li><li data-ko="ERC-4626 준수를 위해 출금 수수료 제거.">Withdrawal fee removed for ERC-4626 compliance and simplicity.</li><li data-ko="Base 메인넷 지갑 설정: Deployer, Operator, Treasury Safe (Gnosis 2/3), Sentinel.">Base mainnet wallet setup: Deployer, Operator, Treasury Safe (Gnosis 2/3), Sentinel.</li></ul>
         </div>
       </div>
-      <div class="arc-entry" onclick="this.classList.toggle('open')">
+      <div class="arc-entry" id="strategy-2026-03-20" onclick="this.classList.toggle('open')">
         <div class="arc-row">
           <span class="arc-cat" data-ko="전략">Strategy</span>
           <span class="arc-title" data-ko="B2B 피봇. DAO 트레저리 GTM.">B2B Pivot. DAO Treasury GTM.</span>
@@ -123,7 +123,7 @@
           <ul class="arc-items"><li data-ko="B2B 피봇: DAO 트레저리 (1순위), 개인 LP (2순위). $24.5B 유휴, 67%가 0% 수익률.">B2B pivot: DAO treasuries (primary) over retail LPs (secondary). $24.5B idle, 67% at 0% yield.</li><li data-ko="20개 타겟 DAO 3개 티어로 선정. Top 3: Gnosis (새 트레저리 매니저), ENS (활발한 포럼), Polygon ($1.3B 유휴).">20 target DAOs selected across 3 tiers. Top 3: Gnosis (new treasury manager), ENS (active forum), Polygon ($1.3B idle).</li><li data-ko="거버넌스 제안서 템플릿 (EN/KO) — Sharpe 3.66, DD -12%, 성과보수만, ERC-4626.">Governance proposal template created (EN/KO) — Sharpe 3.66, DD -12%, perf-fee-only, ERC-4626.</li><li data-ko="그랜트 전략: UFSF 감사 보조금 (100% 커버), Hook Design Lab 코호트 2, v4 Hooks Support.">Grant strategy: UFSF audit subsidy (100% coverage), Hook Design Lab Cohort 2, v4 Hooks Support.</li><li data-ko="메인넷 직행: 테스트넷 연장 없이 → Base 메인넷 $1.2K 시드, 캡 제한, 4주 실데이터.">Mainnet direct: skip extended testnet → Base mainnet with $1.2K seed, capped deposit, 4-week live data.</li><li data-ko="Thesis 페이지 전면 교체: DAO 트레저리 피치 + 백테스트 데이터, 시장 규모, 수익 모델, 타이밍 (Bunni 빈자리).">Thesis page rewritten: DAO treasury pitch with backtest data, market sizing, revenue model, timing (Bunni vacancy).</li></ul>
         </div>
       </div>
-      <div class="arc-entry" onclick="this.classList.toggle('open')">
+      <div class="arc-entry" id="design-2026-03-20" onclick="this.classList.toggle('open')">
         <div class="arc-row">
           <span class="arc-cat" data-ko="디자인 &amp; 홍보">Design &amp; Marketing</span>
           <span class="arc-title" data-ko="볼트 페이지. 메인넷 사이트. 페이즈 재구성.">Vault Page. Mainnet Site. Phase Restructure.</span>
@@ -137,7 +137,7 @@
     <div class="arc-day">
       <div class="arc-date">2026-03-19</div>
       
-      <div class="arc-entry" onclick="this.classList.toggle('open')">
+      <div class="arc-entry" id="dev-2026-03-19" onclick="this.classList.toggle('open')">
         <div class="arc-row">
           <span class="arc-cat" data-ko="개발">Development</span>
           <span class="arc-title" data-ko="Phase 2 → 3 완료. LP 활성화 성공.">Phase 2 → 3 Complete. LP Activated.</span>
@@ -147,7 +147,7 @@
           <ul class="arc-items"><li data-ko="Solidity 컨트랙트 완성: ILAlphaHook (V4 hook + EWMA 변동성 오라클), ILAlphaVault (ERC-4626), BaseVault, 대조군 2개. 44 → 65 테스트 전부 통과.">Solidity contracts complete: ILAlphaHook (V4 hook + EWMA vol oracle), ILAlphaVault (ERC-4626), BaseVault, 2 control vaults. 44 → 65 tests, all passing.</li><li data-ko="Ethereum Sepolia 배포 — 3회 시도. 문제: Sepolia에 V4 PoolManager 미배포. 해결: 자체 PoolManager 배포.">Deployed to Ethereum Sepolia — 3 attempts. Problem: V4 PoolManager not available on Sepolia. Solution: deployed our own PoolManager.</li><li data-ko="CREATE2 hook 배포 실패 — owner가 proxy 주소. 수정: constructor에 owner 파라미터 추가.">CREATE2 hook deployment failed — owner was proxy address. Fix: added explicit owner parameter to constructor.</li><li data-ko="키퍼 봇 가동 (1시간 간격). 첫 사이클: feeYield &gt; ilCost → LP ON. 100K tUSDC가 V4 풀에 배포됨.">Keeper bot live (1hr intervals). First cycle: feeYield &gt; ilCost → LP ON. 100K tUSDC deployed to V4 pool.</li><li data-ko="SwapHelper 배포로 테스트넷 볼륨 생성. CSV 메트릭 로깅 추가.">SwapHelper deployed for testnet volume generation. CSV metrics logging added.</li></ul>
         </div>
       </div>
-      <div class="arc-entry" onclick="this.classList.toggle('open')">
+      <div class="arc-entry" id="strategy-2026-03-19" onclick="this.classList.toggle('open')">
         <div class="arc-row">
           <span class="arc-cat" data-ko="전략">Strategy</span>
           <span class="arc-title" data-ko="포지셔닝 확정. Arrakis 분석 완료.">Positioning Locked. Arrakis Analyzed.</span>
@@ -157,7 +157,7 @@
           <ul class="arc-items"><li data-ko="우리는 아님: 스테이킹 대안, 렌딩 대안, 유동성 보장. 우리임: 15%+ 수익을 원하는 자본을 위한 IL 방어 LP 관리.">We are NOT: staking alt, lending alt, liquidity guarantee. We ARE: IL-defended LP management for capital seeking 15%+ returns.</li><li data-ko="새 토큰 프로젝트 = 최고 ROI 세그먼트. 피치: &#x27;트레저리가 6개월 대신 12개월 유지.&#x27; &#x27;유동성 공급&#x27;이 아님.">New token projects identified as highest ROI segment. Pitch: &#x27;your treasury lasts 12mo instead of 6mo.&#x27; NOT &#x27;we supply liquidity.&#x27;</li><li data-ko="Arrakis 심층 분석: 토큰 발행자용 B2B 동적 수수료 (LP 유지) vs 우리 트레저리 보호 B2B (LP 제거). 시장 안 겹침.">Arrakis deep dive: B2B dynamic fees for token issuers (keeps LP in) vs our B2B treasury protection (LP removal). Non-overlapping markets.</li><li data-ko="생존 확률: $10K→$1M 약 17%. 메인넷 Day 1에 첫 고객 확보 필수 (Arrakis 플레이북).">Survival math: $10K→$1M probability ~17%. Must secure Day 1 customer at mainnet launch (Arrakis playbook).</li><li data-ko="수수료 구조 확정: Stage 1 = 성과보수 10%, 관리보수 0%. 수익 없으면 수수료 0원.">Fee structure finalized: Stage 1 = 10% performance, 0% management. No fees if no profit.</li></ul>
         </div>
       </div>
-      <div class="arc-entry" onclick="this.classList.toggle('open')">
+      <div class="arc-entry" id="design-2026-03-19" onclick="this.classList.toggle('open')">
         <div class="arc-row">
           <span class="arc-cat" data-ko="디자인 &amp; 홍보">Design &amp; Marketing</span>
           <span class="arc-title" data-ko="디자인 시스템 + 공개 사이트 라이브.">Design System + Public Site Live.</span>
@@ -191,6 +191,15 @@ function applyLang() {
 }
 document.addEventListener('click', e => { if (!e.target.closest('.lang-btn') && !e.target.closest('.lang-dropdown')) dropdown.classList.remove('open'); });
 if (currentLang === 'ko') applyLang();
+
+// Auto-open entry from hash
+if (window.location.hash) {
+  const el = document.querySelector(window.location.hash);
+  if (el && el.classList.contains('arc-entry')) {
+    el.classList.add('open');
+    setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+  }
+}
 </script>
 </body>
 </html>

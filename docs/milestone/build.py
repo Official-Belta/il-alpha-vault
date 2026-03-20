@@ -433,9 +433,9 @@ def render_log_archive(log_entries, proj, ko_ui, ko_proj):
   .arc-row {{ display:grid; grid-template-columns:130px 1fr 24px; gap:20px; padding:16px 0; align-items:baseline; transition:opacity 200ms var(--ease); }}
   .arc-entry:hover .arc-row {{ opacity:0.7; }}
   @media (max-width:640px) {{ .arc-row {{ grid-template-columns:1fr auto; gap:8px; }} .arc-cat {{ display:none; }} }}
-  .arc-cat {{ font-family:var(--mono); font-size:13px; font-weight:500; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray-500); }}
-  .arc-title {{ font-family:var(--sans); font-size:17px; font-weight:500; letter-spacing:-0.01em; color:var(--black); }}
-  .arc-toggle {{ font-family:var(--mono); font-size:18px; color:var(--gray-400); transition:transform 200ms var(--ease); }}
+  .arc-cat {{ font-family:var(--mono); font-size:15px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray-500); }}
+  .arc-title {{ font-family:var(--sans); font-size:20px; font-weight:500; letter-spacing:-0.01em; color:var(--black); }}
+  .arc-toggle {{ font-family:var(--mono); font-size:20px; color:var(--gray-400); transition:transform 200ms var(--ease); }}
   .arc-entry.open .arc-toggle {{ transform:rotate(45deg); }}
   .arc-detail {{ max-height:0; overflow:hidden; transition:max-height 300ms var(--ease); }}
   .arc-entry.open .arc-detail {{ max-height:800px; }}

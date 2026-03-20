@@ -43,8 +43,9 @@
   .nav-dark .nav-links a:hover { color: var(--gray-400); }
   .nav-dark .nav-status { color: var(--gray-400); border-color: rgba(255,255,255,0.1); }
   .logo { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: -0.03em; color: var(--black); text-decoration: none; }
-  .fab-vault { position: fixed; bottom: 0; right: 48px; z-index: 90; text-decoration: none; color: var(--white); background: rgba(12,12,12,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); width: 340px; padding: 28px 32px; display: flex; flex-direction: column; gap: 16px; transform: translateY(calc(100% - 56px)); transition: transform 400ms var(--ease); opacity: 0; pointer-events: none; }
-  .fab-vault.visible { opacity: 1; pointer-events: auto; }
+  .fab-vault { position: fixed; bottom: 0; right: 48px; z-index: 90; text-decoration: none; color: var(--white); background: rgba(12,12,12,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); width: 340px; padding: 28px 32px; display: flex; flex-direction: column; gap: 16px; transform: translateY(100%); transition: transform 500ms var(--ease); }
+  .fab-vault.intro { transform: translateY(0); }
+  .fab-vault.settled { transform: translateY(calc(100% - 56px)); }
   .fab-vault:hover { transform: translateY(0); }
   .fab-vault .fab-label { font-family: var(--mono); font-size: 15px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--white); }
   .fab-vault .fab-desc { font-family: var(--sans); font-size: 17px; color: var(--gray-400); line-height: 1.65; }
@@ -598,12 +599,16 @@
   }
   fetchLiveData();
 
-  // FAB scroll reveal
+  // FAB intro animation
   const fabVault = document.getElementById('fabVault');
   if (fabVault) {
-    window.addEventListener('scroll', () => {
-      fabVault.classList.toggle('visible', window.scrollY > window.innerHeight * 0.6);
-    });
+    setTimeout(() => {
+      fabVault.classList.add('intro');
+      setTimeout(() => {
+        fabVault.classList.remove('intro');
+        fabVault.classList.add('settled');
+      }, 2000);
+    }, 1500);
   }
 
   // i18n

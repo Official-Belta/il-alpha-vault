@@ -270,6 +270,7 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
   <a class="logo" href="../index.html">{esc(proj["name"])}</a>
   <div class="nav-links">
     <a href="../index.html#roadmap" class="hm" data-ko="로드맵">Roadmap</a>
+    <a href="../vault.html" class="hm" data-ko="볼트">Vault</a>
     <a href="../index.html#log" class="hm active" data-ko="빌드 로그">Log</a>
     <a href="../thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
@@ -758,6 +759,7 @@ def build_html(roadmap, contracts):
   <a class="logo" href="#">{esc(proj["name"])}</a>
   <div class="nav-links">
     <a href="#roadmap" class="hm nav-item" data-section="roadmap" data-ko="{esc(ko_ui.get('roadmap', 'Roadmap'))}">Roadmap</a>
+    <a href="vault.html" class="hm nav-item" data-ko="볼트">Vault</a>
     <a href="#log" class="hm nav-item" data-section="log" data-ko="빌드 로그">Log</a>
     <a href="thesis.html" class="hm nav-item" data-ko="투자 논문">Thesis</a>
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">

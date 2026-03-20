@@ -43,11 +43,6 @@
   .nav-dark .nav-links a:hover { color: var(--gray-400); }
   .nav-dark .nav-status { color: var(--gray-400); border-color: rgba(255,255,255,0.1); }
   .logo { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: -0.03em; color: var(--black); text-decoration: none; }
-  .fab-vault { position: fixed; bottom: 0; right: 48px; z-index: 90; text-decoration: none; color: var(--white); background: var(--black); padding: 20px 32px; display: flex; flex-direction: column; gap: 8px; transform: translateY(calc(100% - 56px)); transition: transform 400ms var(--ease), box-shadow 400ms var(--ease); }
-  .fab-vault:hover { transform: translateY(0); box-shadow: 0 -8px 40px rgba(0,0,0,0.2); }
-  .fab-vault .fab-label { font-family: var(--sans); font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
-  .fab-vault .fab-desc { font-family: var(--mono); font-size: 13px; color: var(--gray-500); line-height: 1.5; max-width: 280px; }
-  @media (max-width: 640px) { .fab-vault { right: 0; left: 0; padding: 16px 24px; } }
   .nav-links { display: flex; align-items: center; gap: 28px; }
   .nav-links a { font-size: 15px; font-weight: 500; color: var(--gray-600); text-decoration: none; transition: color 300ms var(--ease); }
   .nav-links a:hover { color: var(--black); }
@@ -453,12 +448,28 @@
   </div>
 </section>
 
-<section class="section-light" id="vault">
+<section class="section-dark" id="vault">
   <div class="section-inner">
     <div class="section-eyebrow" data-ko="볼트">Vault</div>
-    <h2 class="section-title reveal" data-ko="입금 및 출금">Deposit & Withdraw</h2>
-    <p class="phase-desc reveal" data-ko="ERC-4626 볼트. 락업 없음. 성과 수수료만 — 수익 없으면 수수료 없음.">ERC-4626 vault. No lockup. Performance-fee-only — if we don't make money, you don't pay.</p>
-    <a class="btn-white" href="vault.html" style="background:var(--black); color:var(--white); display:inline-flex; align-items:center; gap:8px; font-family:var(--sans); font-weight:600; font-size:15px; padding:14px 28px; border-radius:4px; text-decoration:none; transition:opacity 300ms var(--ease);" data-ko="볼트 열기 →">Open Vault →</a>
+    <h2 class="section-title reveal" style="max-width:600px;" data-ko="변동성이 높을 때, LP를 제거합니다">When volatility spikes, we remove your LP</h2>
+    <div class="how-row reveal" style="border-top:1px solid rgba(255,255,255,0.06); margin-bottom:48px;">
+      <div class="how-item">
+        <div class="how-num" style="color:var(--gray-600);">01</div>
+        <div class="how-name" style="color:var(--white);" data-ko="성과 수수료 10%">10% Performance Fee</div>
+        <div class="how-desc" data-ko="수익 없으면 수수료 없음. 관리보수 0%. 출금 수수료 0%.">No profit, no fee. 0% management. 0% withdrawal.</div>
+      </div>
+      <div class="how-item">
+        <div class="how-num" style="color:var(--gray-600);">02</div>
+        <div class="how-name" style="color:var(--white);" data-ko="ERC-4626">ERC-4626</div>
+        <div class="how-desc" data-ko="표준 볼트. DeFi 프로토콜과 즉시 호환. 락업 없음.">Standard vault. Composable with DeFi. No lockup.</div>
+      </div>
+      <div class="how-item">
+        <div class="how-num" style="color:var(--gray-600);">03</div>
+        <div class="how-name" style="color:var(--white);" data-ko="Sharpe 3.66">Sharpe 3.66</div>
+        <div class="how-desc" data-ko="S&P 500 대비 7배. Max Drawdown -12%. 백테스트 검증.">7x the S&P 500. Max DD -12%. Backtest verified.</div>
+      </div>
+    </div>
+    <a href="vault.html" style="font-family:var(--mono); font-size:15px; color:var(--gray-500); text-decoration:none; transition:color 300ms var(--ease); border-bottom:1px solid var(--gray-700); padding-bottom:4px;" onmouseover="this.style.color='var(--white)';this.style.borderColor='var(--white)'" onmouseout="this.style.color='var(--gray-500)';this.style.borderColor='var(--gray-700)'" data-ko="볼트 열기 →">Open Vault →</a>
   </div>
 </section>
 
@@ -511,10 +522,6 @@
   </div>
 </section>
 
-<a class="fab-vault" href="vault.html">
-  <span class="fab-label" data-ko="Vault 열기 →">Open Vault →</span>
-  <span class="fab-desc" data-ko="변동성이 높을 때 LP를 자동 제거. Sharpe 3.66. 성과 수수료만.">Removes LP when volatility spikes. Sharpe 3.66. Performance-fee-only.</span>
-</a>
 
 <footer>
   <span>&copy; 2026 IL Alpha</span>

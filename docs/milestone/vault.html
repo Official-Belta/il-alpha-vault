@@ -25,9 +25,9 @@
   .gate-list { list-style:none; padding:0; margin-bottom:56px; border-top:1px solid rgba(255,255,255,0.06); }
   .gate-list li { font-family:var(--mono); font-size:15px; color:var(--gray-500); padding:18px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
   .gate-actions { display:flex; align-items:center; gap:32px; }
-  .gate-accept { font-family:var(--sans); font-size:17px; font-weight:600; background:var(--white); color:var(--black); border:none; padding:18px 48px; cursor:pointer; transition:opacity 200ms var(--ease); letter-spacing:-0.01em; }
+  .gate-accept { font-family:var(--mono); font-size:14px; font-weight:500; letter-spacing:0.06em; text-transform:uppercase; background:var(--white); color:var(--black); border:none; padding:18px 48px; cursor:pointer; transition:opacity 150ms var(--ease); }
   .gate-accept:hover { opacity:0.85; }
-  .gate-decline { font-family:var(--mono); font-size:14px; color:var(--gray-600); text-decoration:none; transition:color 200ms var(--ease); }
+  .gate-decline { font-family:var(--mono); font-size:14px; letter-spacing:0.04em; color:var(--gray-600); text-decoration:none; transition:color 200ms var(--ease); }
   .gate-decline:hover { color:var(--white); }
 
   /* --- NAV --- */
@@ -46,7 +46,7 @@
   .lang-btn { position:relative; display:flex; align-items:center; gap:6px; font-family:var(--sans); font-size:14px; font-weight:500; color:var(--gray-500); background:transparent; border:1px solid var(--gray-200); border-radius:100px; padding:6px 14px; cursor:pointer; transition:all 200ms var(--ease); }
   .lang-btn:hover { color:var(--black); border-color:var(--gray-400); }
   .lang-btn svg { width:16px; height:16px; }
-  .lang-dropdown { position:absolute; top:calc(100% + 8px); right:0; background:var(--white); border:1px solid var(--gray-200); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); overflow:hidden; opacity:0; transform:translateY(-4px); pointer-events:none; transition:all 200ms var(--ease); min-width:140px; z-index:200; }
+  .lang-dropdown { position:absolute; top:calc(100% + 8px); right:0; background:var(--white); border:1px solid var(--gray-200); border-radius:0; box-shadow:0 8px 24px rgba(0,0,0,0.12); overflow:hidden; opacity:0; transform:translateY(-4px); pointer-events:none; transition:all 200ms var(--ease); min-width:140px; z-index:200; }
   .lang-dropdown.open { opacity:1; transform:translateY(0); pointer-events:auto; }
   .lang-option { display:flex; align-items:center; gap:10px; padding:12px 16px; font-size:14px; font-weight:500; color:var(--gray-600); cursor:pointer; transition:background 150ms var(--ease); }
   .lang-option:hover { background:var(--gray-100); }
@@ -62,11 +62,9 @@
   .vault-hero .desc { font-size:21px; color:var(--gray-400); line-height:1.65; max-width:520px; }
 
   /* --- CONNECT --- */
-  .connect-section { padding:0 48px; margin-top:-28px; margin-bottom:64px; }
-  @media (max-width:640px) { .connect-section { padding:0 24px; } }
-  .connect-btn { font-family:var(--sans); font-size:18px; font-weight:600; background:var(--black); color:var(--white); border:none; padding:20px 48px; cursor:pointer; transition:all 200ms var(--ease); letter-spacing:-0.01em; }
-  .connect-btn:hover { background:var(--gray-800); }
-  .connect-btn.connected { background:var(--accent); color:var(--white); }
+  .nav-connect { font-family:var(--mono); font-size:13px; font-weight:500; letter-spacing:0.04em; color:var(--gray-600); background:none; border:1px solid var(--gray-200); padding:8px 20px; cursor:pointer; transition:all 200ms var(--ease); }
+  .nav-connect:hover { color:var(--black); border-color:var(--black); }
+  .nav-connect.connected { color:var(--accent); border-color:var(--accent); }
 
   /* --- METRICS --- */
   .metrics-section { padding:0 48px 64px; }
@@ -118,15 +116,15 @@
   .max-btn:hover { text-decoration:underline; }
   .input-row { display:flex; gap:16px; align-items:stretch; }
   @media (max-width:640px) { .input-row { flex-direction:column; } }
-  .amt-input { flex:1; font-family:var(--mono); font-size:28px; padding:24px; border:1px solid var(--gray-200); background:var(--white); color:var(--black); outline:none; transition:border-color 200ms var(--ease); }
+  .amt-input { flex:1; font-family:var(--mono); font-size:28px; padding:20px 24px; border:1px solid var(--gray-200); border-right:none; background:var(--white); color:var(--black); outline:none; transition:border-color 200ms var(--ease); }
   .amt-input:focus { border-color:var(--black); }
   .amt-input::placeholder { color:var(--gray-300); }
-  .act-btn { font-family:var(--sans); font-size:18px; font-weight:600; padding:24px 44px; border:none; cursor:pointer; transition:all 200ms var(--ease); white-space:nowrap; letter-spacing:-0.01em; }
+  .act-btn { font-family:var(--mono); font-size:14px; font-weight:500; letter-spacing:0.06em; text-transform:uppercase; padding:20px 36px; border:1px solid var(--gray-200); cursor:pointer; transition:all 150ms var(--ease); white-space:nowrap; }
   .act-btn:disabled { opacity:0.3; cursor:not-allowed; }
-  .btn-dep { background:var(--black); color:var(--white); }
-  .btn-dep:hover:not(:disabled) { background:var(--gray-800); }
-  .btn-wd { background:var(--white); color:var(--black); border:1px solid var(--gray-200); }
-  .btn-wd:hover:not(:disabled) { border-color:var(--black); }
+  .btn-dep { background:var(--black); color:var(--white); border-color:var(--black); }
+  .btn-dep:hover:not(:disabled) { background:var(--gray-900); }
+  .btn-wd { background:var(--white); color:var(--black); }
+  .btn-wd:hover:not(:disabled) { background:var(--gray-100); border-color:var(--black); }
   .act-info { font-family:var(--mono); font-size:14px; color:var(--gray-500); margin-top:12px; }
   .tx-status { font-family:var(--mono); font-size:14px; padding:16px 20px; margin-top:16px; display:none; line-height:1.5; }
   .tx-pending { background:rgba(26,127,100,0.04); color:var(--accent); display:block; }
@@ -170,6 +168,7 @@
     <a href="vault.html" class="hm active" data-ko="볼트">Vault</a>
     <a href="index.html#log" class="hm" data-ko="빌드 로그">Log</a>
     <a href="thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
+    <button class="nav-connect" id="connectBtn" onclick="connectWallet()" data-ko="지갑 연결">Connect</button>
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
@@ -198,11 +197,6 @@
   <h1 data-ko="변동성이 높을 때, LP를 제거합니다">When volatility spikes, we remove your LP</h1>
   <p class="desc" data-ko="온체인 변동성 오라클이 위험을 감지하면 자동으로 LP를 철수합니다. 안전할 때 재진입. 락업 없음. 즉시 인출.">On-chain volatility oracle detects risk and automatically removes LP. Re-enters when safe. No lockup. Instant withdrawal.</p>
 </section>
-
-<!-- CONNECT -->
-<div class="connect-section">
-  <button class="connect-btn" id="connectBtn" onclick="connectWallet()" data-ko="지갑 연결">Connect Wallet</button>
-</div>
 
 <!-- METRICS -->
 <div class="metrics-section">
@@ -376,7 +370,7 @@ async function connectWallet() {
     usdc = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, signer);
 
     const btn = document.getElementById('connectBtn');
-    btn.textContent = userAddress.slice(0,6) + '...' + userAddress.slice(-4);
+    btn.textContent = userAddress.slice(0,6) + '···' + userAddress.slice(-4);
     btn.classList.add('connected');
 
     document.getElementById('actionsSection').style.display = 'block';

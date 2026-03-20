@@ -43,9 +43,11 @@
   .nav-dark .nav-links a:hover { color: var(--gray-400); }
   .nav-dark .nav-status { color: var(--gray-400); border-color: rgba(255,255,255,0.1); }
   .logo { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: -0.03em; color: var(--black); text-decoration: none; }
-  .fab-vault { position: fixed; bottom: 32px; right: 32px; z-index: 90; font-family: var(--sans); font-size: 15px; font-weight: 600; color: var(--white); background: var(--black); text-decoration: none; display: flex; align-items: center; gap: 8px; padding: 16px 28px; border-radius: 9999px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); transition: all 200ms var(--ease); }
-  .fab-vault:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 28px rgba(0,0,0,0.3); }
-  @media (max-width: 640px) { .fab-vault { bottom: 24px; right: 24px; padding: 14px 24px; font-size: 14px; } }
+  .fab-vault { position: fixed; bottom: 0; right: 48px; z-index: 90; text-decoration: none; color: var(--white); background: var(--black); padding: 20px 32px; display: flex; flex-direction: column; gap: 8px; transform: translateY(calc(100% - 56px)); transition: transform 400ms var(--ease), box-shadow 400ms var(--ease); }
+  .fab-vault:hover { transform: translateY(0); box-shadow: 0 -8px 40px rgba(0,0,0,0.2); }
+  .fab-vault .fab-label { font-family: var(--sans); font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+  .fab-vault .fab-desc { font-family: var(--mono); font-size: 13px; color: var(--gray-500); line-height: 1.5; max-width: 280px; }
+  @media (max-width: 640px) { .fab-vault { right: 0; left: 0; padding: 16px 24px; } }
   .nav-links { display: flex; align-items: center; gap: 28px; }
   .nav-links a { font-size: 15px; font-weight: 500; color: var(--gray-600); text-decoration: none; transition: color 300ms var(--ease); }
   .nav-links a:hover { color: var(--black); }
@@ -509,7 +511,10 @@
   </div>
 </section>
 
-<a class="fab-vault" href="vault.html" data-ko="볼트 열기 →">Open Vault →</a>
+<a class="fab-vault" href="vault.html">
+  <span class="fab-label" data-ko="Vault 열기 →">Open Vault →</span>
+  <span class="fab-desc" data-ko="변동성이 높을 때 LP를 자동 제거. Sharpe 3.66. 성과 수수료만.">Removes LP when volatility spikes. Sharpe 3.66. Performance-fee-only.</span>
+</a>
 
 <footer>
   <span>&copy; 2026 IL Alpha</span>

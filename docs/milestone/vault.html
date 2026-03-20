@@ -15,17 +15,28 @@
   body { font-family:var(--sans); background:var(--white); color:var(--black); -webkit-font-smoothing:antialiased; }
   ::selection { background:var(--black); color:var(--white); }
 
-  .unaudited { background:var(--gray-900); color:var(--gray-400); font-family:var(--mono); font-size:12px; text-align:center; padding:10px 48px; letter-spacing:0.06em; }
-  .unaudited strong { color:var(--white); }
+  /* --- GATE --- */
+  .gate { position:fixed; inset:0; z-index:1000; background:var(--black); color:var(--white); display:flex; align-items:center; justify-content:center; }
+  .gate-inner { max-width:600px; padding:0 48px; }
+  .gate-eyebrow { font-family:var(--mono); font-size:14px; text-transform:uppercase; letter-spacing:0.12em; color:var(--gray-600); margin-bottom:32px; }
+  .gate h1 { font-family:var(--display); font-size:clamp(40px,6vw,64px); font-weight:400; letter-spacing:-0.025em; line-height:1.1; margin-bottom:32px; }
+  .gate h1 strong { color:var(--white); }
+  .gate-text { font-size:19px; color:var(--gray-400); line-height:1.75; margin-bottom:48px; max-width:480px; }
+  .gate-list { list-style:none; padding:0; margin-bottom:56px; border-top:1px solid rgba(255,255,255,0.06); }
+  .gate-list li { font-family:var(--mono); font-size:15px; color:var(--gray-500); padding:18px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+  .gate-actions { display:flex; align-items:center; gap:32px; }
+  .gate-accept { font-family:var(--sans); font-size:17px; font-weight:600; background:var(--white); color:var(--black); border:none; padding:18px 48px; cursor:pointer; transition:opacity 200ms var(--ease); letter-spacing:-0.01em; }
+  .gate-accept:hover { opacity:0.85; }
+  .gate-decline { font-family:var(--mono); font-size:14px; color:var(--gray-600); text-decoration:none; transition:color 200ms var(--ease); }
+  .gate-decline:hover { color:var(--white); }
 
+  /* --- NAV --- */
   nav { position:sticky; top:0; z-index:100; padding:0 48px; height:64px; display:flex; align-items:center; justify-content:space-between; background:rgba(250,250,249,0.92); backdrop-filter:blur(20px); border-bottom:1px solid var(--gray-200); }
   .logo { font-family:var(--sans); font-weight:700; font-size:18px; letter-spacing:-0.03em; color:var(--black); text-decoration:none; }
   .nav-links { display:flex; align-items:center; gap:28px; }
   .nav-links a { font-size:15px; font-weight:500; color:var(--gray-600); text-decoration:none; transition:color 300ms var(--ease); }
   .nav-links a:hover { color:var(--black); }
   .nav-links a.active { color:var(--black); font-weight:700; border-bottom:2px solid var(--accent); padding-bottom:2px; }
-  .nav-live::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-right:6px; animation:pulse 2s ease-in-out infinite; }
-  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
   .hamburger { display:none; background:none; border:none; cursor:pointer; padding:8px; color:var(--gray-600); }
   .hamburger svg { width:24px; height:24px; }
   .mobile-menu { display:none; position:fixed; top:64px; left:0; right:0; background:var(--white); border-bottom:1px solid var(--gray-200); padding:16px 24px; z-index:99; flex-direction:column; gap:16px; }
@@ -41,73 +52,91 @@
   .lang-option:hover { background:var(--gray-100); }
   .lang-option.active { color:var(--accent); }
 
-  .vault-page { max-width:720px; margin:0 auto; padding:96px 48px 64px; }
-  @media (max-width:640px) { .vault-page { padding:80px 24px 48px; } }
+  /* --- HERO --- */
+  .vault-hero { background:var(--black); color:var(--white); padding:140px 48px 80px; }
+  @media (max-width:640px) { .vault-hero { padding:100px 24px 56px; } }
+  .vault-hero .eyebrow { font-family:var(--mono); font-size:14px; text-transform:uppercase; letter-spacing:0.12em; color:var(--gray-500); margin-bottom:28px; display:flex; align-items:center; gap:10px; }
+  .vault-hero .eyebrow .dot { width:8px; height:8px; border-radius:50%; background:var(--accent); animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .vault-hero h1 { font-family:var(--display); font-size:clamp(48px,7vw,80px); font-weight:400; letter-spacing:-0.03em; line-height:1.08; margin-bottom:24px; max-width:700px; }
+  .vault-hero .desc { font-size:21px; color:var(--gray-400); line-height:1.65; max-width:520px; }
 
-  .vault-header { margin-bottom:48px; }
-  .vault-eyebrow { font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
-  .vault-eyebrow .dot { width:8px; height:8px; border-radius:50%; background:var(--accent); animation:pulse 2s ease-in-out infinite; }
-  .vault-title { font-family:var(--display); font-size:clamp(40px,6vw,64px); font-weight:400; letter-spacing:-0.025em; margin-bottom:20px; }
-  .vault-sub { font-size:20px; color:var(--gray-500); line-height:1.6; }
+  /* --- CONNECT --- */
+  .connect-section { padding:0 48px; margin-top:-28px; margin-bottom:64px; }
+  @media (max-width:640px) { .connect-section { padding:0 24px; } }
+  .connect-btn { font-family:var(--sans); font-size:18px; font-weight:600; background:var(--black); color:var(--white); border:none; padding:20px 48px; cursor:pointer; transition:all 200ms var(--ease); letter-spacing:-0.01em; }
+  .connect-btn:hover { background:var(--gray-800); }
+  .connect-btn.connected { background:var(--accent); color:var(--white); }
 
-  .connect-btn { font-family:var(--sans); font-size:15px; font-weight:600; background:var(--black); color:var(--white); border:none; padding:14px 28px; border-radius:4px; cursor:pointer; transition:opacity 200ms var(--ease); margin-bottom:48px; display:inline-block; }
-  .connect-btn:hover { opacity:0.85; }
-  .connect-btn.connected { background:var(--accent); }
+  /* --- METRICS --- */
+  .metrics-section { padding:0 48px 64px; }
+  @media (max-width:640px) { .metrics-section { padding:0 24px 48px; } }
+  .metrics-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0; border-top:1px solid var(--gray-200); border-bottom:1px solid var(--gray-200); }
+  @media (max-width:768px) { .metrics-grid { grid-template-columns:1fr 1fr; } }
+  .m-cell { padding:32px 32px 32px 0; border-right:1px solid var(--gray-200); }
+  .m-cell:last-child { border-right:none; }
+  .m-cell:nth-child(n+2) { padding-left:32px; }
+  @media (max-width:768px) { .m-cell:nth-child(2) { border-right:none; } .m-cell:nth-child(n+3) { border-top:1px solid var(--gray-200); } }
+  .m-label { font-family:var(--mono); font-size:13px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:10px; }
+  .m-value { font-family:var(--display); font-size:36px; font-weight:400; letter-spacing:-0.02em; }
+  .m-sub { font-family:var(--mono); font-size:13px; color:var(--gray-400); margin-top:6px; }
 
-  .stats-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; border:1px solid var(--gray-200); border-radius:8px; overflow:hidden; margin-bottom:48px; }
-  @media (max-width:640px) { .stats-grid { grid-template-columns:1fr; } }
-  .stat { padding:24px; border-right:1px solid var(--gray-200); }
-  .stat:last-child { border-right:none; }
-  @media (max-width:640px) { .stat { border-right:none; border-bottom:1px solid var(--gray-200); } .stat:last-child { border-bottom:none; } }
-  .stat-label { font-family:var(--mono); font-size:13px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:8px; }
-  .stat-value { font-family:var(--mono); font-size:32px; font-weight:700; letter-spacing:-0.02em; }
-  .stat-sub { font-family:var(--mono); font-size:13px; color:var(--gray-400); margin-top:6px; }
+  /* --- STRATEGY --- */
+  .strategy-section { padding:64px 48px; border-bottom:1px solid var(--gray-200); max-width:960px; }
+  @media (max-width:640px) { .strategy-section { padding:48px 24px; } }
+  .s-eyebrow { font-family:var(--mono); font-size:13px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:14px; display:flex; align-items:center; gap:16px; }
+  .s-eyebrow::after { content:''; flex:1; max-width:48px; height:1px; background:var(--gray-300); }
+  .s-title { font-family:var(--display); font-size:clamp(28px,4vw,40px); font-weight:400; letter-spacing:-0.02em; margin-bottom:24px; line-height:1.2; }
+  .s-body { font-size:19px; color:var(--gray-600); line-height:1.75; margin-bottom:32px; max-width:600px; }
+  .feature-grid { display:grid; grid-template-columns:1fr 1fr; gap:0; border-top:1px solid var(--gray-200); }
+  @media (max-width:640px) { .feature-grid { grid-template-columns:1fr; } }
+  .feature { padding:28px 0; border-bottom:1px solid var(--gray-200); }
+  .feature:nth-child(odd) { padding-right:32px; border-right:1px solid var(--gray-200); }
+  .feature:nth-child(even) { padding-left:32px; }
+  @media (max-width:640px) { .feature:nth-child(odd) { padding-right:0; border-right:none; } .feature:nth-child(even) { padding-left:0; } }
+  .f-name { font-family:var(--sans); font-size:17px; font-weight:600; margin-bottom:6px; }
+  .f-desc { font-size:15px; color:var(--gray-500); line-height:1.6; }
 
-  .action-section { margin-bottom:48px; }
-  .action-label { font-family:var(--mono); font-size:14px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:16px; display:flex; align-items:center; gap:12px; }
-  .action-label::after { content:''; flex:1; max-width:48px; height:1px; background:var(--gray-300); }
-  .action-row { display:flex; gap:12px; align-items:stretch; }
-  @media (max-width:640px) { .action-row { flex-direction:column; } }
-  .action-input { flex:1; font-family:var(--mono); font-size:24px; padding:20px 24px; border:1px solid var(--gray-200); border-radius:4px; background:var(--white); color:var(--black); outline:none; transition:border-color 200ms var(--ease); }
-  .action-input:focus { border-color:var(--black); }
-  .action-input::placeholder { color:var(--gray-400); }
-  .action-btn { font-family:var(--sans); font-size:17px; font-weight:600; padding:20px 36px; border:none; border-radius:4px; cursor:pointer; transition:all 200ms var(--ease); white-space:nowrap; }
-  .action-btn:disabled { opacity:0.4; cursor:not-allowed; }
-  .btn-deposit { background:var(--black); color:var(--white); }
-  .btn-deposit:hover:not(:disabled) { opacity:0.85; }
-  .btn-withdraw { background:var(--white); color:var(--black); border:1px solid var(--gray-200); }
-  .btn-withdraw:hover:not(:disabled) { border-color:var(--black); }
-  .action-info { font-family:var(--mono); font-size:13px; color:var(--gray-500); margin-top:10px; }
+  /* --- FEES --- */
+  .fee-section { padding:64px 48px; border-bottom:1px solid var(--gray-200); max-width:960px; }
+  @media (max-width:640px) { .fee-section { padding:48px 24px; } }
+  .fee-table { width:100%; border-collapse:collapse; }
+  .fee-table th { font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); text-align:left; padding:16px 0; border-bottom:1px solid var(--gray-200); font-weight:500; }
+  .fee-table td { font-size:18px; padding:20px 0; border-bottom:1px solid var(--gray-200); }
+  .fee-table tr:last-child td { border-bottom:none; }
+  .fee-highlight td { color:var(--accent); font-weight:600; }
 
-  .balance-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-  .balance-label { font-family:var(--mono); font-size:12px; color:var(--gray-500); }
-  .max-btn { font-family:var(--mono); font-size:11px; color:var(--accent); background:none; border:none; cursor:pointer; text-transform:uppercase; letter-spacing:0.06em; font-weight:600; }
+  /* --- ACTIONS --- */
+  .actions-section { padding:64px 48px; max-width:720px; }
+  @media (max-width:640px) { .actions-section { padding:48px 24px; } }
+  .act-block { margin-bottom:56px; }
+  .act-eyebrow { font-family:var(--mono); font-size:14px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:20px; display:flex; align-items:center; gap:16px; }
+  .act-eyebrow::after { content:''; flex:1; max-width:48px; height:1px; background:var(--gray-300); }
+  .bal-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .bal-label { font-family:var(--mono); font-size:14px; color:var(--gray-500); }
+  .max-btn { font-family:var(--mono); font-size:12px; color:var(--accent); background:none; border:none; cursor:pointer; text-transform:uppercase; letter-spacing:0.06em; font-weight:600; }
   .max-btn:hover { text-decoration:underline; }
+  .input-row { display:flex; gap:16px; align-items:stretch; }
+  @media (max-width:640px) { .input-row { flex-direction:column; } }
+  .amt-input { flex:1; font-family:var(--mono); font-size:28px; padding:24px; border:1px solid var(--gray-200); background:var(--white); color:var(--black); outline:none; transition:border-color 200ms var(--ease); }
+  .amt-input:focus { border-color:var(--black); }
+  .amt-input::placeholder { color:var(--gray-300); }
+  .act-btn { font-family:var(--sans); font-size:18px; font-weight:600; padding:24px 44px; border:none; cursor:pointer; transition:all 200ms var(--ease); white-space:nowrap; letter-spacing:-0.01em; }
+  .act-btn:disabled { opacity:0.3; cursor:not-allowed; }
+  .btn-dep { background:var(--black); color:var(--white); }
+  .btn-dep:hover:not(:disabled) { background:var(--gray-800); }
+  .btn-wd { background:var(--white); color:var(--black); border:1px solid var(--gray-200); }
+  .btn-wd:hover:not(:disabled) { border-color:var(--black); }
+  .act-info { font-family:var(--mono); font-size:14px; color:var(--gray-500); margin-top:12px; }
+  .tx-status { font-family:var(--mono); font-size:14px; padding:16px 20px; margin-top:16px; display:none; line-height:1.5; }
+  .tx-pending { background:rgba(26,127,100,0.04); color:var(--accent); display:block; }
+  .tx-success { background:rgba(26,127,100,0.04); color:var(--accent); display:block; }
+  .tx-error { background:rgba(239,68,68,0.04); color:var(--red); display:block; }
 
-  .tx-status { font-family:var(--mono); font-size:13px; padding:12px 16px; border-radius:4px; margin-top:12px; display:none; }
-  .tx-pending { background:rgba(26,127,100,0.06); color:var(--accent); display:block; }
-  .tx-success { background:rgba(26,127,100,0.06); color:var(--accent); display:block; }
-  .tx-error { background:rgba(239,68,68,0.06); color:var(--red); display:block; }
-
-  .contract-link { font-family:var(--mono); font-size:13px; color:var(--gray-500); margin-top:48px; padding-top:24px; border-top:1px solid var(--gray-200); }
-  .contract-link a { color:var(--gray-500); text-decoration:none; }
-  .contract-link a:hover { color:var(--black); }
-
-  .vault-nav-btn { font-family:var(--sans); font-size:14px; font-weight:600; color:var(--white); background:var(--black); padding:8px 18px; border-radius:4px; text-decoration:none; transition:opacity 200ms var(--ease); margin-right:8px; }
-  .vault-nav-btn:hover { opacity:0.8; color:var(--white); }
-
-  .gate-overlay { position:fixed; inset:0; z-index:1000; background:var(--black); color:var(--white); display:flex; align-items:center; justify-content:center; }
-  .gate-card { max-width:560px; padding:64px 48px; }
-  .gate-eyebrow { font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:24px; }
-  .gate-title { font-family:var(--display); font-size:clamp(32px,5vw,48px); font-weight:400; letter-spacing:-0.025em; margin-bottom:24px; line-height:1.15; }
-  .gate-body { font-size:17px; color:var(--gray-400); line-height:1.75; margin-bottom:40px; }
-  .gate-body strong { color:var(--white); }
-  .gate-items { font-family:var(--mono); font-size:13px; color:var(--gray-500); line-height:2.2; margin-bottom:48px; padding:0; list-style:none; border-top:1px solid rgba(255,255,255,0.08); }
-  .gate-items li { padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.08); }
-  .gate-accept { font-family:var(--sans); font-size:15px; font-weight:600; background:var(--white); color:var(--black); border:none; padding:16px 40px; border-radius:4px; cursor:pointer; transition:opacity 200ms var(--ease); }
-  .gate-accept:hover { opacity:0.85; }
-  .gate-back { font-family:var(--mono); font-size:13px; color:var(--gray-600); text-decoration:none; display:inline-block; margin-left:24px; }
-  .gate-back:hover { color:var(--white); }
+  /* --- CONTRACT --- */
+  .contract-section { padding:32px 48px; border-top:1px solid var(--gray-200); }
+  .contract-section a { font-family:var(--mono); font-size:14px; color:var(--gray-500); text-decoration:none; transition:color 200ms var(--ease); }
+  .contract-section a:hover { color:var(--black); }
 
   footer { padding:24px 48px; border-top:1px solid var(--gray-200); }
   footer span { font-family:var(--mono); font-size:11px; color:var(--gray-500); }
@@ -115,25 +144,30 @@
 </head>
 <body>
 
-<div class="gate-overlay" id="gate">
-  <div class="gate-card">
+<!-- RISK GATE -->
+<div class="gate" id="gate">
+  <div class="gate-inner">
     <div class="gate-eyebrow" data-ko="위험 고지">Risk Disclosure</div>
-    <h2 class="gate-title" data-ko-html="이 소프트웨어는<br><strong style='color:var(--white)'>감사 전</strong>입니다">This software is<br><strong style="color:var(--white)">unaudited</strong></h2>
-    <p class="gate-body" data-ko="스마트 컨트랙트는 버그, 취약점, 또는 자금의 전부 손실 위험이 있습니다. 감당할 수 없는 금액을 예치하지 마세요.">Smart contracts may contain bugs, vulnerabilities, or result in total loss of funds. Do not deposit more than you can afford to lose.</p>
-    <ul class="gate-items">
+    <h1 data-ko-html="이 소프트웨어는<br><strong>감사 전</strong>입니다">This software is<br><strong>unaudited</strong></h1>
+    <p class="gate-text" data-ko="스마트 컨트랙트는 버그, 취약점, 또는 자금의 전부 손실 위험이 있습니다. 감당할 수 없는 금액을 예치하지 마세요.">Smart contracts may contain bugs, vulnerabilities, or result in total loss of funds. Do not deposit more than you can afford to lose.</p>
+    <ul class="gate-list">
       <li data-ko="전문 보안 감사 미완료">No professional security audit completed</li>
       <li data-ko="예치 자금의 전부 손실 가능">Deposited funds may be lost entirely</li>
       <li data-ko="본인 책임 하에 사용">Use at your own risk</li>
     </ul>
-    <button class="gate-accept" onclick="acceptRisk()" data-ko="위험을 이해하고 진행">I accept the risk</button>
-    <a class="gate-back" href="index.html" data-ko="돌아가기">Go back</a>
+    <div class="gate-actions">
+      <button class="gate-accept" onclick="acceptRisk()" data-ko="위험을 이해하고 진행">I accept the risk</button>
+      <a class="gate-decline" href="index.html" data-ko="돌아가기">Go back</a>
+    </div>
   </div>
 </div>
 
+<!-- NAV -->
 <nav>
   <a class="logo" href="index.html">IL Alpha</a>
   <div class="nav-links">
     <a href="index.html#roadmap" class="hm" data-ko="로드맵">Roadmap</a>
+    <a href="vault.html" class="hm active" data-ko="볼트">Vault</a>
     <a href="index.html#log" class="hm" data-ko="빌드 로그">Log</a>
     <a href="thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
@@ -151,7 +185,6 @@
     </div>
   </div>
 </nav>
-
 <div class="mobile-menu">
   <a href="index.html#roadmap" data-ko="로드맵" onclick="this.parentElement.classList.remove('open')">Roadmap</a>
   <a href="vault.html" class="active" data-ko="볼트">Vault</a>
@@ -159,63 +192,140 @@
   <a href="thesis.html" data-ko="투자 논문">Thesis</a>
 </div>
 
-<div class="vault-page">
+<!-- HERO -->
+<section class="vault-hero">
+  <div class="eyebrow"><span class="dot"></span> <span data-ko="Base 메인넷 · ERC-4626">Base Mainnet · ERC-4626</span></div>
+  <h1 data-ko="변동성이 높을 때, LP를 제거합니다">When volatility spikes, we remove your LP</h1>
+  <p class="desc" data-ko="온체인 변동성 오라클이 위험을 감지하면 자동으로 LP를 철수합니다. 안전할 때 재진입. 락업 없음. 즉시 인출.">On-chain volatility oracle detects risk and automatically removes LP. Re-enters when safe. No lockup. Instant withdrawal.</p>
+</section>
 
-  <div class="vault-header">
-    <div class="vault-eyebrow"><span class="dot"></span> <span data-ko="Base 메인넷">Base Mainnet</span></div>
-    <h1 class="vault-title" data-ko="IL Alpha Vault">IL Alpha Vault</h1>
-    <p class="vault-sub" data-ko="변동성이 높을 때 자동으로 LP를 제거합니다. ERC-4626. 락업 없음.">Automatically removes LP when volatility spikes. ERC-4626. No lockup.</p>
-  </div>
-
+<!-- CONNECT -->
+<div class="connect-section">
   <button class="connect-btn" id="connectBtn" onclick="connectWallet()" data-ko="지갑 연결">Connect Wallet</button>
+</div>
 
-  <div class="stats-grid">
-    <div class="stat">
-      <div class="stat-label" data-ko="총 자산">Total Assets</div>
-      <div class="stat-value" id="totalAssets">—</div>
+<!-- METRICS -->
+<div class="metrics-section">
+  <div class="metrics-grid">
+    <div class="m-cell">
+      <div class="m-label" data-ko="총 자산">Total Assets</div>
+      <div class="m-value" id="totalAssets">—</div>
+      <div class="m-sub">USDC</div>
     </div>
-    <div class="stat">
-      <div class="stat-label" data-ko="셰어 가격">Share Price</div>
-      <div class="stat-value" id="sharePrice">—</div>
+    <div class="m-cell">
+      <div class="m-label" data-ko="셰어 가격">Share Price</div>
+      <div class="m-value" id="sharePrice">—</div>
     </div>
-    <div class="stat">
-      <div class="stat-label" data-ko="LP 상태">LP Status</div>
-      <div class="stat-value" id="lpStatus">—</div>
-      <div class="stat-sub" id="depositCap"></div>
+    <div class="m-cell">
+      <div class="m-label" data-ko="LP 상태">LP Status</div>
+      <div class="m-value" id="lpStatus">—</div>
+    </div>
+    <div class="m-cell">
+      <div class="m-label" data-ko="잔여 캡">Remaining Cap</div>
+      <div class="m-value" id="depositCap">—</div>
     </div>
   </div>
+</div>
 
-  <div class="action-section" id="depositSection" style="display:none;">
-    <div class="action-label" data-ko="입금">Deposit</div>
-    <div class="balance-row">
-      <span class="balance-label" data-ko="USDC 잔액">USDC Balance: <span id="usdcBalance">—</span></span>
+<!-- STRATEGY -->
+<section class="strategy-section">
+  <div class="s-eyebrow" data-ko="전략">Strategy</div>
+  <h2 class="s-title" data-ko="볼트 구조">How the vault works</h2>
+  <p class="s-body" data-ko="EWMA 변동성 오라클이 모든 스왑에서 가격 분산을 추적합니다. 임계값 초과 시 키퍼 봇이 LP를 완전 제거합니다. 변동성이 안정되면 자동 재진입합니다.">The EWMA volatility oracle tracks price variance on every swap. When variance exceeds the threshold, the keeper bot removes LP entirely. Re-enters automatically when volatility stabilizes.</p>
+  <div class="feature-grid">
+    <div class="feature">
+      <div class="f-name" data-ko="ERC-4626 표준">ERC-4626 Standard</div>
+      <div class="f-desc" data-ko="표준 볼트 인터페이스. DeFi 프로토콜과 즉시 호환. Morpho, Euler 등에서 담보로 사용 가능.">Standard vault interface. Instantly composable with DeFi protocols. Usable as collateral on Morpho, Euler, and others.</div>
+    </div>
+    <div class="feature">
+      <div class="f-name" data-ko="온체인 변동성 오라클">On-chain Vol Oracle</div>
+      <div class="f-desc" data-ko="EWMA 기반 tick 분산 추적. 오프체인 의존성 제로. 모든 스왑이 오라클을 업데이트.">EWMA-based tick variance tracking. Zero off-chain dependencies. Every swap updates the oracle.</div>
+    </div>
+    <div class="feature">
+      <div class="f-name" data-ko="자동 LP 보호">Automatic LP Protection</div>
+      <div class="f-desc" data-ko="변동성 높을 때 LP 완전 제거. 범위 조정이 아닌 완전 철수. 비영구적 손실 노출 제로.">Full LP removal during high volatility. Not range adjustment — complete withdrawal. Zero IL exposure during risk periods.</div>
+    </div>
+    <div class="feature">
+      <div class="f-name" data-ko="즉시 인출">Instant Withdrawal</div>
+      <div class="f-desc" data-ko="락업 없음. 언제든 인출 가능 — 볼트가 일시 정지 상태여도. TWAP 체크로 샌드위치 공격 방지.">No lockup. Withdraw anytime — even when vault is paused. TWAP check prevents sandwich attacks.</div>
+    </div>
+    <div class="feature">
+      <div class="f-name" data-ko="볼륨 스파이크 트리거">Volume Spike Trigger</div>
+      <div class="f-desc" data-ko="비정상 볼륨 감지 시 쿨다운 무시하고 즉시 LP 제거. 급격한 시장 변동에 대한 추가 안전장치.">Bypasses cooldown on abnormal volume for immediate LP removal. Extra safety net for sudden market movements.</div>
+    </div>
+    <div class="feature">
+      <div class="f-name" data-ko="3볼트 비교">3-Vault Comparison</div>
+      <div class="f-desc" data-ko="IL Alpha vs AlwaysLP vs HODL — 동일 풀, 동일 자금. 실시간 성과 비교. 투명한 검증.">IL Alpha vs AlwaysLP vs HODL — same pool, same capital. Real-time performance comparison. Transparent verification.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEES -->
+<section class="fee-section">
+  <div class="s-eyebrow" data-ko="수수료">Fees</div>
+  <h2 class="s-title" data-ko="수익 없으면 수수료 없음">No profit, no fee</h2>
+  <table class="fee-table">
+    <thead>
+      <tr>
+        <th data-ko="항목">Item</th>
+        <th data-ko="현재 (TVL < $5M)">Current (TVL &lt; $5M)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="fee-highlight">
+        <td data-ko="성과 보수">Performance Fee</td>
+        <td>10%</td>
+      </tr>
+      <tr>
+        <td data-ko="관리 보수">Management Fee</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td data-ko="출금 수수료">Withdrawal Fee</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td data-ko="락업">Lockup</td>
+        <td data-ko="없음">None</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- DEPOSIT / WITHDRAW -->
+<section class="actions-section" id="actionsSection" style="display:none;">
+  <div class="act-block">
+    <div class="act-eyebrow" data-ko="입금">Deposit</div>
+    <div class="bal-row">
+      <span class="bal-label" data-ko="USDC 잔액">USDC Balance: <span id="usdcBalance">—</span></span>
       <button class="max-btn" onclick="setMax('deposit')">MAX</button>
     </div>
-    <div class="action-row">
-      <input class="action-input" id="depositAmount" type="number" placeholder="0.00" min="1" step="0.01">
-      <button class="action-btn btn-deposit" id="depositBtn" onclick="doDeposit()" disabled data-ko="입금">Deposit</button>
+    <div class="input-row">
+      <input class="amt-input" id="depositAmount" type="number" placeholder="0.00" min="1" step="0.01">
+      <button class="act-btn btn-dep" id="depositBtn" onclick="doDeposit()" disabled data-ko="입금">Deposit</button>
     </div>
-    <div class="action-info" id="depositInfo"></div>
+    <div class="act-info" id="depositInfo"></div>
     <div class="tx-status" id="depositTx"></div>
   </div>
 
-  <div class="action-section" id="withdrawSection" style="display:none;">
-    <div class="action-label" data-ko="출금">Withdraw</div>
-    <div class="balance-row">
-      <span class="balance-label" data-ko="Vault 셰어">Vault Shares: <span id="shareBalance">—</span></span>
+  <div class="act-block">
+    <div class="act-eyebrow" data-ko="출금">Withdraw</div>
+    <div class="bal-row">
+      <span class="bal-label" data-ko="보유 셰어">Vault Shares: <span id="shareBalance">—</span></span>
       <button class="max-btn" onclick="setMax('withdraw')">MAX</button>
     </div>
-    <div class="action-row">
-      <input class="action-input" id="withdrawAmount" type="number" placeholder="0.00" min="0.01" step="0.01">
-      <button class="action-btn btn-withdraw" id="withdrawBtn" onclick="doWithdraw()" disabled data-ko="출금">Withdraw</button>
+    <div class="input-row">
+      <input class="amt-input" id="withdrawAmount" type="number" placeholder="0.00" min="0.01" step="0.01">
+      <button class="act-btn btn-wd" id="withdrawBtn" onclick="doWithdraw()" disabled data-ko="출금">Withdraw</button>
     </div>
-    <div class="action-info" id="withdrawInfo"></div>
+    <div class="act-info" id="withdrawInfo"></div>
     <div class="tx-status" id="withdrawTx"></div>
   </div>
+</section>
 
-  <div class="contract-link">
-    <span data-ko="컨트랙트:">Contract:</span> <a id="contractLink" href="#" target="_blank" rel="noopener"><span id="contractAddr">—</span> ↗</a>
-  </div>
+<!-- CONTRACT LINK -->
+<div class="contract-section">
+  <a id="contractLink" href="#" target="_blank" rel="noopener" data-ko="Basescan에서 컨트랙트 보기 ↗">View contract on Basescan <span id="contractAddr"></span> ↗</a>
 </div>
 
 <footer><span>&copy; 2026 IL Alpha</span></footer>
@@ -223,8 +333,8 @@
 <script>
 // --- CONFIG ---
 const BASE_CHAIN_ID = 8453;
-const VAULT_ADDRESS = '0x0000000000000000000000000000000000000000'; // TODO: replace after Base deploy
-const USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'; // Base USDC
+const VAULT_ADDRESS = '0x0000000000000000000000000000000000000000';
+const USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
 const BASESCAN = 'https://basescan.org';
 
 const VAULT_ABI = [
@@ -240,7 +350,6 @@ const VAULT_ABI = [
   'function getVaultMetrics() external view returns (uint256,uint256,uint256,uint128,uint256,bool,bool)',
   'function UNAUDITED() external view returns (bool)'
 ];
-
 const ERC20_ABI = [
   'function balanceOf(address) external view returns (uint256)',
   'function allowance(address owner, address spender) external view returns (uint256)',
@@ -250,26 +359,16 @@ const ERC20_ABI = [
 
 let provider, signer, vault, usdc, userAddress;
 
-// --- WALLET ---
 async function connectWallet() {
-  if (!window.ethereum) {
-    alert('No wallet detected. Please install Rabby or MetaMask.');
-    return;
-  }
+  if (!window.ethereum) { alert('No wallet detected. Install Rabby or MetaMask.'); return; }
   try {
     provider = new ethers.BrowserProvider(window.ethereum);
     const network = await provider.getNetwork();
     if (Number(network.chainId) !== BASE_CHAIN_ID) {
       try {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x' + BASE_CHAIN_ID.toString(16) }]
-        });
+        await window.ethereum.request({ method:'wallet_switchEthereumChain', params:[{chainId:'0x'+BASE_CHAIN_ID.toString(16)}] });
         provider = new ethers.BrowserProvider(window.ethereum);
-      } catch (e) {
-        alert('Please switch to Base network.');
-        return;
-      }
+      } catch(e) { alert('Please switch to Base network.'); return; }
     }
     signer = await provider.getSigner();
     userAddress = await signer.getAddress();
@@ -277,70 +376,57 @@ async function connectWallet() {
     usdc = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, signer);
 
     const btn = document.getElementById('connectBtn');
-    btn.textContent = userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+    btn.textContent = userAddress.slice(0,6) + '...' + userAddress.slice(-4);
     btn.classList.add('connected');
 
-    document.getElementById('depositSection').style.display = 'block';
-    document.getElementById('withdrawSection').style.display = 'block';
+    document.getElementById('actionsSection').style.display = 'block';
     document.getElementById('contractLink').href = BASESCAN + '/address/' + VAULT_ADDRESS;
-    document.getElementById('contractAddr').textContent = VAULT_ADDRESS.slice(0, 10) + '...' + VAULT_ADDRESS.slice(-8);
+    document.getElementById('contractAddr').textContent = '(' + VAULT_ADDRESS.slice(0,8) + '...)';
 
     await refreshData();
     document.getElementById('depositBtn').disabled = false;
     document.getElementById('withdrawBtn').disabled = false;
-
-    // Listen for input changes
     document.getElementById('depositAmount').addEventListener('input', updateDepositPreview);
     document.getElementById('withdrawAmount').addEventListener('input', updateWithdrawPreview);
-  } catch (e) {
-    console.error(e);
-    alert('Connection failed: ' + e.message);
-  }
+  } catch(e) { console.error(e); alert('Connection failed: ' + e.message); }
 }
 
-// --- DATA ---
 async function refreshData() {
   try {
     const [metrics, usdcBal, shares] = await Promise.all([
-      vault.getVaultMetrics(),
-      usdc.balanceOf(userAddress),
-      vault.balanceOf(userAddress)
+      vault.getVaultMetrics(), usdc.balanceOf(userAddress), vault.balanceOf(userAddress)
     ]);
-
     const totalAssetsVal = Number(metrics[0]) / 1e6;
     const sharePrice = Number(metrics[4]) / 1e6;
     const lpActive = metrics[5];
     const isPaused = metrics[6];
 
-    document.getElementById('totalAssets').textContent = formatUSDC(totalAssetsVal);
+    document.getElementById('totalAssets').textContent = '$' + formatUSDC(totalAssetsVal);
     document.getElementById('sharePrice').textContent = '$' + sharePrice.toFixed(4);
-    document.getElementById('lpStatus').textContent = lpActive ? 'LP ON' : 'LP OFF';
+    document.getElementById('lpStatus').textContent = lpActive ? 'Active' : 'Removed';
     document.getElementById('lpStatus').style.color = lpActive ? 'var(--accent)' : 'var(--gray-500)';
 
     const maxDep = await vault.maxDeposit(userAddress);
-    document.getElementById('depositCap').textContent = 'Cap: ' + formatUSDC(Number(maxDep) / 1e6) + ' remaining';
+    document.getElementById('depositCap').textContent = '$' + formatUSDC(Number(maxDep) / 1e6);
 
     document.getElementById('usdcBalance').textContent = formatUSDC(Number(usdcBal) / 1e6);
     document.getElementById('shareBalance').textContent = formatUSDC(Number(shares) / 1e6);
 
     if (isPaused) {
       document.getElementById('depositBtn').disabled = true;
-      document.getElementById('depositInfo').textContent = 'Vault is paused. Deposits disabled.';
+      document.getElementById('depositInfo').textContent = 'Vault paused — deposits disabled.';
     }
-  } catch (e) {
-    console.error('Data refresh error:', e);
-  }
+  } catch(e) { console.error('Refresh error:', e); }
 }
 
-// --- PREVIEWS ---
 async function updateDepositPreview() {
   const val = document.getElementById('depositAmount').value;
   if (!val || Number(val) <= 0) { document.getElementById('depositInfo').textContent = ''; return; }
   try {
     const assets = ethers.parseUnits(val, 6);
     const shares = await vault.convertToShares(assets);
-    document.getElementById('depositInfo').textContent = 'You receive: ' + formatUSDC(Number(shares) / 1e6) + ' shares';
-  } catch (e) { document.getElementById('depositInfo').textContent = ''; }
+    document.getElementById('depositInfo').textContent = 'You receive: ' + formatUSDC(Number(shares)/1e6) + ' shares';
+  } catch(e) { document.getElementById('depositInfo').textContent = ''; }
 }
 
 async function updateWithdrawPreview() {
@@ -349,39 +435,32 @@ async function updateWithdrawPreview() {
   try {
     const assets = ethers.parseUnits(val, 6);
     const sharesNeeded = await vault.convertToShares(assets);
-    document.getElementById('withdrawInfo').textContent = 'Burns: ' + formatUSDC(Number(sharesNeeded) / 1e6) + ' shares';
-  } catch (e) { document.getElementById('withdrawInfo').textContent = ''; }
+    document.getElementById('withdrawInfo').textContent = 'Burns: ' + formatUSDC(Number(sharesNeeded)/1e6) + ' shares';
+  } catch(e) { document.getElementById('withdrawInfo').textContent = ''; }
 }
 
-// --- ACTIONS ---
 async function doDeposit() {
   const val = document.getElementById('depositAmount').value;
   if (!val || Number(val) <= 0) return;
   const txEl = document.getElementById('depositTx');
   try {
     const assets = ethers.parseUnits(val, 6);
-
-    // Check allowance
     const allowance = await usdc.allowance(userAddress, VAULT_ADDRESS);
     if (allowance < assets) {
-      txEl.className = 'tx-status tx-pending';
-      txEl.textContent = 'Approving USDC...';
+      txEl.className = 'tx-status tx-pending'; txEl.textContent = 'Approving USDC...';
       const approveTx = await usdc.approve(VAULT_ADDRESS, ethers.MaxUint256);
       await approveTx.wait();
     }
-
-    txEl.className = 'tx-status tx-pending';
-    txEl.textContent = 'Depositing...';
+    txEl.className = 'tx-status tx-pending'; txEl.textContent = 'Depositing...';
     const tx = await vault.deposit(assets, userAddress);
     await tx.wait();
-
     txEl.className = 'tx-status tx-success';
-    txEl.innerHTML = 'Deposit confirmed. <a href="' + BASESCAN + '/tx/' + tx.hash + '" target="_blank" style="color:var(--accent)">View ↗</a>';
+    txEl.innerHTML = 'Deposit confirmed. <a href="'+BASESCAN+'/tx/'+tx.hash+'" target="_blank" style="color:var(--accent)">View on Basescan ↗</a>';
     document.getElementById('depositAmount').value = '';
     await refreshData();
-  } catch (e) {
+  } catch(e) {
     txEl.className = 'tx-status tx-error';
-    txEl.textContent = 'Error: ' + (e.reason || e.message).slice(0, 80);
+    txEl.textContent = 'Error: ' + (e.reason || e.message).slice(0,100);
   }
 }
 
@@ -391,66 +470,54 @@ async function doWithdraw() {
   const txEl = document.getElementById('withdrawTx');
   try {
     const assets = ethers.parseUnits(val, 6);
-    txEl.className = 'tx-status tx-pending';
-    txEl.textContent = 'Withdrawing...';
+    txEl.className = 'tx-status tx-pending'; txEl.textContent = 'Withdrawing...';
     const tx = await vault.withdraw(assets, userAddress, userAddress);
     await tx.wait();
-
     txEl.className = 'tx-status tx-success';
-    txEl.innerHTML = 'Withdrawal confirmed. <a href="' + BASESCAN + '/tx/' + tx.hash + '" target="_blank" style="color:var(--accent)">View ↗</a>';
+    txEl.innerHTML = 'Withdrawal confirmed. <a href="'+BASESCAN+'/tx/'+tx.hash+'" target="_blank" style="color:var(--accent)">View on Basescan ↗</a>';
     document.getElementById('withdrawAmount').value = '';
     await refreshData();
-  } catch (e) {
+  } catch(e) {
     txEl.className = 'tx-status tx-error';
-    txEl.textContent = 'Error: ' + (e.reason || e.message).slice(0, 80);
+    txEl.textContent = 'Error: ' + (e.reason || e.message).slice(0,100);
   }
 }
 
 function setMax(type) {
   if (type === 'deposit') {
-    const bal = document.getElementById('usdcBalance').textContent.replace(/,/g, '');
-    document.getElementById('depositAmount').value = bal;
+    document.getElementById('depositAmount').value = document.getElementById('usdcBalance').textContent.replace(/,/g,'');
     updateDepositPreview();
   } else {
-    const shares = document.getElementById('shareBalance').textContent.replace(/,/g, '');
-    document.getElementById('withdrawAmount').value = shares;
+    document.getElementById('withdrawAmount').value = document.getElementById('shareBalance').textContent.replace(/,/g,'');
     updateWithdrawPreview();
   }
 }
 
-function formatUSDC(n) { return Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function formatUSDC(n) { return Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
-// --- i18n ---
+// i18n
 let currentLang = localStorage.getItem('lang') || 'en';
 const langLabel = document.getElementById('langLabel');
 const dropdown = document.querySelector('.lang-dropdown');
-function setLang(lang) { currentLang = lang; localStorage.setItem('lang', lang); dropdown.classList.remove('open'); applyLang(); }
+function setLang(lang) { currentLang=lang; localStorage.setItem('lang',lang); dropdown.classList.remove('open'); applyLang(); }
 function applyLang() {
   langLabel.textContent = currentLang === 'en' ? 'EN' : 'KR';
   document.documentElement.lang = currentLang === 'ko' ? 'ko' : 'en';
-  document.querySelectorAll('.lang-option').forEach(o => o.classList.toggle('active', o.dataset.lang === currentLang));
+  document.querySelectorAll('.lang-option').forEach(o => o.classList.toggle('active',o.dataset.lang===currentLang));
   document.querySelectorAll('[data-ko],[data-ko-html]').forEach(el => {
     if (!el.dataset.en) el.dataset.en = el.innerHTML;
-    if (currentLang === 'ko') {
-      if (el.dataset.koHtml) el.innerHTML = el.dataset.koHtml;
-      else if (el.dataset.ko) el.textContent = el.dataset.ko;
-    } else if (el.dataset.en) { el.innerHTML = el.dataset.en; }
+    if (currentLang === 'ko') { if (el.dataset.koHtml) el.innerHTML=el.dataset.koHtml; else if (el.dataset.ko) el.textContent=el.dataset.ko; }
+    else if (el.dataset.en) { el.innerHTML=el.dataset.en; }
   });
 }
 document.addEventListener('click', e => { if (!e.target.closest('.lang-btn') && !e.target.closest('.lang-dropdown')) dropdown.classList.remove('open'); });
 if (currentLang === 'ko') applyLang();
 
-// Auto-refresh every 30s if connected
 setInterval(() => { if (vault) refreshData(); }, 30000);
 
-// --- GATE ---
-function acceptRisk() {
-  sessionStorage.setItem('vault_risk_accepted', 'true');
-  document.getElementById('gate').style.display = 'none';
-}
-if (sessionStorage.getItem('vault_risk_accepted') === 'true') {
-  document.getElementById('gate').style.display = 'none';
-}
+// Gate
+function acceptRisk() { sessionStorage.setItem('vault_risk_accepted','true'); document.getElementById('gate').style.display='none'; }
+if (sessionStorage.getItem('vault_risk_accepted') === 'true') document.getElementById('gate').style.display='none';
 </script>
 </body>
 </html>

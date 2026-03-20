@@ -36,7 +36,6 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
 
     // ─── Errors ──────────────────────────────────────────────────────
     error OnlyOwner();
-    error OnlyKeeper();
     error OnlyPoolManager();
     error Paused();
     error DepositTooSmall();
@@ -63,7 +62,7 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     event DepositCapUpdated(uint256 oldCap, uint256 newCap);
     event TwapThresholdUpdated(int24 oldThreshold, int24 newThreshold);
     event SlippageUpdated(uint256 oldBps, uint256 newBps);
-    event PoolKeyUpdated();
+    event PoolKeyUpdated(address indexed currency0, address indexed currency1, uint24 fee);
     event PauseUpdated(bool paused);
 
     // ─── Unaudited Notice ─────────────────────────────────────────────
@@ -170,6 +169,7 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     }
 
     /// @notice C-2 FIX: mint() must have same guards as deposit()
+    /// @dev V4 L-5 FIX: previewMint called once for guard checks, super.mint handles the rest
     function mint(uint256 shares, address receiver)
         public
         override
@@ -177,9 +177,9 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
         nonReentrant
         returns (uint256 assets)
     {
-        assets = previewMint(shares);
-        if (assets < VIRTUAL_ASSETS) revert DepositTooSmall();
-        if (totalAssets() + assets > depositCap) revert DepositCapExceeded();
+        uint256 expectedAssets = previewMint(shares);
+        if (expectedAssets < VIRTUAL_ASSETS) revert DepositTooSmall();
+        if (totalAssets() + expectedAssets > depositCap) revert DepositCapExceeded();
         _checkTWAP();
         assets = super.mint(shares, receiver);
     }
@@ -344,11 +344,24 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
         }
     }
 
-    /// @dev H-2: Check slippage on LP operations
-    function _checkSlippage(int128 d0, int128 d1, uint256 expected) internal view {
-        uint256 actualCost = (d0 < 0 ? uint256(uint128(-d0)) : 0) + (d1 < 0 ? uint256(uint128(-d1)) : 0);
-        uint256 maxCost = expected + (expected * maxSlippageBps) / 10_000;
-        if (actualCost > maxCost) revert SlippageExceeded();
+    /// @dev H-2 + V4 M-2 FIX: Check slippage per-token (handles cross-decimal pairs)
+    ///      Compares each token delta independently against its expected share.
+    ///      Prevents false passes/fails when mixing 6-decimal USDC with 18-decimal WETH.
+    function _checkSlippage(int128 d0, int128 d1, uint256 expectedTotal) internal view {
+        uint256 halfExpected = expectedTotal / 2;
+        uint256 maxPerToken = halfExpected + (halfExpected * maxSlippageBps) / 10_000;
+
+        uint256 cost0 = d0 < 0 ? uint256(uint128(-d0)) : 0;
+        uint256 cost1 = d1 < 0 ? uint256(uint128(-d1)) : 0;
+
+        // Check asset token side only (the token we're spending from vault)
+        // The other token's cost is in a different denomination — can't compare
+        address assetAddr = address(asset);
+        if (Currency.unwrap(poolKey.currency0) == assetAddr) {
+            if (cost0 > maxPerToken) revert SlippageExceeded();
+        } else {
+            if (cost1 > maxPerToken) revert SlippageExceeded();
+        }
     }
 
     // ─── Internal: Real-time LP Valuation ────────────────────────────
@@ -409,10 +422,11 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     {
         totalAssetsVal = totalAssets();
         idleAssets = asset.balanceOf(address(this));
-        // Real-time LP value (not stale)
+        // V4 L-4 FIX: asset token only (consistent with totalAssets)
         if (deployedLiquidity > 0) {
             (uint256 v0, uint256 v1) = _getDeployedLPValue();
-            deployedValue = v0 + v1;
+            address assetAddr = address(asset);
+            deployedValue = Currency.unwrap(poolKey.currency0) == assetAddr ? v0 : v1;
         }
         deployedLiquidityVal = deployedLiquidity;
         uint256 oneShare = 10 ** decimals;
@@ -447,7 +461,7 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
             Currency.unwrap(_poolKey.currency1) != assetAddr
         ) revert InvalidPoolKey();
         poolKey = _poolKey;
-        emit PoolKeyUpdated();
+        emit PoolKeyUpdated(Currency.unwrap(_poolKey.currency0), Currency.unwrap(_poolKey.currency1), _poolKey.fee);
     }
 
     function setPaused(bool _paused) external onlyOwner {

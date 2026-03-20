@@ -461,6 +461,9 @@ contract ILAlphaHook is IHooks {
 
     /// @notice Get time-weighted average tick from recent observations
     /// @return twapTick The TWAP tick, or current lastTick if insufficient data
+    /// @notice Get recency-weighted average tick from recent observations
+    /// @dev Weights newer observations higher (not time-weighted in the TWAP sense).
+    ///      Falls back to lastTick when no valid observations exist (safe default).
     function getTwapTick(PoolId poolId) public view returns (int24 twapTick) {
         int256 weightedSum;
         uint256 totalWeight;

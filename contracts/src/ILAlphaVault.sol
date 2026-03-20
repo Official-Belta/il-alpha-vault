@@ -205,6 +205,7 @@ contract ILAlphaVault is BaseVault, IUnlockCallback {
     /// @dev Public — anyone can call. Result is deterministic (hook signal only).
     ///      Keeper liveness is not a single point of failure.
     function rebalance() external whenNotPaused nonReentrant {
+        _checkTWAP(); // Arb-V3: prevent sandwich on rebalance (5/8 agents recommended)
         bool shouldLP = hook.isLPActive(poolKey);
         uint256 totalBefore = totalAssets();
         uint128 liquidityBefore = deployedLiquidity;

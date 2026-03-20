@@ -46,36 +46,36 @@
 
 ## NEW Findings From V2 Fixes
 
-8개 에이전트에서 독립 분석 후 크로스-밸리데이션된 신규 이슈:
+Cross-validated new issues from 8 independent agent analyses:
 
-### HIGH (2건 — 동일 근본 원인)
+### HIGH (2 — same root cause)
 
 #### R-1: ERC-4626 Non-Conformance in withdraw/redeem
-- **Confirmed by:** Static Analysis, Entry Points, Sharp Edges, Spec Compliance (4/8 에이전트)
+- **Confirmed by:** Static Analysis, Entry Points, Sharp Edges, Spec Compliance (4/8 agents)
 - **File:** `ILAlphaVault.sol:329-370`
 - **Problem:** `withdraw(assets)` burns shares computed from full `assets` but transfers `assets - fee`. ERC-4626 spec requires `withdraw(X)` to deliver exactly X assets. `previewWithdraw`/`previewRedeem`/`maxWithdraw` don't account for fees.
 - **Impact:** Integrating protocols (routers, aggregators, yield optimizers) will misaccount user balances. Late depositors receive inflated share price.
 - **Fix:** Override `previewWithdraw`/`previewRedeem` to include fee. Or restructure: burn fewer shares so user receives exactly `assets`.
 
 #### R-2: `accumulatedFees` Not Subtracted from `totalAssets()`
-- **Confirmed by:** Static Analysis, Entry Points, Sharp Edges, Secure Contracts (4/8 에이전트)
+- **Confirmed by:** Static Analysis, Entry Points, Sharp Edges, Secure Contracts (4/8 agents)
 - **File:** `ILAlphaVault.sol:152-168`
 - **Problem:** Fees stay in `asset.balanceOf(address(this))` and are counted as vault assets. Share price is inflated by unclaimed fees. When `claimFees()` runs, share price drops — punishing remaining depositors.
 - **Fix:** `return idle - accumulatedFees + lpValue` in `totalAssets()`.
 
-### MEDIUM-HIGH (1건)
+### MEDIUM-HIGH (1)
 
 #### R-3: TWAP Buffer Defeatable via Same-Block Multi-Swap
-- **Confirmed by:** Static Analysis, Audit Context, Sharp Edges, Differential Review (4/8 에이전트)
+- **Confirmed by:** Static Analysis, Audit Context, Sharp Edges, Differential Review (4/8 agents)
 - **File:** `ILAlphaHook.sol:448-455`
 - **Problem:** `_recordTickObservation` records every swap with no per-block deduplication. 10 swaps in one block fills the entire circular buffer with attacker-controlled tick values.
 - **Impact:** Attacker bypasses TWAP manipulation protection, enables sandwich attacks on deposit/withdraw.
 - **Fix:** Add `if (obs.timestamp == uint40(block.timestamp)) return;` check, or track `lastRecordedBlock`.
 
-### MEDIUM (5건)
+### MEDIUM (5)
 
 #### R-4: No Slippage Protection on LP Removal
-- **Confirmed by:** Static Analysis, Entry Points, Audit Context, Sharp Edges, Differential Review (5/8 에이전트)
+- **Confirmed by:** Static Analysis, Entry Points, Audit Context, Sharp Edges, Differential Review (5/8 agents)
 - **File:** `ILAlphaVault.sol:312-323`
 - **Fix:** Add `_checkSlippage` to `_executeRemoveLiquidity`.
 
@@ -98,7 +98,7 @@
 - **Confirmed by:** Entry Points, Sharp Edges
 - **Fix:** Add `emit SlippageUpdated(oldBps, newBps)`.
 
-### LOW (3건)
+### LOW (3)
 
 - **R-9:** `mint()` calls `previewMint` twice (gas inefficiency)
 - **R-10:** `PoolKeyUpdated` event has no parameters (un-indexable)
@@ -155,8 +155,8 @@ How many of the 8 independent agents found each issue:
 
 ## Overall Assessment
 
-**V1 → V2 개선 요약:**
-- CRITICAL: 4 → 0 (전체 해결)
+**V1 → V2 improvement summary:**
+- CRITICAL: 4 → 0 (all resolved)
 - Risk: MEDIUM-HIGH → MEDIUM
 - Maturity: 76% → 80%
 - Audit Readiness: 55 → 75 → (after R-1~R-8 fixes) **~90**

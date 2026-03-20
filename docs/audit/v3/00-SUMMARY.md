@@ -45,7 +45,7 @@
 
 ### MEDIUM (4)
 
-1. **`maxDeposit` paused 미반영 + `maxMint` 미오버라이드** — ERC-4626 위반. paused 시 maxDeposit이 0 미반환, maxMint는 deposit cap/paused 무시. 통합 프로토콜이 잘못된 한도 수신.
+1. **`maxDeposit` doesn't reflect paused state + `maxMint` not overridden** — ERC-4626 violation. When paused, maxDeposit doesn't return 0, maxMint ignores deposit cap/paused. Integrating protocols receive incorrect limits.
 
 2. **`setLPRange` callable while vault has deployed LP** — Hook can change tick range, causing vault to remove liquidity at wrong ticks. Fix: coordinate with vault's deployedLiquidity state.
 
@@ -58,9 +58,9 @@
 5. `PoolKeyUpdated` event declared but never emitted in `setPoolKey()`
 6. Dead `_getDeployedLPValue()` call in `_executeRemoveLiquidity` (~5K gas waste)
 7. `mint()` calls `previewMint` twice (gas inefficiency)
-8. Stale comment "fee deferred post-audit" (수수료 의도적 제거됨)
-9. `getTwapTick` NatSpec "time-weighted" 이지만 실제는 recency-weighted
-10. Vault `onlyKeeper` modifier가 어떤 함수에도 미적용 (사실상 데드코드)
+8. Stale comment "fee deferred post-audit" (fee was intentionally removed)
+9. `getTwapTick` NatSpec says "time-weighted" but implementation is recency-weighted
+10. Vault `onlyKeeper` modifier not applied to any function (effectively dead code)
 
 ---
 

@@ -157,9 +157,9 @@ def render_log_summary(log_entries):
         label_en = category_labels.get(cat, cat)
         label_ko = category_labels_ko.get(cat, cat)
         title_ko = entry.get("title_ko", entry["title"])
-        detail_url = f"log/{latest['date']}.html#{cat}"
+        arc_id = f"{cat}-{latest['date']}"
         latest_lines += f"""
-        <a class="log-latest-row" href="{detail_url}">
+        <a class="log-latest-row" href="log/#{arc_id}">
           <span class="log-latest-cat" data-ko="{esc(label_ko)}">{esc(label_en)}</span>
           <span class="log-latest-title" data-ko="{esc(title_ko)}">{esc(entry["title"])}</span>
           <span class="log-latest-arrow">&rarr;</span>
@@ -363,8 +363,9 @@ def render_log_archive(log_entries, proj, ko_ui, ko_proj):
                 ko_attr = f' data-ko="{esc(ko)}"' if ko != item else ""
                 items_html += f'<li{ko_attr}>{esc(item)}</li>'
 
+            arc_id = f"{cat}-{day['date']}"
             entries_html += f"""
-      <div class="arc-entry" onclick="this.classList.toggle('open')">
+      <div class="arc-entry" id="{arc_id}" onclick="this.classList.toggle('open')">
         <div class="arc-row">
           <span class="arc-cat" data-ko="{esc(label_ko)}">{esc(label_en)}</span>
           <span class="arc-title" data-ko="{esc(title_ko)}">{esc(entry["title"])}</span>
@@ -506,6 +507,15 @@ function applyLang() {{
 }}
 document.addEventListener('click', e => {{ if (!e.target.closest('.lang-btn') && !e.target.closest('.lang-dropdown')) dropdown.classList.remove('open'); }});
 if (currentLang === 'ko') applyLang();
+
+// Auto-open entry from hash
+if (window.location.hash) {{
+  const el = document.querySelector(window.location.hash);
+  if (el && el.classList.contains('arc-entry')) {{
+    el.classList.add('open');
+    setTimeout(() => el.scrollIntoView({{ behavior: 'smooth', block: 'center' }}), 100);
+  }}
+}}
 </script>
 </body>
 </html>"""

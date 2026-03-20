@@ -38,8 +38,8 @@
 
 | # | Finding | Status |
 |---|---------|--------|
-| 1 | 50/50 asset split for two-sided LP | Phase 4: pre-swap (CEO 합의) |
-| 2 | `_checkSlippage` cross-decimal sum | USDC 페어만 사용 (수용) |
+| 1 | 50/50 asset split for two-sided LP | Phase 4: pre-swap (agreed) |
+| 2 | `_checkSlippage` cross-decimal sum | USDC pairs only (accepted) |
 
 ### LOW (4)
 

@@ -40,7 +40,7 @@
 
 ### V3 #7: Stale comment "fee deferred post-audit" — FIXED
 
-Grep for "fee deferred", "post-audit", "수수료" returns no matches in `contracts/src/`. Verified.
+Grep for "fee deferred", "post-audit", "withdrawal fee" returns no matches in `contracts/src/`. Verified.
 
 ### V3 #10: `onlyKeeper` dead code in vault — FIXED (partial)
 

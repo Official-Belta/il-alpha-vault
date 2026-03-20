@@ -157,11 +157,13 @@ def render_log_summary(log_entries):
         label_en = category_labels.get(cat, cat)
         label_ko = category_labels_ko.get(cat, cat)
         title_ko = entry.get("title_ko", entry["title"])
+        detail_url = f"log/{latest['date']}.html#{cat}"
         latest_lines += f"""
-        <div class="log-latest-row">
+        <a class="log-latest-row" href="{detail_url}">
           <span class="log-latest-cat" data-ko="{esc(label_ko)}">{esc(label_en)}</span>
           <span class="log-latest-title" data-ko="{esc(title_ko)}">{esc(entry["title"])}</span>
-        </div>"""
+          <span class="log-latest-arrow">&rarr;</span>
+        </a>"""
 
     return f"""
     <div class="log-counter reveal">
@@ -604,9 +606,11 @@ def build_html(roadmap, contracts):
   .fab-vault.intro {{ transform: translateY(0); }}
   .fab-vault.settled {{ transform: translateY(calc(100% - 56px)); }}
   .fab-vault:hover {{ transform: translateY(0); }}
-  .fab-vault .fab-label {{ font-family: var(--mono); font-size: 15px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--white); }}
-  .fab-vault .fab-desc {{ font-family: var(--sans); font-size: 17px; color: var(--gray-400); line-height: 1.65; }}
-  .fab-vault .fab-arrow {{ font-family: var(--mono); font-size: 14px; color: var(--gray-600); transition: color 200ms var(--ease); margin-top: 4px; }}
+  .fab-vault .fab-label {{ font-family: var(--mono); font-size: 14px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--white); display: flex; align-items: center; justify-content: space-between; }}
+  .fab-vault .fab-label::after {{ content: ''; display: inline-block; width: 24px; height: 1px; background: var(--gray-600); transition: width 300ms var(--ease); }}
+  .fab-vault:hover .fab-label::after {{ width: 48px; background: var(--white); }}
+  .fab-vault .fab-desc {{ font-family: var(--sans); font-size: 16px; color: var(--gray-500); line-height: 1.65; }}
+  .fab-vault .fab-arrow {{ font-family: var(--mono); font-size: 13px; color: var(--gray-600); transition: color 200ms var(--ease); padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); }}
   .fab-vault:hover .fab-arrow {{ color: var(--white); }}
   @media (max-width: 640px) {{ .fab-vault {{ right: 0; width: 100%; }} }}
   .nav-links {{ display: flex; align-items: center; gap: 28px; }}
@@ -722,15 +726,18 @@ def build_html(roadmap, contracts):
   .log-section {{ background: var(--black); color: var(--white); padding: 96px 48px; }}
   @media (max-width: 640px) {{ .log-section {{ padding: 64px 24px; }} }}
   .log-section .section-eyebrow::after {{ background: var(--gray-700); }}
-  .log-counter {{ margin-bottom: 32px; }}
+  .log-counter {{ margin-bottom: 40px; }}
   .log-counter-num {{ font-family: var(--display); font-size: clamp(36px,5vw,56px); font-weight: 400; letter-spacing: -0.025em; color: var(--white); margin-bottom: 8px; }}
-  .log-counter-date {{ font-family: var(--mono); font-size: 13px; color: var(--gray-500); }}
-  .log-latest {{ border-top: 1px solid rgba(255,255,255,0.08); margin-bottom: 32px; }}
-  .log-latest-row {{ display: grid; grid-template-columns: 140px 1fr; gap: 24px; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }}
-  @media (max-width: 768px) {{ .log-latest-row {{ grid-template-columns: 1fr; gap: 6px; }} }}
-  .log-latest-cat {{ font-family: var(--mono); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-500); }}
-  .log-latest-title {{ font-family: var(--sans); font-size: 16px; font-weight: 500; color: var(--white); letter-spacing: -0.01em; }}
-  .log-archive-link {{ font-family: var(--mono); font-size: 14px; color: var(--gray-500); text-decoration: none; transition: color 200ms var(--ease); }}
+  .log-counter-date {{ font-family: var(--mono); font-size: 14px; color: var(--gray-500); }}
+  .log-latest {{ border-top: 1px solid rgba(255,255,255,0.08); margin-bottom: 40px; }}
+  .log-latest-row {{ display: grid; grid-template-columns: 180px 1fr auto; gap: 28px; padding: 24px 0; border-bottom: 1px solid rgba(255,255,255,0.08); text-decoration: none; color: inherit; transition: opacity 200ms var(--ease); opacity: 0.6; }}
+  .log-latest-row:hover {{ opacity: 1; }}
+  @media (max-width: 768px) {{ .log-latest-row {{ grid-template-columns: 1fr; gap: 8px; }} }}
+  .log-latest-cat {{ font-family: var(--mono); font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-400); }}
+  .log-latest-title {{ font-family: var(--sans); font-size: 20px; font-weight: 500; color: var(--white); letter-spacing: -0.01em; }}
+  .log-latest-arrow {{ font-family: var(--mono); font-size: 18px; color: var(--gray-600); }}
+  .log-latest-row:hover .log-latest-arrow {{ color: var(--white); }}
+  .log-archive-link {{ font-family: var(--mono); font-size: 15px; color: var(--gray-500); text-decoration: none; transition: color 200ms var(--ease); }}
   .log-archive-link:hover {{ color: var(--white); }}
   .log-filters {{ display: flex; gap: 8px; margin-bottom: 32px; }}
   .log-filter {{ font-family: var(--mono); font-size: 12px; color: var(--gray-500); background: transparent; border: 1px solid rgba(255,255,255,0.08); border-radius: 100px; padding: 6px 16px; cursor: pointer; transition: all 200ms var(--ease); }}

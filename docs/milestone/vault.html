@@ -83,7 +83,7 @@
   /* --- METRICS --- */
   .metrics-section { padding:0 48px 64px; }
   @media (max-width:640px) { .metrics-section { padding:0 24px 48px; } }
-  .metrics-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0; border-top:1px solid var(--gray-200); border-bottom:1px solid var(--gray-200); }
+  .metrics-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0; border-top:1px solid var(--gray-200); border-bottom:1px solid var(--gray-200); }
   @media (max-width:768px) { .metrics-grid { grid-template-columns:1fr 1fr; } }
   .m-cell { padding:32px 32px 32px 0; border-right:1px solid var(--gray-200); }
   .m-cell:last-child { border-right:none; }
@@ -281,6 +281,14 @@
       <div class="m-label" data-ko="잔여 캡">Remaining Cap</div>
       <div class="m-value" id="depositCap">—</div>
     </div>
+    <div class="m-cell">
+      <div class="m-label" data-ko="시간 변동성">Hourly Vol</div>
+      <div class="m-value" id="hourlyVar">—</div>
+    </div>
+    <div class="m-cell">
+      <div class="m-label" data-ko="연간 변동성">Annual Vol</div>
+      <div class="m-value" id="annualVol">—</div>
+    </div>
   </div>
 </div>
 
@@ -360,6 +368,10 @@ const VAULT_ABI = [
   'function getVaultMetrics() external view returns (uint256,uint256,uint256,uint128,uint256,bool,bool)',
   'function UNAUDITED() external view returns (bool)'
 ];
+const HOOK_ADDRESS = '0x0000000000000000000000000000000000000000'; // TODO: replace after deploy
+const HOOK_ABI = [
+  'function getVolEstimate(bytes32 poolId) external view returns (uint256 hourlyVar, uint256 annualizedVol)'
+];
 const ERC20_ABI = [
   'function balanceOf(address) external view returns (uint256)',
   'function allowance(address owner, address spender) external view returns (uint256)',
@@ -367,8 +379,9 @@ const ERC20_ABI = [
   'function decimals() external view returns (uint8)'
 ];
 
-let readProvider, signer, vaultRead, vaultWrite, usdcWrite, userAddress;
+let readProvider, signer, vaultRead, hookRead, vaultWrite, usdcWrite, userAddress;
 const DEPLOYED = VAULT_ADDRESS !== '0x0000000000000000000000000000000000000000';
+const HOOK_DEPLOYED = HOOK_ADDRESS !== '0x0000000000000000000000000000000000000000';
 
 // --- PUBLIC READ (no wallet needed) ---
 async function initPublicRead() {
@@ -381,6 +394,7 @@ async function initPublicRead() {
     return;
   }
   vaultRead = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, readProvider);
+  if (HOOK_DEPLOYED) hookRead = new ethers.Contract(HOOK_ADDRESS, HOOK_ABI, readProvider);
 
   // Set contract link immediately
   const linkEl = document.getElementById('contractLink');
@@ -396,7 +410,7 @@ async function refreshPublicData() {
   try {
     const metrics = await vaultRead.getVaultMetrics();
     const totalAssetsVal = Number(metrics[0]) / 1e6;
-    const sharePrice = Number(metrics[4]) / 1e6;
+    const sharePrice = Number(metrics[4]) / 1e18;
     const lpActive = metrics[5];
     const isPaused = metrics[6];
 
@@ -413,6 +427,20 @@ async function refreshPublicData() {
     if (isPaused) {
       document.getElementById('depositBtn').disabled = true;
       document.getElementById('depositInfo').textContent = 'Vault paused — deposits disabled.';
+    }
+
+    // Vol data from hook
+    if (hookRead) {
+      try {
+        // poolId needs to be fetched or hardcoded — using placeholder
+        // ENG: replace with actual poolId after deployment
+        const poolId = '0x0000000000000000000000000000000000000000000000000000000000000000';
+        const vol = await hookRead.getVolEstimate(poolId);
+        const hourlyVar = (Number(vol[0]) / 1e18 * 100).toFixed(4);
+        const annualVol = (Number(vol[1]) / 1e18 * 100).toFixed(2);
+        document.getElementById('hourlyVar').textContent = hourlyVar + '%';
+        document.getElementById('annualVol').textContent = annualVol + '%';
+      } catch(e) { /* vol data optional */ }
     }
   } catch(e) { console.error('Public read error:', e); }
 }

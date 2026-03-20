@@ -4,9 +4,9 @@
     "tagline": "Volatility-aware liquidity management",
     "description": "Treasury-grade LP management that removes positions before impermanent loss hits. Capital preservation with LP-level returns.",
     "eyebrow": "Uniswap V4 Hook",
-    "network": "Base",
+    "network": "Arbitrum",
     "twitter": "https://twitter.com",
-    "etherscan_base": "https://basescan.org"
+    "etherscan_base": "https://arbiscan.io"
   },
   "phases": [
     {
@@ -48,15 +48,15 @@
     },
     {
       "number": "04",
-      "name": "Base Mainnet",
+      "name": "Arbitrum Mainnet",
       "status": "active",
-      "description": "Code freeze complete. Deploying to Base mainnet with $1.2K seed capital. 4-week live operation for real performance data.",
+      "description": "Code freeze complete. Deploying to Arbitrum mainnet with $1.2K seed capital. 4-week live operation for real performance data.",
       "items": [
         { "text": "Code freeze — all features complete, 4-round audit clean", "status": "done" },
         { "text": "Wallet setup (Deployer, Operator, Treasury Safe, Sentinel)", "status": "done" },
-        { "text": "Deploy 5 contracts to Base mainnet", "status": "active" },
+        { "text": "Deploy 5 contracts to Arbitrum mainnet", "status": "active" },
         { "text": "Seed $400×3 vaults on real ETH/USDC pool", "status": "pending" },
-        { "text": "Keeper bot live on Base (1hr cycles)", "status": "pending" },
+        { "text": "Keeper bot live on Arbitrum (1hr cycles)", "status": "pending" },
         { "text": "Dashboard update — real mainnet data", "status": "pending" },
         { "text": "4-week live performance monitoring", "status": "pending" }
       ]
@@ -117,9 +117,9 @@
       "number": "09",
       "name": "Multi-Chain",
       "status": "upcoming",
-      "description": "Expand from Base to Arbitrum and Ethereum L1. Deploy where V4 activity and TVL justify the gas costs.",
+      "description": "Expand from Arbitrum to Base and Ethereum L1. Deploy where V4 activity and TVL justify the gas costs.",
       "items": [
-        { "text": "Arbitrum deployment (second largest V4 ecosystem)", "status": "pending" },
+        { "text": "Base deployment (Coinbase ecosystem)", "status": "pending" },
         { "text": "Ethereum L1 deployment (TVL $1M+ threshold)", "status": "pending" },
         { "text": "Cross-chain vault aggregation and unified dashboard", "status": "pending" }
       ]
@@ -157,7 +157,7 @@
             "TWAP check on deposit/withdraw — blocks sandwich attacks (±5% threshold).",
             "Volume spike trigger — emergency LP removal bypasses cooldown on abnormal volume.",
             "Withdrawal fee removed for ERC-4626 compliance and simplicity.",
-            "Base mainnet wallet setup: Deployer, Operator, Treasury Safe (Gnosis 2/3), Sentinel."
+            "Arbitrum mainnet wallet setup: Deployer, Operator, Treasury Safe (Gnosis 2/3), Sentinel."
           ],
           "items_ko": [
             "코드 프리즈 선언: 77 테스트 (Hook 31 + Vault 37 + Controls 9), 0 실패. 더 이상 컨트랙트 변경 없음.",
@@ -166,7 +166,7 @@
             "TWAP 체크 — 입출금 시 샌드위치 공격 차단 (±5% 임계값).",
             "볼륨 스파이크 트리거 — 비정상 볼륨 시 쿨다운 무시하고 긴급 LP 제거.",
             "ERC-4626 준수를 위해 출금 수수료 제거.",
-            "Base 메인넷 지갑 설정: Deployer, Operator, Treasury Safe (Gnosis 2/3), Sentinel."
+            "Arbitrum 메인넷 지갑 설정: Deployer, Operator, Treasury Safe (Gnosis 2/3), Sentinel."
           ]
         },
         {
@@ -180,7 +180,7 @@
             "20 target DAOs selected across 3 tiers. Top 3: Gnosis (new treasury manager), ENS (active forum), Polygon ($1.3B idle).",
             "Governance proposal template created (EN/KO) — Sharpe 3.66, DD -12%, perf-fee-only, ERC-4626.",
             "Grant strategy: UFSF audit subsidy (100% coverage), Hook Design Lab Cohort 2, v4 Hooks Support.",
-            "Mainnet direct: skip extended testnet → Base mainnet with $1.2K seed, capped deposit, 4-week live data.",
+            "Mainnet direct: skip extended testnet → Arbitrum mainnet with $1.2K seed, capped deposit, 4-week live data.",
             "Thesis page rewritten: DAO treasury pitch with backtest data, market sizing, revenue model, timing (Bunni vacancy)."
           ],
           "items_ko": [
@@ -188,7 +188,7 @@
             "20개 타겟 DAO 3개 티어로 선정. Top 3: Gnosis (새 트레저리 매니저), ENS (활발한 포럼), Polygon ($1.3B 유휴).",
             "거버넌스 제안서 템플릿 (EN/KO) — Sharpe 3.66, DD -12%, 성과보수만, ERC-4626.",
             "그랜트 전략: UFSF 감사 보조금 (100% 커버), Hook Design Lab 코호트 2, v4 Hooks Support.",
-            "메인넷 직행: 테스트넷 연장 없이 → Base 메인넷 $1.2K 시드, 캡 제한, 4주 실데이터.",
+            "메인넷 직행: 테스트넷 연장 없이 → Arbitrum 메인넷 $1.2K 시드, 캡 제한, 4주 실데이터.",
             "Thesis 페이지 전면 교체: DAO 트레저리 피치 + 백테스트 데이터, 시장 규모, 수익 모델, 타이밍 (Bunni 빈자리)."
           ]
         },
@@ -332,12 +332,12 @@
         "01": { "name": "\ubc31\ud14c\uc2a4\ud2b8", "description": "6\uac1c\uc6d4\uac04\uc758 \uc2e4\uc81c ETH/USDC \uac00\uaca9 \ub370\uc774\ud130\ub85c \uc0c1\uc2b9\uc7a5\ubd80\ud130 \ud558\ub77d\uc7a5\uae4c\uc9c0 \uc804\uccb4 \uc2dc\uc7a5 \uc0ac\uc774\ud074\uc744 \ucee4\ubc84. \ub450 \uac00\uc9c0 \ub300\uc870\uad70 \uc804\ub7b5 \ub300\ube44 \uc815\ub7c9\uc801 \uac80\uc99d \uc644\ub8cc." },
         "02": { "name": "\uc2a4\ub9c8\ud2b8 \ucee8\ud2b8\ub799\ud2b8", "description": "\uc628\uccb4\uc778 \ubcc0\ub3d9\uc131 \uc624\ub77c\ud074\uc744 \ud0d1\uc7ac\ud55c Uniswap V4 \ud6c5. \uc608\uce58\uc6a9 ERC-4626 \ubcfc\ud2b8. \uc5c4\ubc00\ud55c \ube44\uad50\ub97c \uc704\ud55c \ub450 \uac1c\uc758 \ub300\uc870\uad70 \ubcfc\ud2b8." },
         "03": { "name": "테스트넷 검증", "description": "3개 볼트 Sepolia 배포. 키퍼 봇 가동. 4라운드 Trail of Bits 보안 감사: Critical 0, High 0. 대시보드 운영 중." },
-        "04": { "name": "Base 메인넷", "description": "코드 프리즈 완료. $1.2K 시드로 Base 메인넷 배포. 4주 실운영으로 실제 성과 데이터 확보." },
+        "04": { "name": "Arbitrum 메인넷", "description": "코드 프리즈 완료. $1.2K 시드로 Arbitrum 메인넷 배포. 4주 실운영으로 실제 성과 데이터 확보." },
         "05": { "name": "그랜트 & 감사", "description": "UFSF 감사 보조금 신청 (최대 100% 커버). Hook Design Lab 코호트 2. 코드 프리즈 상태에서 전문 보안 감사." },
         "06": { "name": "DAO GTM", "description": "DAO 트레저리 확보가 핵심 GTM. 3-5개 파트너십 × $1-2M. 실제 메인넷 성과 데이터로 거버넌스 제안." },
         "07": { "name": "해자 구축", "description": "유휴 자본 재활용(rehypothecation). 렌딩 프로토콜과 vault share 결합. 런타임 데이터 우위. V4 훅 생태계 선점." },
         "08": { "name": "거버넌스", "description": "PMF 확인 및 TVL $5M 초과 후에만 토큰 결정. 그전까지 순수 수익 모델." },
-        "09": { "name": "멀티체인", "description": "Base에서 Arbitrum, Ethereum L1으로 확장. V4 활동과 TVL이 가스 비용을 정당화하는 곳에 배포." }
+        "09": { "name": "멀티체인", "description": "Arbitrum에서 Base, Ethereum L1으로 확장. V4 활동과 TVL이 가스 비용을 정당화하는 곳에 배포." }
       },
       "items": {
         "Volatility-based LP on/off signal design": "\ubcc0\ub3d9\uc131 \uae30\ubc18 LP \uc628/\uc624\ud504 \uc2e0\ud638 \uc124\uacc4",
@@ -379,6 +379,7 @@
         "If no token: pure revenue model, simpler regulatory path": "미발행 시: 순수 수익 모델, 간소화된 규제 경로",
         "Base L1 launch (lowest gas, Coinbase ecosystem, V4 active)": "Base L1 출시 (최저 가스, Coinbase 생태계, V4 활성)",
         "Arbitrum deployment (second largest V4 ecosystem)": "Arbitrum 배포 (V4 생태계 2위)",
+        "Base deployment (Coinbase ecosystem)": "Base 배포 (Coinbase 생태계)",
         "Ethereum L1 deployment (TVL $1M+ threshold — keeper gas too high for small TVL)": "Ethereum L1 배포 (TVL $1M+ 기준 — 소규모 TVL에선 키퍼 가스 과다)",
         "Cross-chain vault aggregation and unified dashboard": "크로스체인 볼트 통합 및 통합 대시보드",
         "White-label vault deployment for token projects": "토큰 프로젝트용 화이트라벨 볼트 배포",
@@ -389,9 +390,9 @@
         "Performance dashboard live (Chart.js)": "성과 대시보드 라이브 (Chart.js)",
         "Code freeze — all features complete, 4-round audit clean": "코드 프리즈 — 전 기능 완성, 4라운드 감사 통과",
         "Wallet setup (Deployer, Operator, Treasury Safe, Sentinel)": "지갑 설정 (Deployer, Operator, Treasury Safe, Sentinel)",
-        "Deploy 5 contracts to Base mainnet": "Base 메인넷에 5개 컨트랙트 배포",
+        "Deploy 5 contracts to Arbitrum mainnet": "Arbitrum 메인넷에 5개 컨트랙트 배포",
         "Seed $400×3 vaults on real ETH/USDC pool": "실제 ETH/USDC 풀에 $400×3 볼트 시드",
-        "Keeper bot live on Base (1hr cycles)": "Base에서 키퍼 봇 가동 (1시간 주기)",
+        "Keeper bot live on Arbitrum (1hr cycles)": "Arbitrum에서 키퍼 봇 가동 (1시간 주기)",
         "Dashboard update — real mainnet data": "대시보드 업데이트 — 실제 메인넷 데이터",
         "4-week live performance monitoring": "4주 실운영 성과 모니터링",
         "UFSF audit subsidy application (Uniswap Foundation Security Fund)": "UFSF 감사 보조금 신청 (Uniswap Foundation Security Fund)",

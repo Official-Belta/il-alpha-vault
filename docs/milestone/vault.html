@@ -204,7 +204,7 @@
 
 <!-- HERO -->
 <section class="vault-hero">
-  <div class="eyebrow"><span class="dot"></span> <span data-ko="Base 메인넷 · ERC-4626">Base Mainnet · ERC-4626</span></div>
+  <div class="eyebrow"><span class="dot"></span> <span data-ko="Arbitrum 메인넷 · ERC-4626">Arbitrum Mainnet · ERC-4626</span></div>
   <h1 data-ko="변동성이 높을 때, LP를 제거합니다">When volatility spikes, we remove your LP</h1>
   <p class="desc" data-ko="온체인 변동성 오라클이 위험을 감지하면 자동으로 LP를 철수합니다. 안전할 때 재진입. 락업 없음. 즉시 인출.">On-chain volatility oracle detects risk and automatically removes LP. Re-enters when safe. No lockup. Instant withdrawal.</p>
 </section>
@@ -334,17 +334,18 @@
 
 <!-- CONTRACT LINK -->
 <div class="contract-section">
-  <a id="contractLink" href="#" target="_blank" rel="noopener" data-ko="Basescan에서 컨트랙트 보기 ↗">View contract on Basescan <span id="contractAddr"></span> ↗</a>
+  <a id="contractLink" href="#" target="_blank" rel="noopener" data-ko="Arbiscan에서 컨트랙트 보기 ↗">View contract on Arbiscan <span id="contractAddr"></span> ↗</a>
 </div>
 
 <footer><span>&copy; 2026 IL Alpha</span></footer>
 
 <script>
 // --- CONFIG ---
-const BASE_CHAIN_ID = 8453;
-const VAULT_ADDRESS = '0x0000000000000000000000000000000000000000';
-const USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
-const BASESCAN = 'https://basescan.org';
+const CHAIN_ID = 42161; // Arbitrum One
+const RPC_URL = 'https://arb1.arbitrum.io/rpc'; // Public RPC for read-only
+const VAULT_ADDRESS = '0x0000000000000000000000000000000000000000'; // TODO: replace after deploy
+const USDC_ADDRESS = '0xaf88d065e77c8cC2239327C5EDb3A432268e5831'; // Arbitrum USDC
+const EXPLORER = 'https://arbiscan.io';
 
 const VAULT_ABI = [
   'function deposit(uint256 assets, address receiver) external returns (uint256)',
@@ -366,66 +367,34 @@ const ERC20_ABI = [
   'function decimals() external view returns (uint8)'
 ];
 
-let provider, signer, vault, usdc, userAddress;
+let readProvider, signer, vaultRead, vaultWrite, usdcWrite, userAddress;
+const DEPLOYED = VAULT_ADDRESS !== '0x0000000000000000000000000000000000000000';
 
-async function connectWallet() {
-  if (!window.ethereum) { alert('No wallet detected. Install Rabby or MetaMask.'); return; }
-  try {
-    provider = new ethers.BrowserProvider(window.ethereum);
-    const network = await provider.getNetwork();
-    if (Number(network.chainId) !== BASE_CHAIN_ID) {
-      try {
-        await window.ethereum.request({ method:'wallet_switchEthereumChain', params:[{chainId:'0x'+BASE_CHAIN_ID.toString(16)}] });
-        provider = new ethers.BrowserProvider(window.ethereum);
-      } catch(e) { alert('Please switch to Base network.'); return; }
-    }
-    signer = await provider.getSigner();
-    userAddress = await signer.getAddress();
+// --- PUBLIC READ (no wallet needed) ---
+async function initPublicRead() {
+  readProvider = new ethers.JsonRpcProvider(RPC_URL);
+  if (!DEPLOYED) {
+    document.getElementById('totalAssets').textContent = 'Deploying...';
+    document.getElementById('sharePrice').textContent = '—';
+    document.getElementById('lpStatus').textContent = '—';
+    document.getElementById('depositCap').textContent = '—';
+    return;
+  }
+  vaultRead = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, readProvider);
 
-    // Update UI — connected state
-    document.getElementById('connectPre').style.display = 'none';
-    document.getElementById('connectPost').classList.add('show');
-    document.getElementById('connectedAddr').textContent = userAddress.slice(0,6) + '···' + userAddress.slice(-4) + ' · Base';
-    document.getElementById('actionsSection').style.display = 'block';
+  // Set contract link immediately
+  const linkEl = document.getElementById('contractLink');
+  const addrEl = document.getElementById('contractAddr');
+  if (linkEl) linkEl.href = EXPLORER + '/address/' + VAULT_ADDRESS;
+  if (addrEl) addrEl.textContent = '(' + VAULT_ADDRESS.slice(0,6) + '...' + VAULT_ADDRESS.slice(-4) + ')';
 
-    // Contract link
-    const contractLinkEl = document.getElementById('contractLink');
-    const contractAddrEl = document.getElementById('contractAddr');
-    if (contractLinkEl) contractLinkEl.href = BASESCAN + '/address/' + VAULT_ADDRESS;
-    if (contractAddrEl) contractAddrEl.textContent = '(' + VAULT_ADDRESS.slice(0,8) + '...)';
-
-    // Only interact with contracts if deployed (not zero address)
-    if (VAULT_ADDRESS !== '0x0000000000000000000000000000000000000000') {
-      vault = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, signer);
-      usdc = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, signer);
-      await refreshData();
-      document.getElementById('depositBtn').disabled = false;
-      document.getElementById('withdrawBtn').disabled = false;
-      document.getElementById('depositAmount').addEventListener('input', updateDepositPreview);
-      document.getElementById('withdrawAmount').addEventListener('input', updateWithdrawPreview);
-    } else {
-      // Pre-deploy state — show wallet balance only
-      const usdcRead = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, provider);
-      try {
-        const bal = await usdcRead.balanceOf(userAddress);
-        document.getElementById('usdcBalance').textContent = formatUSDC(Number(bal) / 1e6);
-      } catch(e) { document.getElementById('usdcBalance').textContent = '—'; }
-      document.getElementById('shareBalance').textContent = '0.00';
-      document.getElementById('depositBtn').disabled = true;
-      document.getElementById('withdrawBtn').disabled = true;
-      document.getElementById('totalAssets').textContent = 'Deploying...';
-      document.getElementById('sharePrice').textContent = '—';
-      document.getElementById('lpStatus').textContent = '—';
-      document.getElementById('depositCap').textContent = '—';
-    }
-  } catch(e) { console.error(e); alert('Connection failed: ' + e.message); }
+  await refreshPublicData();
 }
 
-async function refreshData() {
+async function refreshPublicData() {
+  if (!vaultRead) return;
   try {
-    const [metrics, usdcBal, shares] = await Promise.all([
-      vault.getVaultMetrics(), usdc.balanceOf(userAddress), vault.balanceOf(userAddress)
-    ]);
+    const metrics = await vaultRead.getVaultMetrics();
     const totalAssetsVal = Number(metrics[0]) / 1e6;
     const sharePrice = Number(metrics[4]) / 1e6;
     const lpActive = metrics[5];
@@ -433,24 +402,87 @@ async function refreshData() {
 
     document.getElementById('totalAssets').textContent = '$' + formatUSDC(totalAssetsVal);
     document.getElementById('sharePrice').textContent = '$' + sharePrice.toFixed(4);
-    document.getElementById('lpStatus').textContent = lpActive ? 'Active' : 'Removed';
-    document.getElementById('lpStatus').style.color = lpActive ? 'var(--accent)' : 'var(--gray-500)';
 
-    const maxDep = await vault.maxDeposit(userAddress);
+    const statusEl = document.getElementById('lpStatus');
+    statusEl.textContent = lpActive ? 'Active' : 'Removed';
+    statusEl.style.color = lpActive ? 'var(--accent)' : 'var(--gray-500)';
+
+    const maxDep = await vaultRead.maxDeposit(VAULT_ADDRESS);
     document.getElementById('depositCap').textContent = '$' + formatUSDC(Number(maxDep) / 1e6);
 
+    if (isPaused) {
+      document.getElementById('depositBtn').disabled = true;
+      document.getElementById('depositInfo').textContent = 'Vault paused — deposits disabled.';
+    }
+  } catch(e) { console.error('Public read error:', e); }
+}
+
+// --- WALLET CONNECT (for deposit/withdraw only) ---
+async function connectWallet() {
+  if (!window.ethereum) { alert('No wallet detected. Install Rabby or MetaMask.'); return; }
+  try {
+    const walletProvider = new ethers.BrowserProvider(window.ethereum);
+    const network = await walletProvider.getNetwork();
+    if (Number(network.chainId) !== CHAIN_ID) {
+      try {
+        await window.ethereum.request({ method:'wallet_switchEthereumChain', params:[{chainId:'0x'+CHAIN_ID.toString(16)}] });
+      } catch(e) { alert('Please switch to Arbitrum network.'); return; }
+    }
+    signer = await (new ethers.BrowserProvider(window.ethereum)).getSigner();
+    userAddress = await signer.getAddress();
+
+    // UI — connected state
+    document.getElementById('connectPre').style.display = 'none';
+    document.getElementById('connectPost').classList.add('show');
+    document.getElementById('connectedAddr').textContent = userAddress.slice(0,6) + '···' + userAddress.slice(-4) + ' · Arbitrum';
+    document.getElementById('actionsSection').style.display = 'block';
+
+    if (DEPLOYED) {
+      vaultWrite = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, signer);
+      usdcWrite = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, signer);
+
+      // Fetch user-specific data
+      const [usdcBal, shares] = await Promise.all([
+        usdcWrite.balanceOf(userAddress),
+        vaultWrite.balanceOf(userAddress)
+      ]);
+      const usdcFmt = formatUSDC(Number(usdcBal) / 1e6);
+      const shareFmt = formatUSDC(Number(shares) / 1e6);
+      document.getElementById('usdcBalance').textContent = usdcFmt;
+      document.getElementById('usdcBalDep').textContent = usdcFmt;
+      document.getElementById('shareBalance').textContent = shareFmt;
+      document.getElementById('shareBalWd').textContent = shareFmt;
+
+      document.getElementById('depositBtn').disabled = false;
+      document.getElementById('withdrawBtn').disabled = false;
+      document.getElementById('depositAmount').addEventListener('input', updateDepositPreview);
+      document.getElementById('withdrawAmount').addEventListener('input', updateWithdrawPreview);
+    } else {
+      // Pre-deploy: show USDC balance only
+      try {
+        const usdcRead = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, readProvider);
+        const bal = await usdcRead.balanceOf(userAddress);
+        document.getElementById('usdcBalance').textContent = formatUSDC(Number(bal) / 1e6);
+      } catch(e) { document.getElementById('usdcBalance').textContent = '—'; }
+      document.getElementById('shareBalance').textContent = '0.00';
+    }
+  } catch(e) { console.error(e); alert('Connection failed: ' + e.message); }
+}
+
+async function refreshUserData() {
+  if (!vaultWrite || !userAddress) return;
+  try {
+    const [usdcBal, shares] = await Promise.all([
+      usdcWrite.balanceOf(userAddress),
+      vaultWrite.balanceOf(userAddress)
+    ]);
     const usdcFmt = formatUSDC(Number(usdcBal) / 1e6);
     const shareFmt = formatUSDC(Number(shares) / 1e6);
     document.getElementById('usdcBalance').textContent = usdcFmt;
     document.getElementById('usdcBalDep').textContent = usdcFmt;
     document.getElementById('shareBalance').textContent = shareFmt;
     document.getElementById('shareBalWd').textContent = shareFmt;
-
-    if (isPaused) {
-      document.getElementById('depositBtn').disabled = true;
-      document.getElementById('depositInfo').textContent = 'Vault paused — deposits disabled.';
-    }
-  } catch(e) { console.error('Refresh error:', e); }
+  } catch(e) { console.error('User data refresh error:', e); }
 }
 
 async function updateDepositPreview() {
@@ -458,7 +490,7 @@ async function updateDepositPreview() {
   if (!val || Number(val) <= 0) { document.getElementById('depositInfo').textContent = ''; return; }
   try {
     const assets = ethers.parseUnits(val, 6);
-    const shares = await vault.convertToShares(assets);
+    const shares = await vaultRead.convertToShares(assets);
     document.getElementById('depositInfo').textContent = 'You receive: ' + formatUSDC(Number(shares)/1e6) + ' shares';
   } catch(e) { document.getElementById('depositInfo').textContent = ''; }
 }
@@ -468,7 +500,7 @@ async function updateWithdrawPreview() {
   if (!val || Number(val) <= 0) { document.getElementById('withdrawInfo').textContent = ''; return; }
   try {
     const assets = ethers.parseUnits(val, 6);
-    const sharesNeeded = await vault.convertToShares(assets);
+    const sharesNeeded = await vaultRead.convertToShares(assets);
     document.getElementById('withdrawInfo').textContent = 'Burns: ' + formatUSDC(Number(sharesNeeded)/1e6) + ' shares';
   } catch(e) { document.getElementById('withdrawInfo').textContent = ''; }
 }
@@ -479,19 +511,19 @@ async function doDeposit() {
   const txEl = document.getElementById('depositTx');
   try {
     const assets = ethers.parseUnits(val, 6);
-    const allowance = await usdc.allowance(userAddress, VAULT_ADDRESS);
+    const allowance = await usdcWrite.allowance(userAddress, VAULT_ADDRESS);
     if (allowance < assets) {
       txEl.className = 'tx-status tx-pending'; txEl.textContent = 'Approving USDC...';
-      const approveTx = await usdc.approve(VAULT_ADDRESS, ethers.MaxUint256);
+      const approveTx = await usdcWrite.approve(VAULT_ADDRESS, ethers.MaxUint256);
       await approveTx.wait();
     }
     txEl.className = 'tx-status tx-pending'; txEl.textContent = 'Depositing...';
-    const tx = await vault.deposit(assets, userAddress);
+    const tx = await vaultWrite.deposit(assets, userAddress);
     await tx.wait();
     txEl.className = 'tx-status tx-success';
-    txEl.innerHTML = 'Deposit confirmed. <a href="'+BASESCAN+'/tx/'+tx.hash+'" target="_blank" style="color:var(--accent)">View on Basescan ↗</a>';
+    txEl.innerHTML = 'Deposit confirmed. <a href="'+EXPLORER+'/tx/'+tx.hash+'" target="_blank" style="color:var(--accent)">View on Arbiscan ↗</a>';
     document.getElementById('depositAmount').value = '';
-    await refreshData();
+    await Promise.all([refreshPublicData(), refreshUserData()]);
   } catch(e) {
     txEl.className = 'tx-status tx-error';
     txEl.textContent = 'Error: ' + (e.reason || e.message).slice(0,100);
@@ -505,12 +537,12 @@ async function doWithdraw() {
   try {
     const assets = ethers.parseUnits(val, 6);
     txEl.className = 'tx-status tx-pending'; txEl.textContent = 'Withdrawing...';
-    const tx = await vault.withdraw(assets, userAddress, userAddress);
+    const tx = await vaultWrite.withdraw(assets, userAddress, userAddress);
     await tx.wait();
     txEl.className = 'tx-status tx-success';
-    txEl.innerHTML = 'Withdrawal confirmed. <a href="'+BASESCAN+'/tx/'+tx.hash+'" target="_blank" style="color:var(--accent)">View on Basescan ↗</a>';
+    txEl.innerHTML = 'Withdrawal confirmed. <a href="'+EXPLORER+'/tx/'+tx.hash+'" target="_blank" style="color:var(--accent)">View on Arbiscan ↗</a>';
     document.getElementById('withdrawAmount').value = '';
-    await refreshData();
+    await Promise.all([refreshPublicData(), refreshUserData()]);
   } catch(e) {
     txEl.className = 'tx-status tx-error';
     txEl.textContent = 'Error: ' + (e.reason || e.message).slice(0,100);
@@ -547,7 +579,14 @@ function applyLang() {
 document.addEventListener('click', e => { if (!e.target.closest('.lang-btn') && !e.target.closest('.lang-dropdown')) dropdown.classList.remove('open'); });
 if (currentLang === 'ko') applyLang();
 
-setInterval(() => { if (vault) refreshData(); }, 30000);
+// Auto-refresh public data every 30s, user data every 30s if connected
+setInterval(() => {
+  refreshPublicData();
+  if (vaultWrite) refreshUserData();
+}, 30000);
+
+// Load public data immediately on page load
+initPublicRead();
 
 // Gate
 function acceptRisk() { sessionStorage.setItem('vault_risk_accepted','true'); document.getElementById('gate').style.display='none'; }

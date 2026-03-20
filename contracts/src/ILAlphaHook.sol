@@ -94,7 +94,8 @@ contract ILAlphaHook is IHooks {
 
     /// @notice H-1 FIX: Tick accumulator for TWAP calculation
     /// @dev Stores last TWAP_WINDOW tick observations for time-weighted average
-    uint8 public constant TWAP_WINDOW = 10;
+    /// @dev H-2 Arb FIX: 30 slots for L2 (0.25s blocks → 30 slots = ~7.5s minimum fill)
+    uint8 public constant TWAP_WINDOW = 30;
 
     struct TickObservation {
         int24 tick;
@@ -106,12 +107,13 @@ contract ILAlphaHook is IHooks {
     address public owner;
     address public pendingOwner;
     address public keeper;
+    address public vault; // Arb C-2: vault reference for deployedLiquidity check
 
     mapping(PoolId => VolOracle) public volOracles;
     mapping(PoolId => PoolState) public poolStates;
 
     /// @notice Circular buffer of tick observations for TWAP
-    mapping(PoolId => TickObservation[10]) public tickObservations;
+    mapping(PoolId => TickObservation[30]) public tickObservations;
     mapping(PoolId => uint8) public observationIndex;
 
     // ─── Modifiers ───────────────────────────────────────────────────
@@ -374,8 +376,14 @@ contract ILAlphaHook is IHooks {
     /// @notice Keeper pushes external vol estimate (e.g., from off-chain EWMA on Binance data)
     /// @dev Rate limited: max change per push is 2x current value (prevents keeper key abuse).
     ///      Keeper can move vol up or down, but not by more than 2x in a single call.
+    /// @dev Arb H-3: 1 call per block per pool to prevent EWMA zero-convergence attack
+    mapping(PoolId => uint256) public lastPushBlock;
+
     function pushVolEstimate(PoolKey calldata key, uint256 externalVar) external onlyKeeper {
         PoolId poolId = key.toId();
+        require(block.number > lastPushBlock[poolId], "1 push per block");
+        lastPushBlock[poolId] = block.number;
+
         VolOracle storage vo = volOracles[poolId];
 
         // Rate limit: external estimate can't be more than 2x current on-chain var
@@ -411,7 +419,18 @@ contract ILAlphaHook is IHooks {
         int24 spacing = key.tickSpacing;
         require(tickLower % spacing == 0 && tickUpper % spacing == 0, "Tick not aligned to spacing");
         PoolId poolId = key.toId();
-        // F-2: LP 활성 시 range 변경 금지 (유동성 고립 방지)
+        // Arb C-2 FIX: check vault's deployedLiquidity (not just hook's isLPActive)
+        // Hook isLPActive and vault deployedLiquidity can be out of sync
+        if (vault != address(0)) {
+            // Read vault's deployedLiquidity via low-level call to avoid circular import
+            (bool ok, bytes memory data) = vault.staticcall(
+                abi.encodeWithSignature("deployedLiquidity()")
+            );
+            if (ok && data.length >= 32) {
+                uint128 vaultLiq = abi.decode(data, (uint128));
+                require(vaultLiq == 0, "Vault LP still deployed");
+            }
+        }
         require(!poolStates[poolId].isLPActive, "LP active, remove first");
         poolStates[poolId].tickLower = tickLower;
         poolStates[poolId].tickUpper = tickUpper;
@@ -447,14 +466,15 @@ contract ILAlphaHook is IHooks {
     // ─── H-1: TWAP Oracle ──────────────────────────────────────────
 
     function _recordTickObservation(PoolId poolId, int24 tick) internal {
-        // R-3 FIX: one observation per block (prevents same-block buffer flooding)
+        // R-3 + Arb M-3 FIX: one observation per block (block.number, not timestamp)
+        // Arbitrum timestamps can repeat across blocks; block.number is unique
         uint8 idx = observationIndex[poolId];
         uint8 prevIdx = idx == 0 ? TWAP_WINDOW - 1 : idx - 1;
-        if (tickObservations[poolId][prevIdx].timestamp == uint40(block.timestamp)) return;
+        if (tickObservations[poolId][prevIdx].timestamp == uint40(block.number)) return;
 
         tickObservations[poolId][idx] = TickObservation({
             tick: tick,
-            timestamp: uint40(block.timestamp)
+            timestamp: uint40(block.number) // Arb M-3: block.number for L2 dedup
         });
         observationIndex[poolId] = (idx + 1) % TWAP_WINDOW;
     }
@@ -473,9 +493,10 @@ contract ILAlphaHook is IHooks {
             if (obs.timestamp == 0) continue;
 
             // Weight by recency: newer observations get more weight
-            uint256 age = block.timestamp - obs.timestamp;
-            if (age > 3600) continue; // ignore observations older than 1 hour
-            uint256 weight = 3600 - age; // newer = higher weight
+            // Using block.number; on Arbitrum ~4 blocks/sec, 3600 = ~15 min window
+            uint256 age = block.number - obs.timestamp;
+            if (age > 14400) continue; // ~1 hour on Arbitrum (4 blocks/sec × 3600s)
+            uint256 weight = 14400 - age;
 
             weightedSum += int256(obs.tick) * int256(weight);
             totalWeight += weight;
@@ -508,6 +529,11 @@ contract ILAlphaHook is IHooks {
     function setKeeper(address _keeper) external onlyOwner {
         require(_keeper != address(0), "Zero address");
         keeper = _keeper;
+    }
+
+    /// @notice Arb C-2: set vault reference for deployedLiquidity check in setLPRange
+    function setVault(address _vault) external onlyOwner {
+        vault = _vault;
     }
 
     function setLambda(PoolKey calldata key, uint16 _lambda) external onlyOwner {

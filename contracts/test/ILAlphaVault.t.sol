@@ -252,7 +252,7 @@ contract ILAlphaVaultTest is Test {
         );
         // Zero vol so feeYield > ilCost
         for (uint256 i = 0; i < 80; i++) {
-            hook.pushVolEstimate(poolKey, 0);
+            vm.roll(block.number + 1); hook.pushVolEstimate(poolKey, 0);
         }
         vm.warp(block.timestamp + 25 hours);
         hook.triggerEvaluation(poolKey);
@@ -266,7 +266,7 @@ contract ILAlphaVaultTest is Test {
         assertTrue(vault.deployedLiquidity() > 0, "Should have deployed liquidity");
 
         // 4. Deactivate LP
-        hook.pushVolEstimate(poolKey, 10000e18); // huge vol
+        vm.roll(block.number + 1); hook.pushVolEstimate(poolKey, 10000e18); // huge vol
         vm.warp(block.timestamp + 25 hours);
         hook.triggerEvaluation(poolKey);
         assertFalse(hook.isLPActive(poolKey), "LP should be inactive");

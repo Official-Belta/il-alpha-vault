@@ -197,7 +197,7 @@ contract ILAlphaHookTest is Test {
 
         // Zero out any residual vol via repeated pushes
         for (uint256 i = 0; i < 80; i++) {
-            hook.pushVolEstimate(poolKey, 0);
+            _pushVol(0);
         }
 
         // Wait past cooldown and trigger
@@ -215,7 +215,7 @@ contract ILAlphaHookTest is Test {
         assertTrue(hook.isLPActive(poolKey), "LP should be active initially");
 
         // Push very high vol to make IL cost exceed fee yield
-        hook.pushVolEstimate(poolKey, 1000e18);
+        _pushVol(1000e18);
 
         vm.warp(block.timestamp + 25 hours);
         hook.triggerEvaluation(poolKey);
@@ -227,21 +227,21 @@ contract ILAlphaHookTest is Test {
         assertTrue(hook.isLPActive(poolKey));
 
         // Deactivate with high vol
-        hook.pushVolEstimate(poolKey, 1000e18);
+        _pushVol(1000e18);
         vm.warp(block.timestamp + 25 hours);
         hook.triggerEvaluation(poolKey);
         assertFalse(hook.isLPActive(poolKey));
 
         // Zero out vol with repeated pushes, then do a swap for fresh volume
         for (uint256 i = 0; i < 80; i++) {
-            hook.pushVolEstimate(poolKey, 0);
+            _pushVol(0);
         }
         // Generate fresh volume
         vm.warp(block.timestamp + 1 hours);
         _doSwap(false, -100 ether);
         // Zero vol again after swap-induced vol
         for (uint256 i = 0; i < 80; i++) {
-            hook.pushVolEstimate(poolKey, 0);
+            _pushVol(0);
         }
 
         vm.warp(block.timestamp + 25 hours);
@@ -253,7 +253,7 @@ contract ILAlphaHookTest is Test {
         _activateLP();
         assertTrue(hook.isLPActive(poolKey), "LP should be active");
 
-        hook.pushVolEstimate(poolKey, 1000e18);
+        _pushVol(1000e18);
 
         vm.expectRevert(ILAlphaHook.CooldownActive.selector);
         hook.triggerEvaluation(poolKey);
@@ -264,28 +264,25 @@ contract ILAlphaHookTest is Test {
     // ─── Keeper Functions ────────────────────────────────────────────
 
     function test_keeper_pushVolEstimate() public {
-        uint256 externalVar = 100e18;
-        hook.pushVolEstimate(poolKey, externalVar);
+        _pushVol(100e18);
 
         (uint128 ewmaVar,,,) = hook.volOracles(poolId);
-        // H-4: baseline=0 → maxExternal=1e18 → blend=(0+1e18)/2=5e17
         assertEq(ewmaVar, 5e17, "Vol capped to 1e18 then blended when baseline is 0");
     }
 
     function test_keeper_pushVolEstimate_onlyKeeper() public {
+        vm.roll(block.number + 1);
         vm.prank(address(0xdead));
         vm.expectRevert(ILAlphaHook.OnlyKeeper.selector);
         hook.pushVolEstimate(poolKey, 100e18);
     }
 
     function test_keeper_pushVolEstimate_rateLimited() public {
-        // Set a known baseline first
-        hook.pushVolEstimate(poolKey, 100e18);
+        _pushVol(100e18);
         (uint128 baseline,,,) = hook.volOracles(poolId);
         assertTrue(baseline > 0);
 
-        // Try to push a huge value — should be rate-limited to 4x baseline
-        hook.pushVolEstimate(poolKey, type(uint256).max);
+        _pushVol(type(uint256).max);
         (uint128 afterPush,,,) = hook.volOracles(poolId);
 
         // Result should be (baseline + min(max, baseline*4)) / 2 = (baseline + baseline*4) / 2 = baseline*2.5
@@ -400,6 +397,7 @@ contract ILAlphaHookTest is Test {
     // ─── Fuzz Tests ──────────────────────────────────────────────────
 
     function testFuzz_pushVolEstimate_alwaysCapped(uint256 externalVar) public {
+        vm.roll(block.number + 1);
         hook.pushVolEstimate(poolKey, externalVar);
         (uint128 ewmaVar,,,) = hook.volOracles(poolId);
         assertTrue(ewmaVar <= type(uint128).max, "Should never exceed uint128.max");
@@ -437,6 +435,12 @@ contract ILAlphaHookTest is Test {
     }
 
     // ─── Helper ──────────────────────────────────────────────────────
+
+    /// @dev Helper: push vol with block advancement (H-3 per-block limit)
+    function _pushVol(uint256 vol) internal {
+        vm.roll(block.number + 1);
+        hook.pushVolEstimate(poolKey, vol);
+    }
 
     function _doSwap(bool zeroForOne, int256 amountSpecified) internal {
         swapRouter.swap(

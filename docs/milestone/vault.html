@@ -62,12 +62,23 @@
   .vault-hero .desc { font-size:21px; color:var(--gray-400); line-height:1.65; max-width:520px; }
 
   /* --- CONNECT --- */
-  .connect-section { padding:64px 48px; border-bottom:1px solid var(--gray-200); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:24px; }
+  .connect-section { padding:64px 48px; border-bottom:1px solid var(--gray-200); }
   @media (max-width:640px) { .connect-section { padding:48px 24px; } }
+  .connect-pre { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:24px; }
   .connect-prompt { font-family:var(--display); font-size:clamp(24px,3vw,32px); font-weight:400; letter-spacing:-0.02em; color:var(--gray-400); }
   .connect-btn { font-family:var(--mono); font-size:14px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--white); background:var(--black); border:none; padding:18px 48px; cursor:pointer; transition:all 150ms var(--ease); }
   .connect-btn:hover { background:var(--gray-800); }
-  .connect-btn.connected { background:none; color:var(--accent); border:1px solid var(--accent); padding:16px 32px; }
+  .connect-post { display:none; }
+  .connect-post.show { display:block; }
+  .connect-addr { font-family:var(--mono); font-size:14px; color:var(--accent); margin-bottom:16px; display:flex; align-items:center; gap:12px; }
+  .connect-addr::before { content:''; width:8px; height:8px; border-radius:50%; background:var(--accent); }
+  .connect-wallet-info { display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--gray-200); }
+  @media (max-width:640px) { .connect-wallet-info { grid-template-columns:1fr; } }
+  .cw-cell { padding:24px; border-right:1px solid var(--gray-200); }
+  .cw-cell:last-child { border-right:none; }
+  @media (max-width:640px) { .cw-cell { border-right:none; border-bottom:1px solid var(--gray-200); } .cw-cell:last-child { border-bottom:none; } }
+  .cw-label { font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:8px; }
+  .cw-value { font-family:var(--mono); font-size:24px; font-weight:700; }
 
   /* --- METRICS --- */
   .metrics-section { padding:0 48px 64px; }
@@ -223,8 +234,23 @@
 
 <!-- CONNECT -->
 <div class="connect-section" id="connectSection">
-  <span class="connect-prompt" data-ko="시작하려면 지갑을 연결하세요">Connect your wallet to get started</span>
-  <button class="connect-btn" id="connectBtn" onclick="connectWallet()" data-ko="연결">CONNECT</button>
+  <div class="connect-pre" id="connectPre">
+    <span class="connect-prompt" data-ko="시작하려면 지갑을 연결하세요">Connect your wallet to get started</span>
+    <button class="connect-btn" id="connectBtn" onclick="connectWallet()" data-ko="연결">CONNECT</button>
+  </div>
+  <div class="connect-post" id="connectPost">
+    <div class="connect-addr" id="connectedAddr"></div>
+    <div class="connect-wallet-info">
+      <div class="cw-cell">
+        <div class="cw-label" data-ko="USDC 잔액">USDC Balance</div>
+        <div class="cw-value" id="usdcBalance">—</div>
+      </div>
+      <div class="cw-cell">
+        <div class="cw-label" data-ko="보유 셰어">Your Shares</div>
+        <div class="cw-value" id="shareBalance">—</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- STRATEGY -->
@@ -297,7 +323,7 @@
   <div class="act-block">
     <div class="act-eyebrow" data-ko="입금">Deposit</div>
     <div class="bal-row">
-      <span class="bal-label" data-ko="USDC 잔액">USDC Balance: <span id="usdcBalance">—</span></span>
+      <span class="bal-label" data-ko="USDC 잔액">USDC Balance: <span id="usdcBalDep">—</span></span>
       <button class="max-btn" onclick="setMax('deposit')">MAX</button>
     </div>
     <div class="input-row">
@@ -311,7 +337,7 @@
   <div class="act-block">
     <div class="act-eyebrow" data-ko="출금">Withdraw</div>
     <div class="bal-row">
-      <span class="bal-label" data-ko="보유 셰어">Vault Shares: <span id="shareBalance">—</span></span>
+      <span class="bal-label" data-ko="보유 셰어">Vault Shares: <span id="shareBalWd">—</span></span>
       <button class="max-btn" onclick="setMax('withdraw')">MAX</button>
     </div>
     <div class="input-row">
@@ -372,22 +398,43 @@ async function connectWallet() {
     }
     signer = await provider.getSigner();
     userAddress = await signer.getAddress();
-    vault = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, signer);
-    usdc = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, signer);
 
-    const btn = document.getElementById('connectBtn');
-    btn.textContent = userAddress.slice(0,6) + '···' + userAddress.slice(-4);
-    btn.classList.add('connected');
-
+    // Update UI — connected state
+    document.getElementById('connectPre').style.display = 'none';
+    document.getElementById('connectPost').classList.add('show');
+    document.getElementById('connectedAddr').textContent = userAddress.slice(0,6) + '···' + userAddress.slice(-4) + ' · Base';
     document.getElementById('actionsSection').style.display = 'block';
-    document.getElementById('contractLink').href = BASESCAN + '/address/' + VAULT_ADDRESS;
-    document.getElementById('contractAddr').textContent = '(' + VAULT_ADDRESS.slice(0,8) + '...)';
 
-    await refreshData();
-    document.getElementById('depositBtn').disabled = false;
-    document.getElementById('withdrawBtn').disabled = false;
-    document.getElementById('depositAmount').addEventListener('input', updateDepositPreview);
-    document.getElementById('withdrawAmount').addEventListener('input', updateWithdrawPreview);
+    // Contract link
+    const contractLinkEl = document.getElementById('contractLink');
+    const contractAddrEl = document.getElementById('contractAddr');
+    if (contractLinkEl) contractLinkEl.href = BASESCAN + '/address/' + VAULT_ADDRESS;
+    if (contractAddrEl) contractAddrEl.textContent = '(' + VAULT_ADDRESS.slice(0,8) + '...)';
+
+    // Only interact with contracts if deployed (not zero address)
+    if (VAULT_ADDRESS !== '0x0000000000000000000000000000000000000000') {
+      vault = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, signer);
+      usdc = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, signer);
+      await refreshData();
+      document.getElementById('depositBtn').disabled = false;
+      document.getElementById('withdrawBtn').disabled = false;
+      document.getElementById('depositAmount').addEventListener('input', updateDepositPreview);
+      document.getElementById('withdrawAmount').addEventListener('input', updateWithdrawPreview);
+    } else {
+      // Pre-deploy state — show wallet balance only
+      const usdcRead = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, provider);
+      try {
+        const bal = await usdcRead.balanceOf(userAddress);
+        document.getElementById('usdcBalance').textContent = formatUSDC(Number(bal) / 1e6);
+      } catch(e) { document.getElementById('usdcBalance').textContent = '—'; }
+      document.getElementById('shareBalance').textContent = '0.00';
+      document.getElementById('depositBtn').disabled = true;
+      document.getElementById('withdrawBtn').disabled = true;
+      document.getElementById('totalAssets').textContent = 'Deploying...';
+      document.getElementById('sharePrice').textContent = '—';
+      document.getElementById('lpStatus').textContent = '—';
+      document.getElementById('depositCap').textContent = '—';
+    }
   } catch(e) { console.error(e); alert('Connection failed: ' + e.message); }
 }
 
@@ -409,8 +456,12 @@ async function refreshData() {
     const maxDep = await vault.maxDeposit(userAddress);
     document.getElementById('depositCap').textContent = '$' + formatUSDC(Number(maxDep) / 1e6);
 
-    document.getElementById('usdcBalance').textContent = formatUSDC(Number(usdcBal) / 1e6);
-    document.getElementById('shareBalance').textContent = formatUSDC(Number(shares) / 1e6);
+    const usdcFmt = formatUSDC(Number(usdcBal) / 1e6);
+    const shareFmt = formatUSDC(Number(shares) / 1e6);
+    document.getElementById('usdcBalance').textContent = usdcFmt;
+    document.getElementById('usdcBalDep').textContent = usdcFmt;
+    document.getElementById('shareBalance').textContent = shareFmt;
+    document.getElementById('shareBalWd').textContent = shareFmt;
 
     if (isPaused) {
       document.getElementById('depositBtn').disabled = true;
@@ -485,10 +536,10 @@ async function doWithdraw() {
 
 function setMax(type) {
   if (type === 'deposit') {
-    document.getElementById('depositAmount').value = document.getElementById('usdcBalance').textContent.replace(/,/g,'');
+    document.getElementById('depositAmount').value = document.getElementById('usdcBalDep').textContent.replace(/,/g,'');
     updateDepositPreview();
   } else {
-    document.getElementById('withdrawAmount').value = document.getElementById('shareBalance').textContent.replace(/,/g,'');
+    document.getElementById('withdrawAmount').value = document.getElementById('shareBalWd').textContent.replace(/,/g,'');
     updateWithdrawPreview();
   }
 }

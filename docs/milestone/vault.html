@@ -62,9 +62,9 @@
   .vault-hero .desc { font-size:21px; color:var(--gray-400); line-height:1.65; max-width:520px; }
 
   /* --- CONNECT --- */
-  .nav-connect { font-family:var(--mono); font-size:13px; font-weight:500; letter-spacing:0.04em; color:var(--gray-600); background:none; border:1px solid var(--gray-200); padding:8px 20px; cursor:pointer; transition:all 200ms var(--ease); }
-  .nav-connect:hover { color:var(--black); border-color:var(--black); }
-  .nav-connect.connected { color:var(--accent); border-color:var(--accent); }
+  .connect-btn { font-family:var(--mono); font-size:15px; font-weight:500; letter-spacing:0.06em; text-transform:uppercase; color:var(--black); background:var(--white); border:none; padding:18px 40px; cursor:pointer; transition:all 150ms var(--ease); margin-top:40px; display:inline-block; }
+  .connect-btn:hover { background:var(--gray-200); }
+  .connect-btn.connected { color:var(--accent); border-bottom:2px solid var(--accent); }
 
   /* --- METRICS --- */
   .metrics-section { padding:0 48px 64px; }
@@ -165,10 +165,8 @@
   <a class="logo" href="index.html">IL Alpha</a>
   <div class="nav-links">
     <a href="index.html#roadmap" class="hm" data-ko="로드맵">Roadmap</a>
-    <a href="vault.html" class="hm active" data-ko="볼트">Vault</a>
     <a href="index.html#log" class="hm" data-ko="빌드 로그">Log</a>
     <a href="thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
-    <button class="nav-connect" id="connectBtn" onclick="connectWallet()" data-ko="지갑 연결">Connect</button>
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
@@ -196,6 +194,7 @@
   <div class="eyebrow"><span class="dot"></span> <span data-ko="Base 메인넷 · ERC-4626">Base Mainnet · ERC-4626</span></div>
   <h1 data-ko="변동성이 높을 때, LP를 제거합니다">When volatility spikes, we remove your LP</h1>
   <p class="desc" data-ko="온체인 변동성 오라클이 위험을 감지하면 자동으로 LP를 철수합니다. 안전할 때 재진입. 락업 없음. 즉시 인출.">On-chain volatility oracle detects risk and automatically removes LP. Re-enters when safe. No lockup. Instant withdrawal.</p>
+  <button class="connect-btn" id="connectBtn" onclick="connectWallet()" data-ko="지갑 연결">CONNECT WALLET</button>
 </section>
 
 <!-- METRICS -->

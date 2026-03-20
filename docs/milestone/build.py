@@ -912,6 +912,12 @@ def build_html(roadmap, contracts):
 </section>
 
 
+<a class="fab-vault" href="vault.html">
+  <span class="fab-label" data-ko="VAULT 열기 →">OPEN VAULT →</span>
+  <span class="fab-desc" data-ko="변동성이 높을 때 LP를 자동 제거합니다. Sharpe 3.66. 성과 수수료만.">Automatically removes LP during high volatility. Sharpe 3.66. Performance-fee-only.</span>
+  <span class="fab-arrow" data-ko="입금 및 출금 →">Deposit & Withdraw →</span>
+</a>
+
 <footer>
   <span>&copy; 2026 {esc(proj["name"])}</span>
   <span>{esc(proj["network"])} &middot; Uniswap V4</span>

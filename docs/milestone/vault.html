@@ -65,20 +65,20 @@
   .connect-section { padding:64px 48px; border-bottom:1px solid var(--gray-200); }
   @media (max-width:640px) { .connect-section { padding:48px 24px; } }
   .connect-pre { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:24px; }
-  .connect-prompt { font-family:var(--display); font-size:clamp(24px,3vw,32px); font-weight:400; letter-spacing:-0.02em; color:var(--gray-400); }
-  .connect-btn { font-family:var(--mono); font-size:14px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--white); background:var(--black); border:none; padding:18px 48px; cursor:pointer; transition:all 150ms var(--ease); }
+  .connect-prompt { font-family:var(--display); font-size:clamp(28px,4vw,40px); font-weight:400; letter-spacing:-0.02em; color:var(--gray-400); }
+  .connect-btn { font-family:var(--mono); font-size:16px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--white); background:var(--black); border:none; padding:22px 56px; cursor:pointer; transition:all 150ms var(--ease); }
   .connect-btn:hover { background:var(--gray-800); }
   .connect-post { display:none; }
   .connect-post.show { display:block; }
-  .connect-addr { font-family:var(--mono); font-size:14px; color:var(--accent); margin-bottom:16px; display:flex; align-items:center; gap:12px; }
+  .connect-addr { font-family:var(--mono); font-size:16px; color:var(--accent); margin-bottom:20px; display:flex; align-items:center; gap:12px; }
   .connect-addr::before { content:''; width:8px; height:8px; border-radius:50%; background:var(--accent); }
   .connect-wallet-info { display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--gray-200); }
   @media (max-width:640px) { .connect-wallet-info { grid-template-columns:1fr; } }
-  .cw-cell { padding:24px; border-right:1px solid var(--gray-200); }
+  .cw-cell { padding:32px; border-right:1px solid var(--gray-200); }
   .cw-cell:last-child { border-right:none; }
   @media (max-width:640px) { .cw-cell { border-right:none; border-bottom:1px solid var(--gray-200); } .cw-cell:last-child { border-bottom:none; } }
-  .cw-label { font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:8px; }
-  .cw-value { font-family:var(--mono); font-size:24px; font-weight:700; }
+  .cw-label { font-family:var(--mono); font-size:14px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:10px; }
+  .cw-value { font-family:var(--mono); font-size:32px; font-weight:700; }
 
   /* --- METRICS --- */
   .metrics-section { padding:0 48px 64px; }
@@ -89,32 +89,32 @@
   .m-cell:last-child { border-right:none; }
   .m-cell:nth-child(n+2) { padding-left:32px; }
   @media (max-width:768px) { .m-cell:nth-child(2) { border-right:none; } .m-cell:nth-child(n+3) { border-top:1px solid var(--gray-200); } }
-  .m-label { font-family:var(--mono); font-size:14px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:12px; }
-  .m-value { font-family:var(--display); font-size:clamp(40px,5vw,56px); font-weight:400; letter-spacing:-0.025em; }
-  .m-sub { font-family:var(--mono); font-size:14px; color:var(--gray-400); margin-top:8px; }
+  .m-label { font-family:var(--mono); font-size:15px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:14px; }
+  .m-value { font-family:var(--display); font-size:clamp(44px,6vw,64px); font-weight:400; letter-spacing:-0.025em; }
+  .m-sub { font-family:var(--mono); font-size:15px; color:var(--gray-400); margin-top:10px; }
 
   /* --- STRATEGY --- */
   .strategy-section { padding:64px 48px; border-bottom:1px solid var(--gray-200); max-width:960px; }
   @media (max-width:640px) { .strategy-section { padding:48px 24px; } }
-  .s-eyebrow { font-family:var(--mono); font-size:13px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:14px; display:flex; align-items:center; gap:16px; }
+  .s-eyebrow { font-family:var(--mono); font-size:15px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:14px; display:flex; align-items:center; gap:16px; }
   .s-eyebrow::after { content:''; flex:1; max-width:48px; height:1px; background:var(--gray-300); }
-  .s-title { font-family:var(--display); font-size:clamp(28px,4vw,40px); font-weight:400; letter-spacing:-0.02em; margin-bottom:24px; line-height:1.2; }
-  .s-body { font-size:19px; color:var(--gray-600); line-height:1.75; margin-bottom:32px; max-width:600px; }
+  .s-title { font-family:var(--display); font-size:clamp(32px,5vw,48px); font-weight:400; letter-spacing:-0.02em; margin-bottom:28px; line-height:1.2; }
+  .s-body { font-size:21px; color:var(--gray-600); line-height:1.75; margin-bottom:36px; max-width:640px; }
   .feature-grid { display:grid; grid-template-columns:1fr 1fr; gap:0; border-top:1px solid var(--gray-200); }
   @media (max-width:640px) { .feature-grid { grid-template-columns:1fr; } }
   .feature { padding:28px 0; border-bottom:1px solid var(--gray-200); }
   .feature:nth-child(odd) { padding-right:32px; border-right:1px solid var(--gray-200); }
   .feature:nth-child(even) { padding-left:32px; }
   @media (max-width:640px) { .feature:nth-child(odd) { padding-right:0; border-right:none; } .feature:nth-child(even) { padding-left:0; } }
-  .f-name { font-family:var(--sans); font-size:17px; font-weight:600; margin-bottom:6px; }
-  .f-desc { font-size:15px; color:var(--gray-500); line-height:1.6; }
+  .f-name { font-family:var(--sans); font-size:20px; font-weight:600; margin-bottom:8px; }
+  .f-desc { font-size:17px; color:var(--gray-500); line-height:1.65; }
 
   /* --- FEES --- */
   .fee-section { padding:64px 48px; border-bottom:1px solid var(--gray-200); max-width:960px; }
   @media (max-width:640px) { .fee-section { padding:48px 24px; } }
   .fee-table { width:100%; border-collapse:collapse; }
   .fee-table th { font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); text-align:left; padding:16px 0; border-bottom:1px solid var(--gray-200); font-weight:500; }
-  .fee-table td { font-size:18px; padding:20px 0; border-bottom:1px solid var(--gray-200); }
+  .fee-table td { font-size:20px; padding:24px 0; border-bottom:1px solid var(--gray-200); }
   .fee-table tr:last-child td { border-bottom:none; }
   .fee-highlight td { color:var(--accent); font-weight:600; }
 
@@ -122,25 +122,25 @@
   .actions-section { padding:64px 48px; max-width:720px; }
   @media (max-width:640px) { .actions-section { padding:48px 24px; } }
   .act-block { margin-bottom:56px; }
-  .act-eyebrow { font-family:var(--mono); font-size:14px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:20px; display:flex; align-items:center; gap:16px; }
+  .act-eyebrow { font-family:var(--mono); font-size:16px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:20px; display:flex; align-items:center; gap:16px; }
   .act-eyebrow::after { content:''; flex:1; max-width:48px; height:1px; background:var(--gray-300); }
   .bal-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-  .bal-label { font-family:var(--mono); font-size:14px; color:var(--gray-500); }
+  .bal-label { font-family:var(--mono); font-size:16px; color:var(--gray-500); }
   .max-btn { font-family:var(--mono); font-size:12px; color:var(--accent); background:none; border:none; cursor:pointer; text-transform:uppercase; letter-spacing:0.06em; font-weight:600; }
   .max-btn:hover { text-decoration:underline; }
   .input-row { display:flex; gap:16px; align-items:stretch; }
   @media (max-width:640px) { .input-row { flex-direction:column; } }
-  .amt-input { flex:1; font-family:var(--mono); font-size:28px; padding:20px 24px; border:1px solid var(--gray-200); border-right:none; background:var(--white); color:var(--black); outline:none; transition:border-color 200ms var(--ease); }
+  .amt-input { flex:1; font-family:var(--mono); font-size:36px; padding:24px 28px; border:1px solid var(--gray-200); border-right:none; background:var(--white); color:var(--black); outline:none; transition:border-color 200ms var(--ease); }
   .amt-input:focus { border-color:var(--black); }
   .amt-input::placeholder { color:var(--gray-300); }
-  .act-btn { font-family:var(--mono); font-size:14px; font-weight:500; letter-spacing:0.06em; text-transform:uppercase; padding:20px 36px; border:1px solid var(--gray-200); cursor:pointer; transition:all 150ms var(--ease); white-space:nowrap; }
+  .act-btn { font-family:var(--mono); font-size:16px; font-weight:500; letter-spacing:0.06em; text-transform:uppercase; padding:24px 44px; border:1px solid var(--gray-200); cursor:pointer; transition:all 150ms var(--ease); white-space:nowrap; }
   .act-btn:disabled { opacity:0.3; cursor:not-allowed; }
   .btn-dep { background:var(--black); color:var(--white); border-color:var(--black); }
   .btn-dep:hover:not(:disabled) { background:var(--gray-900); }
   .btn-wd { background:var(--white); color:var(--black); }
   .btn-wd:hover:not(:disabled) { background:var(--gray-100); border-color:var(--black); }
-  .act-info { font-family:var(--mono); font-size:14px; color:var(--gray-500); margin-top:12px; }
-  .tx-status { font-family:var(--mono); font-size:14px; padding:16px 20px; margin-top:16px; display:none; line-height:1.5; }
+  .act-info { font-family:var(--mono); font-size:16px; color:var(--gray-500); margin-top:14px; }
+  .tx-status { font-family:var(--mono); font-size:16px; padding:20px 24px; margin-top:16px; display:none; line-height:1.5; }
   .tx-pending { background:rgba(26,127,100,0.04); color:var(--accent); display:block; }
   .tx-success { background:rgba(26,127,100,0.04); color:var(--accent); display:block; }
   .tx-error { background:rgba(239,68,68,0.04); color:var(--red); display:block; }
@@ -209,6 +209,58 @@
   <p class="desc" data-ko="온체인 변동성 오라클이 위험을 감지하면 자동으로 LP를 철수합니다. 안전할 때 재진입. 락업 없음. 즉시 인출.">On-chain volatility oracle detects risk and automatically removes LP. Re-enters when safe. No lockup. Instant withdrawal.</p>
 </section>
 
+<!-- CONNECT -->
+<div class="connect-section" id="connectSection">
+  <div class="connect-pre" id="connectPre">
+    <span class="connect-prompt" data-ko="시작하려면 지갑을 연결하세요">Connect your wallet to get started</span>
+    <button class="connect-btn" id="connectBtn" onclick="connectWallet()" data-ko="연결">CONNECT</button>
+  </div>
+  <div class="connect-post" id="connectPost">
+    <div class="connect-addr" id="connectedAddr"></div>
+    <div class="connect-wallet-info">
+      <div class="cw-cell">
+        <div class="cw-label" data-ko="USDC 잔액">USDC Balance</div>
+        <div class="cw-value" id="usdcBalance">—</div>
+      </div>
+      <div class="cw-cell">
+        <div class="cw-label" data-ko="보유 셰어">Your Shares</div>
+        <div class="cw-value" id="shareBalance">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DEPOSIT / WITHDRAW -->
+<section class="actions-section" id="actionsSection" style="display:none;">
+  <div class="act-block">
+    <div class="act-eyebrow" data-ko="입금">Deposit</div>
+    <div class="bal-row">
+      <span class="bal-label" data-ko="USDC 잔액">USDC Balance: <span id="usdcBalDep">—</span></span>
+      <button class="max-btn" onclick="setMax('deposit')">MAX</button>
+    </div>
+    <div class="input-row">
+      <input class="amt-input" id="depositAmount" type="number" placeholder="0.00" min="1" step="0.01">
+      <button class="act-btn btn-dep" id="depositBtn" onclick="doDeposit()" disabled data-ko="입금">Deposit</button>
+    </div>
+    <div class="act-info" id="depositInfo"></div>
+    <div class="tx-status" id="depositTx"></div>
+  </div>
+
+  <div class="act-block">
+    <div class="act-eyebrow" data-ko="출금">Withdraw</div>
+    <div class="bal-row">
+      <span class="bal-label" data-ko="보유 셰어">Vault Shares: <span id="shareBalWd">—</span></span>
+      <button class="max-btn" onclick="setMax('withdraw')">MAX</button>
+    </div>
+    <div class="input-row">
+      <input class="amt-input" id="withdrawAmount" type="number" placeholder="0.00" min="0.01" step="0.01">
+      <button class="act-btn btn-wd" id="withdrawBtn" onclick="doWithdraw()" disabled data-ko="출금">Withdraw</button>
+    </div>
+    <div class="act-info" id="withdrawInfo"></div>
+    <div class="tx-status" id="withdrawTx"></div>
+  </div>
+</section>
+
 <!-- METRICS -->
 <div class="metrics-section">
   <div class="metrics-grid">
@@ -228,27 +280,6 @@
     <div class="m-cell">
       <div class="m-label" data-ko="잔여 캡">Remaining Cap</div>
       <div class="m-value" id="depositCap">—</div>
-    </div>
-  </div>
-</div>
-
-<!-- CONNECT -->
-<div class="connect-section" id="connectSection">
-  <div class="connect-pre" id="connectPre">
-    <span class="connect-prompt" data-ko="시작하려면 지갑을 연결하세요">Connect your wallet to get started</span>
-    <button class="connect-btn" id="connectBtn" onclick="connectWallet()" data-ko="연결">CONNECT</button>
-  </div>
-  <div class="connect-post" id="connectPost">
-    <div class="connect-addr" id="connectedAddr"></div>
-    <div class="connect-wallet-info">
-      <div class="cw-cell">
-        <div class="cw-label" data-ko="USDC 잔액">USDC Balance</div>
-        <div class="cw-value" id="usdcBalance">—</div>
-      </div>
-      <div class="cw-cell">
-        <div class="cw-label" data-ko="보유 셰어">Your Shares</div>
-        <div class="cw-value" id="shareBalance">—</div>
-      </div>
     </div>
   </div>
 </div>
@@ -291,62 +322,14 @@
   <div class="s-eyebrow" data-ko="수수료">Fees</div>
   <h2 class="s-title" data-ko="수익 없으면 수수료 없음">No profit, no fee</h2>
   <table class="fee-table">
-    <thead>
-      <tr>
-        <th data-ko="항목">Item</th>
-        <th data-ko="현재 (TVL < $5M)">Current (TVL &lt; $5M)</th>
-      </tr>
-    </thead>
+    <thead><tr><th data-ko="항목">Item</th><th data-ko="현재 (TVL < $5M)">Current (TVL &lt; $5M)</th></tr></thead>
     <tbody>
-      <tr class="fee-highlight">
-        <td data-ko="성과 보수">Performance Fee</td>
-        <td>10%</td>
-      </tr>
-      <tr>
-        <td data-ko="관리 보수">Management Fee</td>
-        <td>0%</td>
-      </tr>
-      <tr>
-        <td data-ko="출금 수수료">Withdrawal Fee</td>
-        <td>0%</td>
-      </tr>
-      <tr>
-        <td data-ko="락업">Lockup</td>
-        <td data-ko="없음">None</td>
-      </tr>
+      <tr class="fee-highlight"><td data-ko="성과 보수">Performance Fee</td><td>10%</td></tr>
+      <tr><td data-ko="관리 보수">Management Fee</td><td>0%</td></tr>
+      <tr><td data-ko="출금 수수료">Withdrawal Fee</td><td>0%</td></tr>
+      <tr><td data-ko="락업">Lockup</td><td data-ko="없음">None</td></tr>
     </tbody>
   </table>
-</section>
-
-<!-- DEPOSIT / WITHDRAW -->
-<section class="actions-section" id="actionsSection" style="display:none;">
-  <div class="act-block">
-    <div class="act-eyebrow" data-ko="입금">Deposit</div>
-    <div class="bal-row">
-      <span class="bal-label" data-ko="USDC 잔액">USDC Balance: <span id="usdcBalDep">—</span></span>
-      <button class="max-btn" onclick="setMax('deposit')">MAX</button>
-    </div>
-    <div class="input-row">
-      <input class="amt-input" id="depositAmount" type="number" placeholder="0.00" min="1" step="0.01">
-      <button class="act-btn btn-dep" id="depositBtn" onclick="doDeposit()" disabled data-ko="입금">Deposit</button>
-    </div>
-    <div class="act-info" id="depositInfo"></div>
-    <div class="tx-status" id="depositTx"></div>
-  </div>
-
-  <div class="act-block">
-    <div class="act-eyebrow" data-ko="출금">Withdraw</div>
-    <div class="bal-row">
-      <span class="bal-label" data-ko="보유 셰어">Vault Shares: <span id="shareBalWd">—</span></span>
-      <button class="max-btn" onclick="setMax('withdraw')">MAX</button>
-    </div>
-    <div class="input-row">
-      <input class="amt-input" id="withdrawAmount" type="number" placeholder="0.00" min="0.01" step="0.01">
-      <button class="act-btn btn-wd" id="withdrawBtn" onclick="doWithdraw()" disabled data-ko="출금">Withdraw</button>
-    </div>
-    <div class="act-info" id="withdrawInfo"></div>
-    <div class="tx-status" id="withdrawTx"></div>
-  </div>
 </section>
 
 <!-- CONTRACT LINK -->

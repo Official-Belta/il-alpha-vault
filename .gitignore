@@ -1,8 +1,43 @@
+# Python
 .venv/
 __pycache__/
 *.pyc
-data/raw/
 *.egg-info/
+
+# Data
+data/raw/
+
+# Secrets
 .env
+keeper/pool_key.json
+keeper/keeper.log
+keeper/metrics.csv
+
+# Dependencies
 contracts/lib/
+node_modules/
+
+# Tools
 .gstack/
+.claude/
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Foundry
+contracts/cache/
+contracts/out/
+contracts/broadcast/
+
+# Internal docs (not for public)
+docs/ENG_HANDOFF.md
+docs/ENG_COMPLETE.md
+docs/ENG_STATUS.md
+docs/DESIGNER_HANDOFF.md
+docs/competitive-notes-gemini.md
+docs/grant-strategy.md
+docs/grants/
+docs/dao-target-list.md
+docs/phase3-live-verification.md

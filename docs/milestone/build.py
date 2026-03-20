@@ -270,7 +270,6 @@ def render_log_detail_page(day, proj, ko_ui, ko_proj):
   <a class="logo" href="../index.html">{esc(proj["name"])}</a>
   <div class="nav-links">
     <a href="../index.html#roadmap" class="hm" data-ko="로드맵">Roadmap</a>
-    <a href="../vault.html" class="hm" data-ko="볼트">Vault</a>
     <a href="../index.html#log" class="hm active" data-ko="빌드 로그">Log</a>
     <a href="../thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
@@ -452,7 +451,6 @@ def render_log_archive(log_entries, proj, ko_ui, ko_proj):
   <a class="logo" href="../index.html">{esc(proj["name"])}</a>
   <div class="nav-links">
     <a href="../index.html#roadmap" class="hm" data-ko="로드맵">Roadmap</a>
-    <a href="../vault.html" class="hm" data-ko="볼트">Vault</a>
     <a href="./" class="hm active" data-ko="빌드 로그">Log</a>
     <a href="../thesis.html" class="hm" data-ko="투자 논문">Thesis</a>
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
@@ -602,6 +600,18 @@ def build_html(roadmap, contracts):
   .nav-dark .nav-links a:hover {{ color: var(--gray-400); }}
   .nav-dark .nav-status {{ color: var(--gray-400); border-color: rgba(255,255,255,0.1); }}
   .logo {{ font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: -0.03em; color: var(--black); text-decoration: none; }}
+  .fab-vault {{ position: fixed; bottom: 0; right: 48px; z-index: 90; text-decoration: none; color: var(--white); background: var(--black); width: 280px; padding: 20px 28px; display: flex; flex-direction: column; gap: 12px; transform: translateY(calc(100% - 48px)); transition: transform 300ms var(--ease); }}
+  .fab-vault:hover {{ transform: translateY(0); }}
+  .fab-vault .fab-label {{ font-family: var(--mono); font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--white); }}
+  .fab-vault .fab-desc {{ font-family: var(--sans); font-size: 15px; color: var(--gray-400); line-height: 1.6; }}
+  .fab-vault .fab-arrow {{ font-family: var(--mono); font-size: 13px; color: var(--gray-600); transition: color 200ms var(--ease); }}
+  .fab-vault:hover .fab-arrow {{ color: var(--white); }}
+  .nav-dark .fab-vault {{ background: var(--white); color: var(--black); }}
+  .nav-dark .fab-vault .fab-label {{ color: var(--black); }}
+  .nav-dark .fab-vault .fab-desc {{ color: var(--gray-600); }}
+  .nav-dark .fab-vault .fab-arrow {{ color: var(--gray-400); }}
+  .nav-dark .fab-vault:hover .fab-arrow {{ color: var(--black); }}
+  @media (max-width: 640px) {{ .fab-vault {{ right: 0; width: 100%; }} }}
   .nav-links {{ display: flex; align-items: center; gap: 28px; }}
   .nav-links a {{ font-size: 15px; font-weight: 500; color: var(--gray-600); text-decoration: none; transition: color 300ms var(--ease); }}
   .nav-links a:hover {{ color: var(--black); }}
@@ -759,7 +769,6 @@ def build_html(roadmap, contracts):
   <a class="logo" href="#">{esc(proj["name"])}</a>
   <div class="nav-links">
     <a href="#roadmap" class="hm nav-item" data-section="roadmap" data-ko="{esc(ko_ui.get('roadmap', 'Roadmap'))}">Roadmap</a>
-    <a href="vault.html" class="hm nav-item" data-ko="볼트">Vault</a>
     <a href="#log" class="hm nav-item" data-section="log" data-ko="빌드 로그">Log</a>
     <a href="thesis.html" class="hm nav-item" data-ko="투자 논문">Thesis</a>
     <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">

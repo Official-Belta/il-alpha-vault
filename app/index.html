@@ -308,14 +308,22 @@ async function connectWallet() {
     }
     document.getElementById('chainWarning').style.display = 'none';
 
+    document.getElementById('connectBtn').textContent = shortAddr(userAddress);
+    document.getElementById('connectBtn').classList.add('connected');
+    document.getElementById('actionBtn').textContent = 'Enter amount';
+
+    // Skip contract setup if vault not deployed yet
+    if (CONFIG.VAULT === '0x0000000000000000000000000000000000000000') {
+      showTx('pending', 'Wallet connected. Vault not deployed yet — coming soon.');
+      return;
+    }
+
     // Setup contracts
     vaultContract = new ethers.Contract(CONFIG.VAULT, VAULT_ABI, signer);
     usdcContract = new ethers.Contract(CONFIG.USDC, ERC20_ABI, signer);
 
-    document.getElementById('connectBtn').textContent = shortAddr(userAddress);
-    document.getElementById('connectBtn').classList.add('connected');
-
     await refreshAll();
+    showTx('success', 'Connected: ' + shortAddr(userAddress));
   } catch (e) {
     showTx('error', 'Connection failed: ' + e.message);
   }

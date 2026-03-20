@@ -36,26 +36,26 @@ Phase 4 (Base Mainnet)          ██░░░░░░░░░░  15%  — C
 | Withdrawal fee removed | ERC-4626 compliance, simplicity | ✅ Done |
 | Volume spike trigger | Emergency LP removal bypasses cooldown | ✅ Done |
 | TWAP check | Deposit/withdraw manipulation protection | ✅ Done |
-| Base mainnet deploy | 5 contracts via forge script | ⏳ ENG 진행 중 |
-| Keeper Base 전환 | Base RPC, real ETH/USDC pool | ⏳ |
-| Dashboard Base 전환 | Real mainnet data | ⏳ |
+| Base mainnet deploy | 5 contracts via forge script | ⏳ ENG in progress |
+| Keeper Base migration | Base RPC, real ETH/USDC pool | ⏳ |
+| Dashboard Base migration | Real mainnet data | ⏳ |
 
 ### 4.2 Seed Operation ($1.2K, 4 weeks)
 
 ```
 Wallet Setup:
-  Deployer  (시드 A) — contract deployment
-  Operator  (시드 A) — $400×3 vault seed (1,200 USDC)
-  Treasury  (시드 B) — Gnosis Safe, vault owner
-  Sentinel  (시드 C) — keeper bot PK
+  Deployer  (Seed A) — contract deployment
+  Operator  (Seed A) — $400×3 vault seed (1,200 USDC)
+  Treasury  (Seed B) — Gnosis Safe, vault owner
+  Sentinel  (Seed C) — keeper bot PK
 
 Vaults:
   ILAlphaVault:  $400 USDC → ETH/USDC V4 pool (with hook)
   AlwaysLPVault: $400 USDC → same pool (no hook, control)
   HODLVault:     $400 USDC → hold only (control)
 
-Deposit cap: 비활성화 (본인 자금만, 외부 비공개)
-Unaudited 고지: 사이트 + 컨트랙트에 명시
+Deposit cap: Disabled (own funds only, not open to external deposits)
+Unaudited notice: Displayed on site + contracts
 ```
 
 ### 4.3 Revenue Model — Phased Fee Structure
@@ -64,13 +64,13 @@ Unaudited 고지: 사이트 + 컨트랙트에 명시
 Stage 1: Launch (TVL < $5M)
 ├─ Performance Fee: 10%
 ├─ Management Fee: 0%
-├─ Withdrawal Fee: 0%        ← 감사 후 재추가 검토
-└─ "수익 안 나면 우리도 안 번다"
+├─ Withdrawal Fee: 0%        ← May revisit after audit
+└─ "If we don't generate profit, we don't earn either"
 
 Stage 2: Growth (TVL $5-20M)
 ├─ Performance Fee: 15%
 ├─ Management Fee: 0.5%/yr
-└─ Withdrawal Fee: 0.1% (감사 후)
+└─ Withdrawal Fee: 0.1% (post-audit)
 
 Stage 3: Established (TVL $20M+)
 ├─ Performance Fee: 15-20%
@@ -82,30 +82,30 @@ Stage 3: Established (TVL $20M+)
 
 ## Phase 5: Grants & Audit (Month 1-3)
 
-### 5A. UFSF Audit Subsidy — 최우선
+### 5A. UFSF Audit Subsidy — Top Priority
 
 | Item | Detail |
 |------|--------|
-| 프로그램 | Uniswap Foundation Security Fund (Areta 운영) |
-| 보조율 | 감사비 최대 100% |
-| 신청 시점 | 코드 프리즈 + mainnet 4주 운영 데이터 확보 후 |
-| 신청 링크 | https://areta.fillout.com/UFSF |
-| 코드 규모 | Hook 446줄 + Vault 448줄 = ~900줄 핵심 |
+| Program | Uniswap Foundation Security Fund (operated by Areta) |
+| Subsidy rate | Up to 100% of audit costs |
+| Application timing | After code freeze + 4 weeks of mainnet operational data |
+| Application link | https://areta.fillout.com/UFSF |
+| Code scope | Hook 446 lines + Vault 448 lines = ~900 lines core |
 
-### 5B. 추가 그랜트 (병렬)
+### 5B. Additional Grants (Parallel)
 
-| 프로그램 | 목표 금액 | 확률 | 시점 |
+| Program | Target Amount | Probability | Timing |
 |---------|----------|------|------|
-| Hook Design Lab (Cohort 2) | 펀딩+멘토링+GTM | 중 | mainnet 데이터 후 |
-| v4 Hooks Support | 기술 지원 | 중-높 | 즉시 |
-| Arbitrum Questbook | $25-75K | 중 | 병렬 |
-| Base Ecosystem | $50-150K | 중 | 병렬 |
+| Hook Design Lab (Cohort 2) | Funding + mentorship + GTM | Medium | After mainnet data |
+| v4 Hooks Support | Technical support | Medium-High | Immediately |
+| Arbitrum Questbook | $25-75K | Medium | Parallel |
+| Base Ecosystem | $50-150K | Medium | Parallel |
 
-### 5C. 전문 감사 (UFSF 승인 후)
+### 5C. Professional Audit (After UFSF Approval)
 
-감사 기관 (UFSF 네트워크):
+Audit firms (UFSF network):
 - Spearbit, Trail of Bits, Code4rena, OpenZeppelin
-- 코드 프리즈 상태에서 감사 → 수정 → 재검증 → 캡 오픈
+- Audit on frozen code → fix → re-verify → open deposit cap
 
 ---
 
@@ -113,7 +113,7 @@ Stage 3: Established (TVL $20M+)
 
 ### 6A. B2B — DAO Treasury Acquisition (Primary GTM)
 
-**전제:** mainnet 4주+ 실데이터 + 감사 완료 (또는 진행 중)
+**Prerequisite:** 4+ weeks of mainnet live data + audit complete (or in progress)
 
 **Target:** 3-5 DAO partners at $1-2M each = $3-10M TVL
 
@@ -125,10 +125,10 @@ Stage 3: Established (TVL $20M+)
 | 4 | Close first DAO partnership | Month 3-4 |
 | 5 | Case study → pitch next 4 | Month 4-6 |
 
-**Top 3 아웃리치 타겟:**
-1. **Gnosis DAO** — 새 트레저리 매니저(Noca)가 Q1 2026 "유휴 자본 배치" 미션
-2. **ENS DAO** — 포럼 활발, karpatkey가 16K+ ETH 관리
-3. **Polygon** — $1.3B 유휴 스테이블코인, 연 $70M 기회비용
+**Top 3 Outreach Targets:**
+1. **Gnosis DAO** — New treasury manager (Noca) has a Q1 2026 "deploy idle capital" mission
+2. **ENS DAO** — Active forum, karpatkey manages 16K+ ETH
+3. **Polygon** — $1.3B idle stablecoins, $70M/yr opportunity cost
 
 **Pitch:** "LP yield with Sharpe 3.66, Max DD -12%. Performance-fee-only. ERC-4626. No lockup."
 
@@ -156,9 +156,9 @@ Stage 3: Established (TVL $20M+)
 | Moat | How |
 |------|-----|
 | Data advantage | More runtime = more accurate vol oracle |
-| Rehypothecation | LP OFF 시 유휴 자금 → Aave/Compound (Bunni가 못 한 걸 단순하게) |
-| Share composability | vault share → Morpho/Euler 담보로 사용 가능하게 통합 |
-| Audit + track record | 무중단 운영 = 신뢰 축적 |
+| Rehypothecation | Route idle funds to Aave/Compound when LP is off (what Bunni couldn't do, simplified) |
+| Share composability | Integrate vault shares as collateral on Morpho/Euler |
+| Audit + track record | Uninterrupted operation = trust accumulation |
 | V4 hook ecosystem | First-mover as V4 grows |
 
 ---
@@ -193,16 +193,16 @@ Decision point: only after PMF confirmed and TVL > $5M.
 ### Customer segments
 | Segment | Pain | Pitch | Priority |
 |---------|------|-------|----------|
-| DAO treasuries | $24.5B idle, scared of IL | "Sharpe 3.66, DD -12%. Governance-ready." | **1순위** |
-| Protocol treasuries | Treasury melting from IL | "12mo instead of 6mo." | **2순위** |
-| Existing LPs | 49.5% unprofitable | "Stop losing." | 3순위 |
-| LP-curious holders | Want >4% but scared | "Higher yield, auto risk mgmt." | 4순위 |
+| DAO treasuries | $24.5B idle, scared of IL | "Sharpe 3.66, DD -12%. Governance-ready." | **#1** |
+| Protocol treasuries | Treasury melting from IL | "12mo instead of 6mo." | **#2** |
+| Existing LPs | 49.5% unprofitable | "Stop losing." | #3 |
+| LP-curious holders | Want >4% but scared | "Higher yield, auto risk mgmt." | #4 |
 
 ---
 
 ## Financial Projections
 
-### Year 1 (B2B DAO 파트너십 기준)
+### Year 1 (Based on B2B DAO Partnerships)
 ```
 3 DAO partners × $2M avg = $6M TVL
   Performance fee: ~$6.4K/mo ($77K/yr)
@@ -237,23 +237,23 @@ Phase 8                                    ????                 Token?
           |            |            |             |            |
 TVL       $1.2K       $1.2K       $6M           $10M         $15-20M
 Revenue   $0          $0          ~$6K/mo       ~$17K/mo     ~$36K/mo
-Key       Deploy      UFSF申請    1st DAO       5 DAOs       Established
+Key       Deploy      UFSF App    1st DAO       5 DAOs       Established
 ```
 
 ---
 
 ## Immediate Next Actions
 
-1. ✅ ~~B2B 피봇 (메시징/문서)~~
+1. ✅ ~~B2B pivot (messaging/docs)~~
 2. ✅ ~~4-round Trail of Bits audit (internal)~~
 3. ✅ ~~Governance proposal template (EN/KO)~~
 4. ✅ ~~DAO target list (20 DAOs, 3 tiers)~~
 5. ✅ ~~Grant strategy (UF 3 programs + Arbitrum/Base)~~
-6. ⏳ **Base mainnet 배포** ($1.2K seed) — ENG 진행 중
-7. ⏳ **4주 실운영** — 성과 데이터 축적
-8. ⏳ **UFSF 감사 보조금 신청** — 4주 데이터 후
-9. ⏳ **Litepaper** — mainnet 데이터 포함
-10. ⏳ **DAO 아웃리치** — 감사 진행 중 + 실데이터 확보 후
+6. ⏳ **Base mainnet deployment** ($1.2K seed) — ENG in progress
+7. ⏳ **4-week live operation** — Accumulate performance data
+8. ⏳ **UFSF audit subsidy application** — After 4 weeks of data
+9. ⏳ **Litepaper** — Including mainnet data
+10. ⏳ **DAO outreach** — After audit in progress + live data secured
 
 ---
 

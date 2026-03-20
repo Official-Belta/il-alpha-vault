@@ -159,6 +159,6 @@ How many of the 8 independent agents found each issue:
 - CRITICAL: 4 → 0 (전체 해결)
 - Risk: MEDIUM-HIGH → MEDIUM
 - Maturity: 76% → 80%
-- Audit Readiness: 55 → 75 → (R-1~R-8 수정 후) **~90**
+- Audit Readiness: 55 → 75 → (after R-1~R-8 fixes) **~90**
 
-**남은 작업:** R-1~R-8 수정 (~1.5시간) → 프로페셔널 감사 의뢰 준비 완료. 현재 코드에 자금 탈취 가능한 CRITICAL은 없으나, ERC-4626 비준수(R-1)와 share price 왜곡(R-2)은 통합 프로토콜과의 호환성 문제를 유발하므로 메인넷 전 반드시 수정 필요.
+**Remaining work:** Fix R-1 through R-8 (~1.5 hours) → ready for professional audit engagement. No fund-extractable CRITICAL in current code, but ERC-4626 non-conformance (R-1) and share price distortion (R-2) cause compatibility issues with integrating protocols and must be fixed before mainnet.

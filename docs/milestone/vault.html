@@ -62,9 +62,12 @@
   .vault-hero .desc { font-size:21px; color:var(--gray-400); line-height:1.65; max-width:520px; }
 
   /* --- CONNECT --- */
-  .connect-btn { font-family:var(--mono); font-size:15px; font-weight:500; letter-spacing:0.06em; text-transform:uppercase; color:var(--black); background:var(--white); border:none; padding:18px 40px; cursor:pointer; transition:all 150ms var(--ease); margin-top:40px; display:inline-block; }
-  .connect-btn:hover { background:var(--gray-200); }
-  .connect-btn.connected { color:var(--accent); border-bottom:2px solid var(--accent); }
+  .connect-section { padding:64px 48px; border-bottom:1px solid var(--gray-200); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:24px; }
+  @media (max-width:640px) { .connect-section { padding:48px 24px; } }
+  .connect-prompt { font-family:var(--display); font-size:clamp(24px,3vw,32px); font-weight:400; letter-spacing:-0.02em; color:var(--gray-400); }
+  .connect-btn { font-family:var(--mono); font-size:14px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--white); background:var(--black); border:none; padding:18px 48px; cursor:pointer; transition:all 150ms var(--ease); }
+  .connect-btn:hover { background:var(--gray-800); }
+  .connect-btn.connected { background:none; color:var(--accent); border:1px solid var(--accent); padding:16px 32px; }
 
   /* --- METRICS --- */
   .metrics-section { padding:0 48px 64px; }
@@ -75,9 +78,9 @@
   .m-cell:last-child { border-right:none; }
   .m-cell:nth-child(n+2) { padding-left:32px; }
   @media (max-width:768px) { .m-cell:nth-child(2) { border-right:none; } .m-cell:nth-child(n+3) { border-top:1px solid var(--gray-200); } }
-  .m-label { font-family:var(--mono); font-size:13px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:10px; }
-  .m-value { font-family:var(--display); font-size:36px; font-weight:400; letter-spacing:-0.02em; }
-  .m-sub { font-family:var(--mono); font-size:13px; color:var(--gray-400); margin-top:6px; }
+  .m-label { font-family:var(--mono); font-size:14px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:12px; }
+  .m-value { font-family:var(--display); font-size:clamp(40px,5vw,56px); font-weight:400; letter-spacing:-0.025em; }
+  .m-sub { font-family:var(--mono); font-size:14px; color:var(--gray-400); margin-top:8px; }
 
   /* --- STRATEGY --- */
   .strategy-section { padding:64px 48px; border-bottom:1px solid var(--gray-200); max-width:960px; }
@@ -184,7 +187,6 @@
 </nav>
 <div class="mobile-menu">
   <a href="index.html#roadmap" data-ko="로드맵" onclick="this.parentElement.classList.remove('open')">Roadmap</a>
-  <a href="vault.html" class="active" data-ko="볼트">Vault</a>
   <a href="index.html#log" data-ko="빌드 로그" onclick="this.parentElement.classList.remove('open')">Log</a>
   <a href="thesis.html" data-ko="투자 논문">Thesis</a>
 </div>
@@ -194,7 +196,6 @@
   <div class="eyebrow"><span class="dot"></span> <span data-ko="Base 메인넷 · ERC-4626">Base Mainnet · ERC-4626</span></div>
   <h1 data-ko="변동성이 높을 때, LP를 제거합니다">When volatility spikes, we remove your LP</h1>
   <p class="desc" data-ko="온체인 변동성 오라클이 위험을 감지하면 자동으로 LP를 철수합니다. 안전할 때 재진입. 락업 없음. 즉시 인출.">On-chain volatility oracle detects risk and automatically removes LP. Re-enters when safe. No lockup. Instant withdrawal.</p>
-  <button class="connect-btn" id="connectBtn" onclick="connectWallet()" data-ko="지갑 연결">CONNECT WALLET</button>
 </section>
 
 <!-- METRICS -->
@@ -218,6 +219,12 @@
       <div class="m-value" id="depositCap">—</div>
     </div>
   </div>
+</div>
+
+<!-- CONNECT -->
+<div class="connect-section" id="connectSection">
+  <span class="connect-prompt" data-ko="시작하려면 지갑을 연결하세요">Connect your wallet to get started</span>
+  <button class="connect-btn" id="connectBtn" onclick="connectWallet()" data-ko="연결">CONNECT</button>
 </div>
 
 <!-- STRATEGY -->

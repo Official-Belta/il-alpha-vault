@@ -10,222 +10,214 @@
 <link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
 <style>
-  :root { --black:#0C0C0C; --white:#FAFAF9; --gray-100:#F5F5F4; --gray-200:#E7E5E4; --gray-300:#D6D3D1; --gray-400:#A8A29E; --gray-500:#78716C; --gray-600:#57534E; --gray-700:#44403C; --gray-900:#1C1917; --accent:#1A7F64; --red:#EF4444; --yellow:#EAB308; --display:'Playfair Display',Georgia,serif; --sans:'Geist Sans','Satoshi',system-ui,sans-serif; --mono:'Geist Mono','SF Mono',monospace; }
+  :root { --bg:#08090A; --surface:#111214; --border:#1E2025; --white:#F8F8F7; --dim:#9CA3AF; --muted:#6B7280; --accent:#1A7F64; --red:#EF4444; --yellow:#EAB308; --display:'Playfair Display',Georgia,serif; --sans:'Geist Sans','Satoshi',system-ui,sans-serif; --mono:'Geist Mono','SF Mono',monospace; }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:var(--sans); background:var(--black); color:var(--white); padding:48px; max-width:1100px; margin:0 auto; }
-  @media (max-width:640px) { body { padding:24px; } }
+  body { font-family:var(--sans); background:var(--bg); color:var(--white); }
 
-  h1 { font-family:var(--display); font-size:56px; font-weight:400; letter-spacing:-0.025em; margin-bottom:12px; }
-  .sub { font-family:var(--mono); font-size:17px; color:var(--gray-500); margin-bottom:16px; }
-  .updated { font-family:var(--mono); font-size:15px; color:var(--gray-600); margin-bottom:56px; }
+  .container { max-width:1080px; margin:0 auto; padding:64px 48px; }
+  @media (max-width:640px) { .container { padding:40px 20px; } }
 
-  .section-label { font-family:var(--display); font-size:28px; font-weight:400; letter-spacing:-0.02em; color:var(--white); margin-bottom:24px; padding-top:56px; padding-bottom:16px; border-top:1px solid rgba(255,255,255,0.12); }
-  .section-label:first-of-type { border-top:none; padding-top:0; }
+  /* Header */
+  .header { margin-bottom:64px; }
+  .header h1 { font-family:var(--display); font-size:clamp(40px,5vw,56px); font-weight:400; letter-spacing:-0.03em; margin-bottom:12px; }
+  .header .meta { font-family:var(--mono); font-size:15px; color:var(--muted); margin-bottom:8px; }
+  .header .time { font-family:var(--mono); font-size:14px; color:var(--muted); }
+  .refresh { font-family:var(--mono); font-size:14px; color:var(--muted); background:none; border:1px solid var(--border); padding:10px 28px; cursor:pointer; transition:all 150ms; margin-top:20px; }
+  .refresh:hover { color:var(--white); border-color:var(--dim); }
 
-  .metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:0; border:1px solid rgba(255,255,255,0.12); margin-bottom:56px; background:rgba(255,255,255,0.02); }
-  @media (max-width:768px) { .metrics { grid-template-columns:1fr 1fr; } }
-  .m { padding:32px; border-right:1px solid rgba(255,255,255,0.08); }
-  .m:nth-child(4n) { border-right:none; }
-  @media (max-width:768px) { .m:nth-child(2n) { border-right:none; } .m:nth-child(n+3) { border-top:1px solid rgba(255,255,255,0.08); } }
-  .m-label { font-family:var(--mono); font-size:14px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-400); margin-bottom:12px; }
-  .m-val { font-family:var(--mono); font-size:40px; font-weight:700; }
-  .m-sub { font-family:var(--mono); font-size:14px; color:var(--gray-600); margin-top:8px; }
+  /* Section */
+  .section { margin-bottom:72px; }
+  .section-title { font-family:var(--display); font-size:clamp(28px,3.5vw,36px); font-weight:400; letter-spacing:-0.02em; margin-bottom:28px; padding-bottom:16px; border-bottom:1px solid var(--border); }
+
+  /* Status strip */
+  .status-strip { display:grid; grid-template-columns:1fr 1fr 1fr; margin-bottom:72px; }
+  @media (max-width:640px) { .status-strip { grid-template-columns:1fr; } }
+  .status-item { padding:28px 32px; background:var(--surface); border-right:1px solid var(--border); }
+  .status-item:last-child { border-right:none; }
+  @media (max-width:640px) { .status-item { border-right:none; border-bottom:1px solid var(--border); } .status-item:last-child { border-bottom:none; } }
+  .si-row { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+  .si-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .si-dot.live { background:var(--accent); animation:pulse 2s ease-in-out infinite; }
+  .si-dot.warn { background:var(--yellow); }
+  .si-dot.dead { background:var(--red); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .si-name { font-family:var(--sans); font-size:18px; font-weight:600; }
+  .si-detail { font-family:var(--mono); font-size:14px; color:var(--dim); line-height:1.8; white-space:pre-line; }
+
+  /* Metric grid */
+  .mgrid { display:grid; grid-template-columns:1fr 1fr 1fr; border:1px solid var(--border); }
+  @media (max-width:768px) { .mgrid { grid-template-columns:1fr 1fr; } }
+  .mcell { padding:36px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .mcell:nth-child(3n) { border-right:none; }
+  @media (max-width:768px) { .mcell:nth-child(2n) { border-right:none; } }
+  .mcell-label { font-family:var(--mono); font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px; }
+  .mcell-val { font-family:var(--display); font-size:clamp(32px,4vw,44px); font-weight:400; letter-spacing:-0.02em; }
+  .mcell-sub { font-family:var(--mono); font-size:13px; color:var(--muted); margin-top:8px; }
   .green { color:var(--accent); }
   .red { color:var(--red); }
-  .yellow { color:var(--yellow); }
 
-  /* Status cards */
-  .status-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1px; background:rgba(255,255,255,0.08); margin-bottom:56px; }
-  @media (max-width:640px) { .status-row { grid-template-columns:1fr; } }
-  .status-card { background:rgba(255,255,255,0.03); padding:32px; }
-  .status-card .s-header { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
-  .status-card .s-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
-  .s-dot.live { background:var(--accent); animation:pulse 2s ease-in-out infinite; }
-  .s-dot.warn { background:var(--yellow); }
-  .s-dot.dead { background:var(--red); }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  .status-card .s-title { font-family:var(--sans); font-size:20px; font-weight:600; }
-  .status-card .s-detail { font-family:var(--mono); font-size:15px; color:var(--gray-400); line-height:2; white-space:pre-line; }
-
-  .lp-bar { display:flex; align-items:center; gap:20px; padding:28px 32px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); margin-bottom:56px; }
-  .lp-dot { width:16px; height:16px; border-radius:50%; flex-shrink:0; }
+  /* LP bar */
+  .lp-bar { display:flex; align-items:center; gap:20px; padding:32px 36px; background:var(--surface); border:1px solid var(--border); }
+  .lp-dot { width:14px; height:14px; border-radius:50%; flex-shrink:0; }
   .lp-dot.on { background:var(--accent); animation:pulse 2s ease-in-out infinite; }
-  .lp-dot.off { background:var(--gray-600); }
+  .lp-dot.off { background:var(--muted); }
   .lp-text { font-family:var(--sans); font-size:22px; font-weight:600; }
-  .lp-detail { font-family:var(--mono); font-size:16px; color:var(--gray-400); margin-left:auto; }
+  .lp-detail { font-family:var(--mono); font-size:15px; color:var(--dim); margin-left:auto; }
 
-  .dep-table { width:100%; border-collapse:collapse; margin-bottom:48px; }
-  .dep-table th { font-family:var(--mono); font-size:13px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); text-align:left; padding:16px 16px 16px 0; border-bottom:1px solid rgba(255,255,255,0.1); }
-  .dep-table td { font-family:var(--mono); font-size:18px; padding:20px 16px 20px 0; border-bottom:1px solid rgba(255,255,255,0.06); color:var(--gray-300); }
-  .dep-table td a { color:var(--gray-400); text-decoration:none; }
-  .dep-table td a:hover { color:var(--white); }
+  /* Table */
+  table { width:100%; border-collapse:collapse; }
+  th { font-family:var(--mono); font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; text-align:left; padding:16px 0; border-bottom:1px solid var(--border); }
+  td { font-family:var(--mono); font-size:17px; padding:20px 0; border-bottom:1px solid var(--border); color:var(--dim); }
+  td a { color:var(--dim); text-decoration:none; }
+  td a:hover { color:var(--white); }
 
-  .history { margin-bottom:48px; }
-  .h-row { display:grid; grid-template-columns:160px 120px 1fr 120px; gap:16px; padding:18px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-family:var(--mono); font-size:16px; color:var(--gray-400); }
-  @media (max-width:640px) { .h-row { grid-template-columns:1fr; gap:4px; } }
-  .h-header { color:var(--gray-500); font-size:13px; text-transform:uppercase; letter-spacing:0.06em; }
-
-  .refresh-btn { font-family:var(--mono); font-size:13px; color:var(--gray-500); background:none; border:1px solid rgba(255,255,255,0.08); padding:10px 24px; cursor:pointer; transition:all 150ms; margin-bottom:48px; }
-  .refresh-btn:hover { color:var(--white); border-color:rgba(255,255,255,0.2); }
-
-  .link { font-family:var(--mono); font-size:13px; color:var(--gray-600); }
-  .link a { color:var(--gray-500); text-decoration:none; }
-  .link a:hover { color:var(--white); }
+  /* Links */
+  .links { font-family:var(--mono); font-size:14px; color:var(--muted); }
+  .links a { color:var(--dim); text-decoration:none; }
+  .links a:hover { color:var(--white); }
+  .links > div { margin-bottom:10px; }
 </style>
 </head>
 <body>
+<div class="container">
 
-<h1>관리자 대시보드</h1>
-<p class="sub">IL Alpha Vault · Arbitrum 메인넷</p>
-<p class="updated" id="lastUpdate">로딩 중...</p>
-
-<button class="refresh-btn" onclick="loadAll()">새로고침</button>
+<!-- HEADER -->
+<div class="header">
+  <h1>관리자 대시보드</h1>
+  <div class="meta">IL Alpha Vault · Arbitrum</div>
+  <div class="time" id="lastUpdate">로딩 중...</div>
+  <button class="refresh" onclick="loadAll()">새로고침</button>
+</div>
 
 <!-- SYSTEM STATUS -->
-<div class="section-label">시스템 상태</div>
-<div class="status-row">
-  <div class="status-card">
-    <div class="s-header">
-      <span class="s-dot" id="vaultDot"></span>
-      <span class="s-title">스마트 컨트랙트</span>
-    </div>
-    <div class="s-detail" id="vaultStatus">확인 중...</div>
+<div class="status-strip">
+  <div class="status-item">
+    <div class="si-row"><span class="si-dot" id="vaultDot"></span><span class="si-name">컨트랙트</span></div>
+    <div class="si-detail" id="vaultStatus">확인 중...</div>
   </div>
-  <div class="status-card">
-    <div class="s-header">
-      <span class="s-dot" id="keeperDot"></span>
-      <span class="s-title">키퍼 봇</span>
-    </div>
-    <div class="s-detail" id="keeperStatus">확인 중...</div>
+  <div class="status-item">
+    <div class="si-row"><span class="si-dot" id="keeperDot"></span><span class="si-name">키퍼</span></div>
+    <div class="si-detail" id="keeperStatus">확인 중...</div>
   </div>
-  <div class="status-card">
-    <div class="s-header">
-      <span class="s-dot" id="hookDot"></span>
-      <span class="s-title">변동성 오라클 (Hook)</span>
-    </div>
-    <div class="s-detail" id="hookStatus">확인 중...</div>
+  <div class="status-item">
+    <div class="si-row"><span class="si-dot" id="hookDot"></span><span class="si-name">변동성 오라클</span></div>
+    <div class="si-detail" id="hookStatus">확인 중...</div>
   </div>
 </div>
 
-<!-- VAULT METRICS -->
-<div class="section-label">볼트 현황</div>
-<div class="metrics">
-  <div class="m">
-    <div class="m-label">총 예치금 (TVL)</div>
-    <div class="m-val" id="tvl">—</div>
-    <div class="m-sub">USDC</div>
-  </div>
-  <div class="m">
-    <div class="m-label">셰어 가격</div>
-    <div class="m-val" id="sharePrice">—</div>
-  </div>
-  <div class="m">
-    <div class="m-label">유휴 자본</div>
-    <div class="m-val" id="idle">—</div>
-    <div class="m-sub" id="idlePct"></div>
-  </div>
-  <div class="m">
-    <div class="m-label">LP 배치 중</div>
-    <div class="m-val" id="deployed">—</div>
-    <div class="m-sub" id="deployedPct"></div>
-  </div>
-  <div class="m">
-    <div class="m-label">예치 한도</div>
-    <div class="m-val" id="cap">—</div>
-  </div>
-  <div class="m">
-    <div class="m-label">잔여 한도</div>
-    <div class="m-val" id="remaining">—</div>
-  </div>
-  <div class="m">
-    <div class="m-label">누적 수익률</div>
-    <div class="m-val" id="yield">—</div>
-  </div>
-  <div class="m">
-    <div class="m-label">일시정지 여부</div>
-    <div class="m-val" id="paused">—</div>
+<!-- VAULT -->
+<div class="section">
+  <div class="section-title">볼트 현황</div>
+  <div class="mgrid">
+    <div class="mcell">
+      <div class="mcell-label">총 예치금</div>
+      <div class="mcell-val" id="tvl">—</div>
+    </div>
+    <div class="mcell">
+      <div class="mcell-label">셰어 가격</div>
+      <div class="mcell-val" id="sharePrice">—</div>
+    </div>
+    <div class="mcell">
+      <div class="mcell-label">누적 수익률</div>
+      <div class="mcell-val" id="yield">—</div>
+    </div>
+    <div class="mcell">
+      <div class="mcell-label">유휴 자본</div>
+      <div class="mcell-val" id="idle">—</div>
+      <div class="mcell-sub" id="idlePct"></div>
+    </div>
+    <div class="mcell">
+      <div class="mcell-label">LP 배치</div>
+      <div class="mcell-val" id="deployed">—</div>
+      <div class="mcell-sub" id="deployedPct"></div>
+    </div>
+    <div class="mcell">
+      <div class="mcell-label">잔여 한도</div>
+      <div class="mcell-val" id="remaining">—</div>
+      <div class="mcell-sub" id="capTotal"></div>
+    </div>
   </div>
 </div>
 
-<!-- LP STATUS -->
-<div class="section-label">LP 상태</div>
-<div class="lp-bar">
-  <span class="lp-dot" id="lpDot"></span>
-  <span class="lp-text" id="lpText">—</span>
-  <span class="lp-detail" id="lpDetail"></span>
+<!-- LP -->
+<div class="section">
+  <div class="section-title">LP 상태</div>
+  <div class="lp-bar">
+    <span class="lp-dot" id="lpDot"></span>
+    <span class="lp-text" id="lpText">—</span>
+    <span class="lp-detail" id="lpDetail"></span>
+  </div>
 </div>
 
 <!-- VOLATILITY -->
-<div class="section-label">변동성 오라클</div>
-<div class="metrics" style="grid-template-columns:1fr 1fr;">
-  <div class="m">
-    <div class="m-label">시간당 분산</div>
-    <div class="m-val" id="hourlyVar">—</div>
-  </div>
-  <div class="m">
-    <div class="m-label">연간 변동성</div>
-    <div class="m-val" id="annualVol">—</div>
+<div class="section">
+  <div class="section-title">변동성</div>
+  <div class="mgrid" style="grid-template-columns:1fr 1fr 1fr;">
+    <div class="mcell">
+      <div class="mcell-label">시간당 분산</div>
+      <div class="mcell-val" id="hourlyVar" style="font-size:28px;">—</div>
+    </div>
+    <div class="mcell">
+      <div class="mcell-label">연간 변동성</div>
+      <div class="mcell-val" id="annualVol">—</div>
+    </div>
+    <div class="mcell">
+      <div class="mcell-label">마지막 리밸런스</div>
+      <div class="mcell-val" id="lastRebalance" style="font-size:28px;">—</div>
+    </div>
   </div>
 </div>
 
 <!-- DEPOSITORS -->
-<div class="section-label">예치자 (<span id="depositorCount">0</span>명)</div>
-<table class="dep-table">
-  <thead>
-    <tr>
-      <th>주소</th>
-      <th>셰어</th>
-      <th>가치 (USDC)</th>
-      <th>TVL 비율</th>
-    </tr>
-  </thead>
-  <tbody id="depositorRows">
-    <tr><td colspan="4" style="color:var(--gray-600);">로딩 중...</td></tr>
-  </tbody>
-</table>
-
-<!-- KEEPER DETAIL -->
-<div class="section-label">키퍼 상세</div>
-<div class="metrics" style="grid-template-columns:1fr 1fr 1fr 1fr;">
-  <div class="m">
-    <div class="m-label">키퍼 주소</div>
-    <div class="m-val" style="font-size:13px;" id="keeperAddr">—</div>
-  </div>
-  <div class="m">
-    <div class="m-label">ETH 잔액</div>
-    <div class="m-val" id="keeperBal">—</div>
-    <div class="m-sub" id="keeperBalWarn"></div>
-  </div>
-  <div class="m">
-    <div class="m-label">예상 가스비/회</div>
-    <div class="m-val">~$0.01</div>
-    <div class="m-sub">Arbitrum 기준</div>
-  </div>
-  <div class="m">
-    <div class="m-label">마지막 리밸런스</div>
-    <div class="m-val" style="font-size:16px;" id="lastRebalance">—</div>
-  </div>
+<div class="section">
+  <div class="section-title">예치자 <span style="color:var(--dim);" id="depositorCount">0</span>명</div>
+  <table>
+    <thead><tr><th>주소</th><th>셰어</th><th>가치</th><th>비율</th></tr></thead>
+    <tbody id="depositorRows"><tr><td colspan="4" style="color:var(--muted);">로딩 중...</td></tr></tbody>
+  </table>
 </div>
 
-<!-- RECENT EVENTS -->
-<div class="section-label">입출금 내역</div>
-<div class="history" id="eventHistory">
-  <div class="h-row h-header"><span>블록</span><span>유형</span><span>주소</span><span>금액</span></div>
+<!-- HISTORY -->
+<div class="section">
+  <div class="section-title">입출금 내역</div>
+  <table id="eventTable">
+    <thead><tr><th>블록</th><th>유형</th><th>주소</th><th>금액</th></tr></thead>
+    <tbody id="eventRows"><tr><td colspan="4" style="color:var(--muted);">로딩 중...</td></tr></tbody>
+  </table>
+</div>
+
+<!-- KEEPER -->
+<div class="section">
+  <div class="section-title">키퍼 상세</div>
+  <div class="mgrid" style="grid-template-columns:1fr 1fr 1fr;">
+    <div class="mcell">
+      <div class="mcell-label">주소</div>
+      <div class="mcell-val" style="font-size:15px;" id="keeperAddr">—</div>
+    </div>
+    <div class="mcell">
+      <div class="mcell-label">ETH 잔액</div>
+      <div class="mcell-val" id="keeperBal">—</div>
+      <div class="mcell-sub" id="keeperBalWarn"></div>
+    </div>
+    <div class="mcell">
+      <div class="mcell-label">예상 가스비</div>
+      <div class="mcell-val">~$0.01</div>
+      <div class="mcell-sub">/회 (Arbitrum)</div>
+    </div>
+  </div>
 </div>
 
 <!-- LINKS -->
-<div class="section-label">링크</div>
-<div class="link" style="margin-bottom:8px;">
-  Vault: <a id="vaultLink" href="#" target="_blank">—</a>
+<div class="section">
+  <div class="section-title">링크</div>
+  <div class="links">
+    <div>Vault: <a id="vaultLink" href="#" target="_blank">—</a></div>
+    <div>Hook: <a id="hookLink" href="#" target="_blank">—</a></div>
+    <div>키퍼: <a href="https://arbiscan.io/address/0x0b034b10d7bB219d4bbdbf5d241380693e3B4c9C" target="_blank">Arbiscan ↗</a></div>
+    <div>공개 페이지: <a href="vault.html">vault.html</a></div>
+  </div>
 </div>
-<div class="link" style="margin-bottom:8px;">
-  Hook: <a id="hookLink" href="#" target="_blank">—</a>
-</div>
-<div class="link" style="margin-bottom:48px;">
-  키퍼: <a href="https://arbiscan.io/address/0x0b034b10d7bB219d4bbdbf5d241380693e3B4c9C" target="_blank">Arbiscan ↗</a> (매시간 TX 확인)
-</div>
-<div class="link" style="margin-bottom:8px;">
-  공개 페이지: <a href="vault.html">vault.html</a>
+
 </div>
 
 <script>
@@ -233,253 +225,162 @@ const RPC = 'https://arb1.arbitrum.io/rpc';
 const VAULT = '0xbae653ebc6b960a315cc43119b5095bd943c2a73';
 const HOOK = '0xfae907196801ed77119b7f288c05d1df475f9040';
 const USDC_ADDR = '0xaf88d065e77c8cC2239327C5EDb3A432268e5831';
-const EXPLORER = 'https://arbiscan.io';
-const KEEPER_ADDR = '0x0b034b10d7bB219d4bbdbf5d241380693e3B4c9C';
+const KEEPER = '0x0b034b10d7bB219d4bbdbf5d241380693e3B4c9C';
+const POOL_ID = '0x51bc40c9fcc3fe4ab474ea85249074e973dbd264a3244e902d363256d1c951ba';
+const EX = 'https://arbiscan.io';
 
-const VAULT_ABI = [
+const V_ABI = [
   'function totalAssets() view returns (uint256)',
   'function balanceOf(address) view returns (uint256)',
-  'function convertToAssets(uint256 shares) view returns (uint256)',
+  'function convertToAssets(uint256) view returns (uint256)',
   'function depositCap() view returns (uint256)',
   'function maxDeposit(address) view returns (uint256)',
   'function paused() view returns (bool)',
   'function totalSupply() view returns (uint256)',
-  'function owner() view returns (address)',
-  'function getVaultMetrics() view returns (uint256,uint256,uint256,uint128,uint256,bool,bool)',
-  'event Transfer(address indexed from, address indexed to, uint256 value)',
   'event Deposit(address indexed sender, address indexed owner, uint256 assets, uint256 shares)',
   'event Withdraw(address indexed sender, address indexed receiver, address indexed owner, uint256 assets, uint256 shares)',
+  'event Transfer(address indexed from, address indexed to, uint256 value)',
   'event Rebalanced(bool lpActive, uint256 totalAssetsBefore, uint256 totalAssetsAfter, uint128 liquidityDelta, uint256 timestamp)'
 ];
-
-const HOOK_ABI = [
-  'function getVolEstimate(bytes32 poolId) view returns (uint256 hourlyVar, uint256 annualizedVol)',
-  'event VolUpdated(bytes32 indexed poolId, uint128 ewmaVar, uint256 timestamp)',
-  'event LPToggled(bytes32 indexed poolId, bool isActive, uint256 feeYield, uint256 ilCost)',
+const H_ABI = [
   'function volOracles(bytes32) view returns (uint128 ewmaVar, int24 lastTick, uint40 lastTimestamp, uint16 lambda)'
 ];
+const E_ABI = ['function balanceOf(address) view returns (uint256)'];
 
-let provider, vaultC, hookC;
-
-function fmt(n, d=2) { return Number(n).toLocaleString('ko-KR',{minimumFractionDigits:d,maximumFractionDigits:d}); }
-
-function setDot(id, state) {
-  const el = document.getElementById(id);
-  if (el) el.className = 's-dot ' + state;
-}
+let prov, vc, hc;
+const fmt = (n,d=2) => Number(n).toLocaleString('ko-KR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const dot = (id,s) => { const e=document.getElementById(id); if(e) e.className='si-dot '+s; };
 
 async function loadAll() {
-  provider = new ethers.JsonRpcProvider(RPC);
-  vaultC = new ethers.Contract(VAULT, VAULT_ABI, provider);
-  hookC = new ethers.Contract(HOOK, HOOK_ABI, provider);
+  prov = new ethers.JsonRpcProvider(RPC);
+  vc = new ethers.Contract(VAULT, V_ABI, prov);
+  hc = new ethers.Contract(HOOK, H_ABI, prov);
 
-  // Links
-  document.getElementById('vaultLink').href = EXPLORER + '/address/' + VAULT;
-  document.getElementById('vaultLink').textContent = VAULT.slice(0,10) + '...' + VAULT.slice(-8);
-  document.getElementById('hookLink').href = EXPLORER + '/address/' + HOOK;
-  document.getElementById('hookLink').textContent = HOOK.slice(0,10) + '...' + HOOK.slice(-8);
+  document.getElementById('vaultLink').href = EX+'/address/'+VAULT;
+  document.getElementById('vaultLink').textContent = VAULT.slice(0,10)+'...'+VAULT.slice(-8);
+  document.getElementById('hookLink').href = EX+'/address/'+HOOK;
+  document.getElementById('hookLink').textContent = HOOK.slice(0,10)+'...'+HOOK.slice(-8);
 
   try {
-    // --- 1. 스마트 컨트랙트 상태 ---
-    const code = await provider.getCode(VAULT);
-    if (code === '0x') {
-      setDot('vaultDot', 'dead');
-      document.getElementById('vaultStatus').textContent = '컨트랙트 미배포 또는 주소 오류';
-    } else {
-      // 개별 함수로 조회 (getVaultMetrics가 revert될 수 있음)
-      const [totalAssetsRaw, isPaused, capRaw, maxDepRaw, supplyRaw] = await Promise.all([
-        vaultC.totalAssets(),
-        vaultC.paused(),
-        vaultC.depositCap(),
-        vaultC.maxDeposit(VAULT),
-        vaultC.totalSupply()
-      ]);
-      const totalAssets = Number(totalAssetsRaw) / 1e6;
+    // Contract check
+    const code = await prov.getCode(VAULT);
+    if (code==='0x') { dot('vaultDot','dead'); document.getElementById('vaultStatus').textContent='미배포'; return; }
 
-      // Share price: convertToAssets(1e6) / 1e6 (shares = 6 decimals like USDC)
-      let sharePrice = 1.0;
-      if (supplyRaw > 0n) {
-        const spRaw = await vaultC.convertToAssets(1000000n);
-        sharePrice = Number(spRaw) / 1e6;
+    // Vault data
+    const [ta, paused, cap, maxD, supply] = await Promise.all([
+      vc.totalAssets(), vc.paused(), vc.depositCap(), vc.maxDeposit(VAULT), vc.totalSupply()
+    ]);
+    const tvl = Number(ta)/1e6;
+    let sp = 1.0;
+    if (supply > 0n) { const r = await vc.convertToAssets(1000000n); sp = Number(r)/1e6; }
+
+    const usdc = new ethers.Contract(USDC_ADDR, E_ABI, prov);
+    const idleRaw = await usdc.balanceOf(VAULT);
+    const idle = Number(idleRaw)/1e6;
+    const deployed = tvl - idle;
+    const lpOn = deployed > 0;
+
+    dot('vaultDot', paused ? 'warn' : 'live');
+    document.getElementById('vaultStatus').textContent = paused ? '⚠️ 일시정지' : '정상 운영';
+
+    document.getElementById('tvl').textContent = '$'+fmt(tvl);
+    document.getElementById('sharePrice').textContent = '$'+sp.toFixed(4);
+    const y = (sp-1)*100;
+    const yEl = document.getElementById('yield');
+    yEl.textContent = (y>=0?'+':'')+y.toFixed(4)+'%';
+    yEl.className = 'mcell-val '+(y>=0?'green':'red');
+
+    document.getElementById('idle').textContent = '$'+fmt(idle);
+    document.getElementById('deployed').textContent = '$'+fmt(deployed);
+    if (tvl>0) {
+      document.getElementById('idlePct').textContent = (idle/tvl*100).toFixed(0)+'%';
+      document.getElementById('deployedPct').textContent = (deployed/tvl*100).toFixed(0)+'%';
+    }
+    document.getElementById('remaining').textContent = '$'+fmt(Number(maxD)/1e6);
+    document.getElementById('capTotal').textContent = '한도 $'+fmt(Number(cap)/1e6);
+
+    document.getElementById('lpDot').className = 'lp-dot '+(lpOn?'on':'off');
+    document.getElementById('lpText').textContent = lpOn ? 'LP 활성 — 수수료 수입 중' : 'LP 제거 — USDC 대기';
+    document.getElementById('lpDetail').textContent = '유휴 $'+fmt(idle)+' / 배치 $'+fmt(deployed);
+
+    // Depositors
+    const mints = await vc.queryFilter(vc.filters.Transfer(ethers.ZeroAddress), 0);
+    const holders = new Set();
+    mints.forEach(e => holders.add(e.args[1]));
+    const rows = [];
+    for (const a of holders) {
+      const b = await vc.balanceOf(a);
+      if (Number(b) > 0) {
+        const v = await vc.convertToAssets(b);
+        rows.push({a, shares:Number(b)/1e6, val:Number(v)/1e6, pct:Number(b)*100/Number(supply)});
       }
+    }
+    rows.sort((a,b)=>b.val-a.val);
+    document.getElementById('depositorCount').textContent = rows.length;
+    document.getElementById('depositorRows').innerHTML = rows.length===0
+      ? '<tr><td colspan="4" style="color:var(--muted)">예치자 없음</td></tr>'
+      : rows.map(r=>`<tr><td><a href="${EX}/address/${r.a}" target="_blank">${r.a.slice(0,8)}···${r.a.slice(-6)}</a></td><td>${fmt(r.shares)}</td><td>$${fmt(r.val)}</td><td>${r.pct.toFixed(1)}%</td></tr>`).join('');
 
-      // USDC balance of vault = idle capital
-      const usdcContract = new ethers.Contract(USDC_ADDR, ['function balanceOf(address) view returns (uint256)'], provider);
-      const idleRaw = await usdcContract.balanceOf(VAULT);
-      const idleVal = Number(idleRaw) / 1e6;
-      const deployedVal = totalAssets - idleVal;
+    // Events (deposit/withdraw only, full history, deduplicated)
+    const [deps, wds] = await Promise.all([
+      vc.queryFilter(vc.filters.Deposit(), 0),
+      vc.queryFilter(vc.filters.Withdraw(), 0)
+    ]);
+    const seen = new Set();
+    const evts = [
+      ...deps.map(e=>({t:'입금',who:e.args[1],amt:Number(e.args[3])/1e6,blk:e.blockNumber,tx:e.transactionHash})),
+      ...wds.map(e=>({t:'출금',who:e.args[1],amt:Number(e.args[3])/1e6,blk:e.blockNumber,tx:e.transactionHash}))
+    ].filter(e=>{if(seen.has(e.tx))return false;seen.add(e.tx);return true;})
+     .sort((a,b)=>b.blk-a.blk).slice(0,20);
 
-      // LP active = deployed > 0
-      const lpActive = deployedVal > 0;
+    document.getElementById('eventRows').innerHTML = evts.length===0
+      ? '<tr><td colspan="4" style="color:var(--muted)">내역 없음</td></tr>'
+      : evts.map(e=>`<tr><td>${e.blk}</td><td class="${e.t==='입금'?'green':'red'}">${e.t}</td><td><a href="${EX}/address/${e.who}" target="_blank">${e.who.slice(0,8)}···${e.who.slice(-4)}</a></td><td class="${e.t==='입금'?'green':'red'}">$${fmt(e.amt)}</td></tr>`).join('');
 
-      setDot('vaultDot', isPaused ? 'warn' : 'live');
-      document.getElementById('vaultStatus').textContent = isPaused
-        ? '⚠️ 볼트 일시정지 상태\n입금 차단 중, 출금은 가능'
-        : '정상 운영 중\ntotalAssets: $' + fmt(totalAssets);
+    // Rebalance time
+    let rbs = [];
+    try { rbs = await vc.queryFilter(vc.filters.Rebalanced(), 0); } catch(e){}
+    if (rbs.length > 0) {
+      const last = rbs[rbs.length-1];
+      const ts = Number(last.args[4]);
+      const ago = Math.round((Date.now()/1000-ts)/60);
+      const el = document.getElementById('lastRebalance');
+      el.textContent = ago+'분 전';
+      el.style.color = ago>120 ? 'var(--yellow)' : 'var(--accent)';
+    }
 
-      document.getElementById('tvl').textContent = '$' + fmt(totalAssets);
-      document.getElementById('sharePrice').textContent = '$' + sharePrice.toFixed(6);
-      document.getElementById('idle').textContent = '$' + fmt(idleVal);
-      document.getElementById('deployed').textContent = '$' + fmt(deployedVal);
-
-      if (totalAssets > 0) {
-        document.getElementById('idlePct').textContent = (idleVal/totalAssets*100).toFixed(1) + '% (TVL 대비)';
-        document.getElementById('deployedPct').textContent = (deployedVal/totalAssets*100).toFixed(1) + '% (TVL 대비)';
-      }
-
-      const yieldPct = (sharePrice - 1.0) * 100;
-      const yieldEl = document.getElementById('yield');
-      yieldEl.textContent = (yieldPct >= 0 ? '+' : '') + yieldPct.toFixed(4) + '%';
-      yieldEl.className = 'm-val ' + (yieldPct >= 0 ? 'green' : 'red');
-
-      document.getElementById('cap').textContent = '$' + fmt(Number(capRaw) / 1e6);
-      document.getElementById('remaining').textContent = '$' + fmt(Number(maxDepRaw) / 1e6);
-
-      document.getElementById('paused').textContent = isPaused ? '예 ⚠️' : '아니오';
-      document.getElementById('paused').className = 'm-val ' + (isPaused ? 'red' : 'green');
-
-      // LP 상태
-      const lpDot = document.getElementById('lpDot');
-      lpDot.className = 'lp-dot ' + (lpActive ? 'on' : 'off');
-      document.getElementById('lpText').textContent = lpActive ? '볼트 전체 LP 활성 — 풀에서 수수료 수입 중' : '볼트 전체 LP 제거 — 전액 USDC 대기 (자본 보호)';
-      document.getElementById('lpDetail').textContent = '유휴: $' + fmt(idleVal) + ' / 배치: $' + fmt(deployedVal);
-
-      // --- 2. 예치자 스캔 ---
-      const filter = vaultC.filters.Transfer(ethers.ZeroAddress);
-      const mintEvents = await vaultC.queryFilter(filter, 0, 'latest');
-      const holders = new Set();
-      mintEvents.forEach(e => holders.add(e.args[1]));
-
-      const totalSupply = await vaultC.totalSupply();
-      const rows = [];
-      for (const addr of holders) {
-        const bal = await vaultC.balanceOf(addr);
-        if (Number(bal) > 0) {
-          const value = await vaultC.convertToAssets(bal);
-          rows.push({ addr, shares:Number(bal)/1e6, value:Number(value)/1e6, pct:Number(bal)*100/Number(totalSupply) });
-        }
-      }
-      rows.sort((a,b) => b.value - a.value);
-
-      document.getElementById('depositorCount').textContent = rows.length;
-      const tbody = document.getElementById('depositorRows');
-      tbody.innerHTML = rows.length === 0
-        ? '<tr><td colspan="4" style="color:var(--gray-600);">예치자 없음</td></tr>'
-        : rows.map(r => `<tr>
-            <td><a href="${EXPLORER}/address/${r.addr}" target="_blank">${r.addr.slice(0,8)}···${r.addr.slice(-6)}</a></td>
-            <td>${fmt(r.shares)}</td>
-            <td>$${fmt(r.value)}</td>
-            <td>${r.pct.toFixed(1)}%</td>
-          </tr>`).join('');
-
-      // --- 3. 최근 이벤트 ---
-      // 전체 히스토리 스캔 (Arbitrum 블록 빠름 — 10000 = 42분밖에 안 됨)
-      const [deposits, withdrawals] = await Promise.all([
-        vaultC.queryFilter(vaultC.filters.Deposit(), 0),
-        vaultC.queryFilter(vaultC.filters.Withdraw(), 0)
-      ]);
-
-      // Rebalance 이벤트 (vault에서 emit)
-      let rebalances = [];
+    // Vol
+    const hookCode = await prov.getCode(HOOK);
+    if (hookCode !== '0x') {
+      dot('hookDot','live');
+      document.getElementById('hookStatus').textContent = '정상';
       try {
-        rebalances = await vaultC.queryFilter(vaultC.filters.Rebalanced(), 0);
-      } catch(e) {
-        try { rebalances = await hookC.queryFilter(hookC.filters.Rebalanced(), 0); } catch(e2) {}
-      }
+        const o = await hc.volOracles(POOL_ID);
+        const hv = Number(o[0])/1e18;
+        const av = Math.sqrt(hv*8760)*0.00009999*100;
+        document.getElementById('hourlyVar').textContent = hv.toFixed(1)+' tick²/h';
+        document.getElementById('annualVol').textContent = av.toFixed(1)+'%';
+        document.getElementById('hookStatus').textContent = '정상\n연간 변동성 '+av.toFixed(1)+'%';
+      } catch(e){}
+    } else { dot('hookDot','dead'); document.getElementById('hookStatus').textContent = '미배포'; }
 
-      // 입출금만 표시 (리밸런스 제외), TX 해시로 중복 제거
-      const seen = new Set();
-      const events = [
-        ...deposits.map(e => ({ type:'입금', who:e.args[1], assets:Number(e.args[3])/1e6, block:e.blockNumber, tx:e.transactionHash })),
-        ...withdrawals.map(e => ({ type:'출금', who:e.args[1], assets:Number(e.args[3])/1e6, block:e.blockNumber, tx:e.transactionHash }))
-      ].filter(e => { if (seen.has(e.tx)) return false; seen.add(e.tx); return true; })
-       .sort((a,b) => b.block - a.block).slice(0, 20);
+    // Keeper
+    const kb = await prov.getBalance(KEEPER);
+    const keth = Number(ethers.formatEther(kb));
+    document.getElementById('keeperAddr').textContent = KEEPER.slice(0,10)+'...'+KEEPER.slice(-8);
+    document.getElementById('keeperBal').textContent = keth.toFixed(4)+' ETH';
+    if (keth < 0.01) { dot('keeperDot','dead'); document.getElementById('keeperStatus').textContent='⚠️ ETH 부족'; document.getElementById('keeperBalWarn').textContent='충전 필요'; document.getElementById('keeperBalWarn').style.color='var(--red)'; }
+    else if (keth < 0.05) { dot('keeperDot','warn'); document.getElementById('keeperStatus').textContent='잔액 낮음'; document.getElementById('keeperBalWarn').textContent='곧 충전'; document.getElementById('keeperBalWarn').style.color='var(--yellow)'; }
+    else { dot('keeperDot','live'); document.getElementById('keeperStatus').textContent='정상'; }
 
-      const histEl = document.getElementById('eventHistory');
-      if (events.length === 0) {
-        histEl.innerHTML += '<div class="h-row" style="color:var(--gray-600);">입출금 내역 없음</div>';
-      } else {
-        events.forEach(ev => {
-          const color = ev.type === '입금' ? 'green' : 'red';
-          const who = ev.who.slice(0,6) + '···' + ev.who.slice(-4);
-          histEl.innerHTML += `<div class="h-row">
-            <span>${ev.block}</span>
-            <span class="${color}">${ev.type}</span>
-            <span><a href="${EXPLORER}/address/${ev.who}" target="_blank" style="color:var(--gray-400);">${who}</a></span>
-            <span class="${color}">$${fmt(ev.assets)}</span>
-          </div>`;
-        });
-      }
-
-      // 마지막 리밸런스 시간
-      if (rebalances.length > 0) {
-        const lastRb = rebalances[rebalances.length - 1];
-        const rbTimestamp = Number(lastRb.args[4]); // timestamp arg
-        const ago = Math.round((Date.now()/1000 - rbTimestamp) / 60);
-        document.getElementById('lastRebalance').textContent = ago + '분 전';
-        document.getElementById('lastRebalance').style.color = ago > 120 ? 'var(--yellow)' : 'var(--accent)';
-      }
-    }
-
-    // --- 4. Hook 상태 ---
-    const hookCode = await provider.getCode(HOOK);
-    if (hookCode === '0x') {
-      setDot('hookDot', 'dead');
-      document.getElementById('hookStatus').textContent = 'Hook 미배포';
-    } else {
-      setDot('hookDot', 'live');
-      document.getElementById('hookStatus').textContent = '정상 배포됨\n변동성 오라클 활성';
-      try {
-        const poolId = '0x51bc40c9fcc3fe4ab474ea85249074e973dbd264a3244e902d363256d1c951ba';
-        const oracle = await hookC.volOracles(poolId);
-        const ewmaVar = Number(oracle[0]);
-        const hourlyVar = ewmaVar / 1e18;
-        const annualVol = Math.sqrt(hourlyVar * 8760) * 0.00009999 * 100;
-        document.getElementById('hourlyVar').textContent = hourlyVar.toFixed(2) + ' tick²/h';
-        document.getElementById('annualVol').textContent = annualVol.toFixed(2) + '%';
-        document.getElementById('hookStatus').textContent = '정상 배포됨\n시간당 분산: ' + hourlyVar.toFixed(2) + ' tick²\nlambda: ' + (Number(oracle[3]) / 10000).toFixed(4);
-      } catch(e) {
-        document.getElementById('hourlyVar').textContent = '—';
-        document.getElementById('annualVol').textContent = '—';
-      }
-    }
-
-    // --- 5. 키퍼 상태 ---
-    if (KEEPER_ADDR) {
-      const keeperBal = await provider.getBalance(KEEPER_ADDR);
-      const ethBal = Number(ethers.formatEther(keeperBal));
-      document.getElementById('keeperAddr').textContent = KEEPER_ADDR.slice(0,10) + '...' + KEEPER_ADDR.slice(-8);
-      document.getElementById('keeperBal').textContent = ethBal.toFixed(4) + ' ETH';
-
-      if (ethBal < 0.01) {
-        setDot('keeperDot', 'dead');
-        document.getElementById('keeperStatus').textContent = '⚠️ ETH 부족!\n가스비 충전 필요';
-        document.getElementById('keeperBalWarn').textContent = '⚠️ 충전 필요';
-        document.getElementById('keeperBalWarn').style.color = 'var(--red)';
-      } else if (ethBal < 0.05) {
-        setDot('keeperDot', 'warn');
-        document.getElementById('keeperStatus').textContent = '경고: ETH 잔액 낮음\n곧 충전 필요';
-        document.getElementById('keeperBalWarn').textContent = '잔액 낮음';
-        document.getElementById('keeperBalWarn').style.color = 'var(--yellow)';
-      } else {
-        setDot('keeperDot', 'live');
-        document.getElementById('keeperStatus').textContent = '정상 운영 중\nETH 잔액 충분';
-      }
-    } else {
-      setDot('keeperDot', 'warn');
-      document.getElementById('keeperStatus').textContent = '키퍼 주소 미설정\nKEEPER_ADDR 채우기 필요';
-    }
-
-    document.getElementById('lastUpdate').textContent = '마지막 갱신: ' + new Date().toLocaleString('ko-KR');
-
+    document.getElementById('lastUpdate').textContent = '마지막 갱신: '+new Date().toLocaleString('ko-KR');
   } catch(e) {
-    console.error('로딩 오류:', e);
-    document.getElementById('lastUpdate').textContent = '오류: ' + e.message;
-    setDot('vaultDot', 'dead');
-    document.getElementById('vaultStatus').textContent = 'RPC 연결 실패\n' + e.message.slice(0,60);
+    console.error(e);
+    document.getElementById('lastUpdate').textContent = '오류: '+e.message;
+    dot('vaultDot','dead');
+    document.getElementById('vaultStatus').textContent = 'RPC 오류';
   }
 }
-
 loadAll();
 setInterval(loadAll, 60000);
 </script>

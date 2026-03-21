@@ -459,40 +459,49 @@ async function connectWallet() {
     signer = await (new ethers.BrowserProvider(window.ethereum)).getSigner();
     userAddress = await signer.getAddress();
 
-    // UI — connected state
-    document.getElementById('connectPre').style.display = 'none';
-    document.getElementById('connectPost').classList.add('show');
-    document.getElementById('connectedAddr').textContent = userAddress.slice(0,6) + '···' + userAddress.slice(-4) + ' · Arbitrum';
-    document.getElementById('actionsSection').style.display = 'block';
+    // UI — connected state (all null-safe)
+    const _set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    const _show = (id) => { const el = document.getElementById(id); if (el) el.style.display = 'block'; };
+    const _hide = (id) => { const el = document.getElementById(id); if (el) el.style.display = 'none'; };
+    const _class = (id, cls) => { const el = document.getElementById(id); if (el) el.classList.add(cls); };
+
+    _hide('connectPre');
+    _class('connectPost', 'show');
+    _set('connectedAddr', userAddress.slice(0,6) + '···' + userAddress.slice(-4) + ' · Arbitrum');
+    _show('actionsSection');
 
     if (DEPLOYED) {
       vaultWrite = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, signer);
       usdcWrite = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, signer);
 
-      // Fetch user-specific data
-      const [usdcBal, shares] = await Promise.all([
-        usdcWrite.balanceOf(userAddress),
-        vaultWrite.balanceOf(userAddress)
-      ]);
-      const usdcFmt = formatUSDC(Number(usdcBal) / 1e6);
-      const shareFmt = formatUSDC(Number(shares) / 1e6);
-      document.getElementById('usdcBalance').textContent = usdcFmt;
-      document.getElementById('usdcBalDep').textContent = usdcFmt;
-      document.getElementById('shareBalance').textContent = shareFmt;
-      document.getElementById('shareBalWd').textContent = shareFmt;
-
-      document.getElementById('depositBtn').disabled = false;
-      document.getElementById('withdrawBtn').disabled = false;
-      document.getElementById('depositAmount').addEventListener('input', updateDepositPreview);
-      document.getElementById('withdrawAmount').addEventListener('input', updateWithdrawPreview);
-    } else {
-      // Pre-deploy: show USDC balance only
       try {
-        const usdcRead = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, readProvider);
-        const bal = await usdcRead.balanceOf(userAddress);
-        document.getElementById('usdcBalance').textContent = formatUSDC(Number(bal) / 1e6);
-      } catch(e) { document.getElementById('usdcBalance').textContent = '—'; }
-      document.getElementById('shareBalance').textContent = '0.00';
+        const [usdcBal, shares] = await Promise.all([
+          usdcWrite.balanceOf(userAddress),
+          vaultWrite.balanceOf(userAddress)
+        ]);
+        const usdcFmt = formatUSDC(Number(usdcBal) / 1e6);
+        const shareFmt = formatUSDC(Number(shares) / 1e6);
+        _set('usdcBalance', usdcFmt);
+        _set('usdcBalDep', usdcFmt);
+        _set('shareBalance', shareFmt);
+        _set('shareBalWd', shareFmt);
+      } catch(e) { console.error('Balance fetch error:', e); }
+
+      const depBtn = document.getElementById('depositBtn');
+      const wdBtn = document.getElementById('withdrawBtn');
+      if (depBtn) depBtn.disabled = false;
+      if (wdBtn) wdBtn.disabled = false;
+      const depInput = document.getElementById('depositAmount');
+      const wdInput = document.getElementById('withdrawAmount');
+      if (depInput) depInput.addEventListener('input', updateDepositPreview);
+      if (wdInput) wdInput.addEventListener('input', updateWithdrawPreview);
+    } else {
+      try {
+        const usdcReadOnly = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, readProvider);
+        const bal = await usdcReadOnly.balanceOf(userAddress);
+        _set('usdcBalance', formatUSDC(Number(bal) / 1e6));
+      } catch(e) { _set('usdcBalance', '—'); }
+      _set('shareBalance', '0.00');
     }
   } catch(e) { console.error(e); alert('Connection failed: ' + e.message); }
 }

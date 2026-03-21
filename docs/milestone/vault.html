@@ -351,7 +351,7 @@
 // --- CONFIG ---
 const CHAIN_ID = 42161; // Arbitrum One
 const RPC_URL = 'https://arb1.arbitrum.io/rpc'; // Public RPC for read-only
-const VAULT_ADDRESS = '0x0000000000000000000000000000000000000000'; // TODO: replace after deploy
+const VAULT_ADDRESS = '0xbae653ebc6b960a315cc43119b5095bd943c2a73';
 const USDC_ADDRESS = '0xaf88d065e77c8cC2239327C5EDb3A432268e5831'; // Arbitrum USDC
 const EXPLORER = 'https://arbiscan.io';
 
@@ -368,7 +368,7 @@ const VAULT_ABI = [
   'function getVaultMetrics() external view returns (uint256,uint256,uint256,uint128,uint256,bool,bool)',
   'function UNAUDITED() external view returns (bool)'
 ];
-const HOOK_ADDRESS = '0x0000000000000000000000000000000000000000'; // TODO: replace after deploy
+const HOOK_ADDRESS = '0xfae907196801ed77119b7f288c05d1df475f9040';
 const HOOK_ABI = [
   'function getVolEstimate(bytes32 poolId) external view returns (uint256 hourlyVar, uint256 annualizedVol)'
 ];

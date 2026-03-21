@@ -403,6 +403,25 @@ contract ILAlphaHook is IHooks {
         emit KeeperVolPushed(poolId, externalVar);
     }
 
+    /// @notice #16: Keeper pushes external volume estimate (e.g., Binance ETH/USDC scaled)
+    /// @dev Allows LP ON/OFF decisions based on real market volume even when our pool has no swaps.
+    ///      Rate limited: 1 call per block per pool (same as pushVolEstimate).
+    event KeeperVolumePushed(PoolId indexed poolId, uint128 externalVolume);
+
+    function pushVolumeEstimate(PoolKey calldata key, uint128 externalVolume) external onlyKeeper {
+        PoolId poolId = key.toId();
+        require(block.number > lastPushBlock[poolId], "1 push per block");
+        lastPushBlock[poolId] = block.number;
+
+        PoolState storage ps = poolStates[poolId];
+
+        // Blend: 50% on-chain EWMA + 50% external
+        uint256 blended = (uint256(ps.ewmaVolume) + uint256(externalVolume)) / 2;
+        ps.ewmaVolume = blended > type(uint128).max ? type(uint128).max : uint128(blended);
+
+        emit KeeperVolumePushed(poolId, externalVolume);
+    }
+
     /// @notice Keeper triggers LP rebalance evaluation outside of swaps
     function triggerEvaluation(PoolKey calldata key) external onlyKeeper {
         PoolId poolId = key.toId();

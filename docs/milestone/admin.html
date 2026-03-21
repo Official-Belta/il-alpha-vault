@@ -373,20 +373,18 @@ async function loadAll() {
           </tr>`).join('');
 
       // --- 3. 최근 이벤트 ---
-      const block = await provider.getBlockNumber();
-      const fromBlock = Math.max(0, block - 10000);
+      // 전체 히스토리 스캔 (Arbitrum 블록 빠름 — 10000 = 42분밖에 안 됨)
       const [deposits, withdrawals] = await Promise.all([
-        vaultC.queryFilter(vaultC.filters.Deposit(), fromBlock),
-        vaultC.queryFilter(vaultC.filters.Withdraw(), fromBlock)
+        vaultC.queryFilter(vaultC.filters.Deposit(), 0),
+        vaultC.queryFilter(vaultC.filters.Withdraw(), 0)
       ]);
 
       // Rebalance 이벤트 (vault에서 emit)
       let rebalances = [];
       try {
-        rebalances = await vaultC.queryFilter(vaultC.filters.Rebalanced(), fromBlock);
+        rebalances = await vaultC.queryFilter(vaultC.filters.Rebalanced(), 0);
       } catch(e) {
-        // hook에서 emit하는 경우도 시도
-        try { rebalances = await hookC.queryFilter(hookC.filters.Rebalanced(), fromBlock); } catch(e2) {}
+        try { rebalances = await hookC.queryFilter(hookC.filters.Rebalanced(), 0); } catch(e2) {}
       }
 
       // 입출금만 표시 (리밸런스 제외), TX 해시로 중복 제거

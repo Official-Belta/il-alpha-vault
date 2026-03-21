@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IL Alpha — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<style>
+  :root { --black:#0C0C0C; --white:#FAFAF9; --gray-100:#F5F5F4; --gray-200:#E7E5E4; --gray-300:#D6D3D1; --gray-400:#A8A29E; --gray-500:#78716C; --gray-600:#57534E; --gray-700:#44403C; --gray-900:#1C1917; --accent:#1A7F64; --red:#EF4444; --display:'Playfair Display',Georgia,serif; --sans:'Geist Sans','Satoshi',system-ui,sans-serif; --mono:'Geist Mono','SF Mono',monospace; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:var(--sans); background:var(--black); color:var(--white); padding:48px; max-width:1100px; margin:0 auto; }
+  @media (max-width:640px) { body { padding:24px; } }
+
+  h1 { font-family:var(--display); font-size:36px; font-weight:400; letter-spacing:-0.025em; margin-bottom:8px; }
+  .sub { font-family:var(--mono); font-size:14px; color:var(--gray-500); margin-bottom:48px; }
+  .updated { font-family:var(--mono); font-size:12px; color:var(--gray-600); margin-bottom:48px; }
+
+  .section-label { font-family:var(--mono); font-size:13px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.06); }
+
+  /* Metrics */
+  .metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:0; border:1px solid rgba(255,255,255,0.06); margin-bottom:48px; }
+  @media (max-width:768px) { .metrics { grid-template-columns:1fr 1fr; } }
+  .m { padding:28px; border-right:1px solid rgba(255,255,255,0.06); }
+  .m:nth-child(4n) { border-right:none; }
+  @media (max-width:768px) { .m:nth-child(2n) { border-right:none; } .m:nth-child(n+3) { border-top:1px solid rgba(255,255,255,0.06); } }
+  .m-label { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:8px; }
+  .m-val { font-family:var(--mono); font-size:28px; font-weight:700; }
+  .m-sub { font-family:var(--mono); font-size:12px; color:var(--gray-600); margin-top:4px; }
+  .green { color:var(--accent); }
+  .red { color:var(--red); }
+
+  /* LP Status */
+  .lp-bar { display:flex; align-items:center; gap:16px; padding:20px 28px; border:1px solid rgba(255,255,255,0.06); margin-bottom:48px; }
+  .lp-dot { width:12px; height:12px; border-radius:50%; }
+  .lp-dot.on { background:var(--accent); animation:pulse 2s ease-in-out infinite; }
+  .lp-dot.off { background:var(--gray-600); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .lp-text { font-family:var(--mono); font-size:16px; }
+  .lp-detail { font-family:var(--mono); font-size:13px; color:var(--gray-500); margin-left:auto; }
+
+  /* Depositors table */
+  .dep-table { width:100%; border-collapse:collapse; margin-bottom:48px; }
+  .dep-table th { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); text-align:left; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+  .dep-table td { font-family:var(--mono); font-size:15px; padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.06); color:var(--gray-300); }
+  .dep-table td:first-child { color:var(--white); }
+  .dep-table td a { color:var(--gray-400); text-decoration:none; }
+  .dep-table td a:hover { color:var(--white); }
+
+  /* Keeper stats */
+  .keeper-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; border:1px solid rgba(255,255,255,0.06); margin-bottom:48px; }
+  @media (max-width:640px) { .keeper-grid { grid-template-columns:1fr; } }
+  .k-cell { padding:24px 28px; border-right:1px solid rgba(255,255,255,0.06); }
+  .k-cell:last-child { border-right:none; }
+  @media (max-width:640px) { .k-cell { border-right:none; border-bottom:1px solid rgba(255,255,255,0.06); } .k-cell:last-child { border-bottom:none; } }
+
+  /* History */
+  .history { margin-bottom:48px; }
+  .h-row { display:grid; grid-template-columns:200px 1fr 100px; gap:16px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-family:var(--mono); font-size:13px; color:var(--gray-400); }
+  @media (max-width:640px) { .h-row { grid-template-columns:1fr; gap:4px; } }
+  .h-row:first-child { color:var(--gray-600); font-size:11px; text-transform:uppercase; letter-spacing:0.06em; }
+
+  .refresh-btn { font-family:var(--mono); font-size:13px; color:var(--gray-500); background:none; border:1px solid rgba(255,255,255,0.08); padding:10px 24px; cursor:pointer; transition:all 150ms; margin-bottom:48px; }
+  .refresh-btn:hover { color:var(--white); border-color:rgba(255,255,255,0.2); }
+
+  .link { font-family:var(--mono); font-size:13px; color:var(--gray-600); }
+  .link a { color:var(--gray-500); text-decoration:none; }
+  .link a:hover { color:var(--white); }
+</style>
+</head>
+<body>
+
+<h1>Admin Dashboard</h1>
+<p class="sub">IL Alpha Vault · Arbitrum Mainnet</p>
+<p class="updated" id="lastUpdate">Loading...</p>
+
+<button class="refresh-btn" onclick="loadAll()">Refresh</button>
+
+<!-- VAULT METRICS -->
+<div class="section-label">Vault Overview</div>
+<div class="metrics">
+  <div class="m">
+    <div class="m-label">Total Assets (TVL)</div>
+    <div class="m-val" id="tvl">—</div>
+    <div class="m-sub">USDC</div>
+  </div>
+  <div class="m">
+    <div class="m-label">Share Price</div>
+    <div class="m-val" id="sharePrice">—</div>
+  </div>
+  <div class="m">
+    <div class="m-label">Idle Capital</div>
+    <div class="m-val" id="idle">—</div>
+    <div class="m-sub" id="idlePct"></div>
+  </div>
+  <div class="m">
+    <div class="m-label">Deployed in LP</div>
+    <div class="m-val" id="deployed">—</div>
+    <div class="m-sub" id="deployedPct"></div>
+  </div>
+  <div class="m">
+    <div class="m-label">Deposit Cap</div>
+    <div class="m-val" id="cap">—</div>
+  </div>
+  <div class="m">
+    <div class="m-label">Remaining Cap</div>
+    <div class="m-val" id="remaining">—</div>
+  </div>
+  <div class="m">
+    <div class="m-label">Yield Since Start</div>
+    <div class="m-val" id="yield">—</div>
+  </div>
+  <div class="m">
+    <div class="m-label">Vault Paused</div>
+    <div class="m-val" id="paused">—</div>
+  </div>
+</div>
+
+<!-- LP STATUS -->
+<div class="section-label">LP Status</div>
+<div class="lp-bar">
+  <span class="lp-dot" id="lpDot"></span>
+  <span class="lp-text" id="lpText">—</span>
+  <span class="lp-detail" id="lpDetail"></span>
+</div>
+
+<!-- VOLATILITY -->
+<div class="section-label">Volatility Oracle</div>
+<div class="metrics" style="grid-template-columns:1fr 1fr;">
+  <div class="m">
+    <div class="m-label">Hourly Variance</div>
+    <div class="m-val" id="hourlyVar">—</div>
+  </div>
+  <div class="m">
+    <div class="m-label">Annualized Vol</div>
+    <div class="m-val" id="annualVol">—</div>
+  </div>
+</div>
+
+<!-- DEPOSITORS -->
+<div class="section-label">Depositors (<span id="depositorCount">0</span>)</div>
+<table class="dep-table">
+  <thead>
+    <tr>
+      <th>Address</th>
+      <th>Shares</th>
+      <th>Value (USDC)</th>
+      <th>% of TVL</th>
+    </tr>
+  </thead>
+  <tbody id="depositorRows">
+    <tr><td colspan="4" style="color:var(--gray-600);">Loading...</td></tr>
+  </tbody>
+</table>
+
+<!-- KEEPER -->
+<div class="section-label">Keeper</div>
+<div class="keeper-grid">
+  <div class="k-cell">
+    <div class="m-label">Keeper Address</div>
+    <div class="m-val" style="font-size:14px;" id="keeperAddr">—</div>
+  </div>
+  <div class="k-cell">
+    <div class="m-label">Keeper ETH Balance</div>
+    <div class="m-val" id="keeperBal">—</div>
+  </div>
+  <div class="k-cell">
+    <div class="m-label">Est. Rebalance Gas</div>
+    <div class="m-val" id="gasEst">~$0.01</div>
+    <div class="m-sub">per cycle (Arbitrum)</div>
+  </div>
+</div>
+
+<!-- RECENT EVENTS -->
+<div class="section-label">Recent Events</div>
+<div class="history" id="eventHistory">
+  <div class="h-row"><span>Time</span><span>Event</span><span>Value</span></div>
+</div>
+
+<!-- LINKS -->
+<div class="section-label">Links</div>
+<div class="link" style="margin-bottom:8px;">
+  Vault: <a id="vaultLink" href="#" target="_blank">—</a>
+</div>
+<div class="link" style="margin-bottom:8px;">
+  Hook: <a id="hookLink" href="#" target="_blank">—</a>
+</div>
+<div class="link" style="margin-bottom:48px;">
+  Public page: <a href="vault.html">vault.html</a>
+</div>
+
+<script>
+const RPC = 'https://arb1.arbitrum.io/rpc';
+const VAULT = '0xbae653ebc6b960a315cc43119b5095bd943c2a73';
+const HOOK = '0xfae907196801ed77119b7f288c05d1df475f9040';
+const USDC = '0xaf88d065e77c8cC2239327C5EDb3A432268e5831';
+const EXPLORER = 'https://arbiscan.io';
+
+const VAULT_ABI = [
+  'function totalAssets() view returns (uint256)',
+  'function balanceOf(address) view returns (uint256)',
+  'function convertToAssets(uint256 shares) view returns (uint256)',
+  'function depositCap() view returns (uint256)',
+  'function maxDeposit(address) view returns (uint256)',
+  'function paused() view returns (bool)',
+  'function totalSupply() view returns (uint256)',
+  'function getVaultMetrics() view returns (uint256,uint256,uint256,uint128,uint256,bool,bool)',
+  'event Transfer(address indexed from, address indexed to, uint256 value)',
+  'event Deposit(address indexed sender, address indexed owner, uint256 assets, uint256 shares)',
+  'event Withdraw(address indexed sender, address indexed receiver, address indexed owner, uint256 assets, uint256 shares)'
+];
+
+const HOOK_ABI = [
+  'function getVolEstimate(bytes32 poolId) view returns (uint256 hourlyVar, uint256 annualizedVol)',
+  'event VolUpdated(bytes32 indexed poolId, uint256 newVariance)',
+  'event LPToggled(bytes32 indexed poolId, bool isActive)'
+];
+
+const ERC20_ABI = ['function balanceOf(address) view returns (uint256)'];
+
+let provider, vault, hook;
+
+function fmt(n, d=2) { return Number(n).toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d}); }
+
+async function loadAll() {
+  provider = new ethers.JsonRpcProvider(RPC);
+  vault = new ethers.Contract(VAULT, VAULT_ABI, provider);
+  hook = new ethers.Contract(HOOK, HOOK_ABI, provider);
+
+  document.getElementById('vaultLink').href = EXPLORER + '/address/' + VAULT;
+  document.getElementById('vaultLink').textContent = VAULT.slice(0,10) + '...' + VAULT.slice(-8);
+  document.getElementById('hookLink').href = EXPLORER + '/address/' + HOOK;
+  document.getElementById('hookLink').textContent = HOOK.slice(0,10) + '...' + HOOK.slice(-8);
+
+  try {
+    // Vault metrics
+    const metrics = await vault.getVaultMetrics();
+    const totalAssets = Number(metrics[0]) / 1e6;
+    const idleVal = Number(metrics[1]) / 1e6;
+    const deployedVal = Number(metrics[2]) / 1e6;
+    const sharePrice = Number(metrics[4]) / 1e18;
+    const lpActive = metrics[5];
+    const isPaused = metrics[6];
+
+    document.getElementById('tvl').textContent = '$' + fmt(totalAssets);
+    document.getElementById('sharePrice').textContent = '$' + sharePrice.toFixed(6);
+    document.getElementById('idle').textContent = '$' + fmt(idleVal);
+    document.getElementById('deployed').textContent = '$' + fmt(deployedVal);
+
+    if (totalAssets > 0) {
+      document.getElementById('idlePct').textContent = (idleVal/totalAssets*100).toFixed(1) + '% of TVL';
+      document.getElementById('deployedPct').textContent = (deployedVal/totalAssets*100).toFixed(1) + '% of TVL';
+    }
+
+    // Yield = (sharePrice - 1.0) * 100
+    const yieldPct = (sharePrice - 1.0) * 100;
+    const yieldEl = document.getElementById('yield');
+    yieldEl.textContent = (yieldPct >= 0 ? '+' : '') + yieldPct.toFixed(4) + '%';
+    yieldEl.className = 'm-val ' + (yieldPct >= 0 ? 'green' : 'red');
+
+    // Cap
+    const cap = await vault.depositCap();
+    const maxDep = await vault.maxDeposit(VAULT);
+    document.getElementById('cap').textContent = '$' + fmt(Number(cap) / 1e6);
+    document.getElementById('remaining').textContent = '$' + fmt(Number(maxDep) / 1e6);
+
+    // Paused
+    document.getElementById('paused').textContent = isPaused ? 'YES' : 'No';
+    document.getElementById('paused').className = 'm-val ' + (isPaused ? 'red' : 'green');
+
+    // LP Status
+    const lpDot = document.getElementById('lpDot');
+    lpDot.className = 'lp-dot ' + (lpActive ? 'on' : 'off');
+    document.getElementById('lpText').textContent = lpActive ? 'LP ACTIVE — earning fees' : 'LP REMOVED — capital protected';
+    document.getElementById('lpDetail').textContent = 'Idle: $' + fmt(idleVal) + ' / Deployed: $' + fmt(deployedVal);
+
+    // Depositors — scan Transfer events (mint = from 0x0)
+    const filter = vault.filters.Transfer(ethers.ZeroAddress);
+    const mintEvents = await vault.queryFilter(filter, 0, 'latest');
+    const holders = new Set();
+    mintEvents.forEach(e => holders.add(e.args[1]));
+
+    // Get balances
+    const totalSupply = await vault.totalSupply();
+    const rows = [];
+    for (const addr of holders) {
+      const bal = await vault.balanceOf(addr);
+      if (Number(bal) > 0) {
+        const value = await vault.convertToAssets(bal);
+        const pct = Number(bal) * 100 / Number(totalSupply);
+        rows.push({
+          addr,
+          shares: Number(bal) / 1e6,
+          value: Number(value) / 1e6,
+          pct
+        });
+      }
+    }
+    rows.sort((a,b) => b.value - a.value);
+
+    document.getElementById('depositorCount').textContent = rows.length;
+    const tbody = document.getElementById('depositorRows');
+    if (rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="color:var(--gray-600);">No depositors yet</td></tr>';
+    } else {
+      tbody.innerHTML = rows.map(r => `<tr>
+        <td><a href="${EXPLORER}/address/${r.addr}" target="_blank">${r.addr.slice(0,8)}···${r.addr.slice(-6)}</a></td>
+        <td>${fmt(r.shares)}</td>
+        <td>$${fmt(r.value)}</td>
+        <td>${r.pct.toFixed(1)}%</td>
+      </tr>`).join('');
+    }
+
+    // Recent events (last 100 blocks)
+    const block = await provider.getBlockNumber();
+    const fromBlock = Math.max(0, block - 5000);
+    const [deposits, withdrawals] = await Promise.all([
+      vault.queryFilter(vault.filters.Deposit(), fromBlock),
+      vault.queryFilter(vault.filters.Withdraw(), fromBlock)
+    ]);
+
+    const events = [
+      ...deposits.map(e => ({ type:'Deposit', assets:Number(e.args[3])/1e6, block:e.blockNumber, tx:e.transactionHash })),
+      ...withdrawals.map(e => ({ type:'Withdraw', assets:Number(e.args[3])/1e6, block:e.blockNumber, tx:e.transactionHash }))
+    ].sort((a,b) => b.block - a.block).slice(0, 20);
+
+    const histEl = document.getElementById('eventHistory');
+    if (events.length === 0) {
+      histEl.innerHTML += '<div class="h-row" style="color:var(--gray-600);">No events yet</div>';
+    } else {
+      events.forEach(ev => {
+        histEl.innerHTML += `<div class="h-row">
+          <span>Block ${ev.block}</span>
+          <span>${ev.type} <a href="${EXPLORER}/tx/${ev.tx}" target="_blank" style="color:var(--gray-500);">↗</a></span>
+          <span class="${ev.type==='Deposit'?'green':'red'}">$${fmt(ev.assets)}</span>
+        </div>`;
+      });
+    }
+
+    // Vol data
+    try {
+      const poolId = '0x0000000000000000000000000000000000000000000000000000000000000000';
+      const vol = await hook.getVolEstimate(poolId);
+      document.getElementById('hourlyVar').textContent = (Number(vol[0])/1e18*100).toFixed(4) + '%';
+      document.getElementById('annualVol').textContent = (Number(vol[1])/1e18*100).toFixed(2) + '%';
+    } catch(e) {
+      document.getElementById('hourlyVar').textContent = '—';
+      document.getElementById('annualVol').textContent = '—';
+    }
+
+    // Keeper ETH balance (if known — read from recent tx sender)
+    if (deposits.length > 0 || withdrawals.length > 0) {
+      // Can't determine keeper address from deposit/withdraw events
+      // Would need Rebalance events — placeholder
+    }
+
+    document.getElementById('lastUpdate').textContent = 'Last updated: ' + new Date().toLocaleString();
+
+  } catch(e) {
+    console.error('Load error:', e);
+    document.getElementById('lastUpdate').textContent = 'Error: ' + e.message;
+  }
+}
+
+loadAll();
+// Auto refresh every 60s
+setInterval(loadAll, 60000);
+</script>
+</body>
+</html>

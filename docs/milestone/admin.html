@@ -15,54 +15,55 @@
   body { font-family:var(--sans); background:var(--black); color:var(--white); padding:48px; max-width:1100px; margin:0 auto; }
   @media (max-width:640px) { body { padding:24px; } }
 
-  h1 { font-family:var(--display); font-size:48px; font-weight:400; letter-spacing:-0.025em; margin-bottom:12px; }
-  .sub { font-family:var(--mono); font-size:16px; color:var(--gray-500); margin-bottom:16px; }
-  .updated { font-family:var(--mono); font-size:14px; color:var(--gray-600); margin-bottom:48px; }
+  h1 { font-family:var(--display); font-size:56px; font-weight:400; letter-spacing:-0.025em; margin-bottom:12px; }
+  .sub { font-family:var(--mono); font-size:17px; color:var(--gray-500); margin-bottom:16px; }
+  .updated { font-family:var(--mono); font-size:15px; color:var(--gray-600); margin-bottom:56px; }
 
-  .section-label { font-family:var(--mono); font-size:16px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray-500); margin-bottom:20px; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.06); }
+  .section-label { font-family:var(--display); font-size:28px; font-weight:400; letter-spacing:-0.02em; color:var(--white); margin-bottom:24px; padding-top:56px; padding-bottom:16px; border-top:1px solid rgba(255,255,255,0.12); }
+  .section-label:first-of-type { border-top:none; padding-top:0; }
 
-  .metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:0; border:1px solid rgba(255,255,255,0.06); margin-bottom:48px; }
+  .metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:0; border:1px solid rgba(255,255,255,0.12); margin-bottom:56px; background:rgba(255,255,255,0.02); }
   @media (max-width:768px) { .metrics { grid-template-columns:1fr 1fr; } }
-  .m { padding:28px; border-right:1px solid rgba(255,255,255,0.06); }
+  .m { padding:32px; border-right:1px solid rgba(255,255,255,0.08); }
   .m:nth-child(4n) { border-right:none; }
-  @media (max-width:768px) { .m:nth-child(2n) { border-right:none; } .m:nth-child(n+3) { border-top:1px solid rgba(255,255,255,0.06); } }
-  .m-label { font-family:var(--mono); font-size:14px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); margin-bottom:10px; }
-  .m-val { font-family:var(--mono); font-size:36px; font-weight:700; }
-  .m-sub { font-family:var(--mono); font-size:14px; color:var(--gray-600); margin-top:6px; }
+  @media (max-width:768px) { .m:nth-child(2n) { border-right:none; } .m:nth-child(n+3) { border-top:1px solid rgba(255,255,255,0.08); } }
+  .m-label { font-family:var(--mono); font-size:14px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-400); margin-bottom:12px; }
+  .m-val { font-family:var(--mono); font-size:40px; font-weight:700; }
+  .m-sub { font-family:var(--mono); font-size:14px; color:var(--gray-600); margin-top:8px; }
   .green { color:var(--accent); }
   .red { color:var(--red); }
   .yellow { color:var(--yellow); }
 
   /* Status cards */
-  .status-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:48px; }
+  .status-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1px; background:rgba(255,255,255,0.08); margin-bottom:56px; }
   @media (max-width:640px) { .status-row { grid-template-columns:1fr; } }
-  .status-card { border:1px solid rgba(255,255,255,0.06); padding:24px; }
-  .status-card .s-header { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
-  .status-card .s-dot { width:10px; height:10px; border-radius:50%; }
+  .status-card { background:rgba(255,255,255,0.03); padding:32px; }
+  .status-card .s-header { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+  .status-card .s-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
   .s-dot.live { background:var(--accent); animation:pulse 2s ease-in-out infinite; }
   .s-dot.warn { background:var(--yellow); }
   .s-dot.dead { background:var(--red); }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  .status-card .s-title { font-family:var(--mono); font-size:17px; font-weight:600; }
-  .status-card .s-detail { font-family:var(--mono); font-size:15px; color:var(--gray-500); line-height:1.8; }
+  .status-card .s-title { font-family:var(--sans); font-size:20px; font-weight:600; }
+  .status-card .s-detail { font-family:var(--mono); font-size:15px; color:var(--gray-400); line-height:2; white-space:pre-line; }
 
-  .lp-bar { display:flex; align-items:center; gap:16px; padding:20px 28px; border:1px solid rgba(255,255,255,0.06); margin-bottom:48px; }
-  .lp-dot { width:12px; height:12px; border-radius:50%; }
+  .lp-bar { display:flex; align-items:center; gap:20px; padding:28px 32px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); margin-bottom:56px; }
+  .lp-dot { width:16px; height:16px; border-radius:50%; flex-shrink:0; }
   .lp-dot.on { background:var(--accent); animation:pulse 2s ease-in-out infinite; }
   .lp-dot.off { background:var(--gray-600); }
-  .lp-text { font-family:var(--mono); font-size:20px; }
-  .lp-detail { font-family:var(--mono); font-size:15px; color:var(--gray-500); margin-left:auto; }
+  .lp-text { font-family:var(--sans); font-size:22px; font-weight:600; }
+  .lp-detail { font-family:var(--mono); font-size:16px; color:var(--gray-400); margin-left:auto; }
 
   .dep-table { width:100%; border-collapse:collapse; margin-bottom:48px; }
-  .dep-table th { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); text-align:left; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
-  .dep-table td { font-family:var(--mono); font-size:17px; padding:20px 0; border-bottom:1px solid rgba(255,255,255,0.06); color:var(--gray-300); }
+  .dep-table th { font-family:var(--mono); font-size:13px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-500); text-align:left; padding:16px 16px 16px 0; border-bottom:1px solid rgba(255,255,255,0.1); }
+  .dep-table td { font-family:var(--mono); font-size:18px; padding:20px 16px 20px 0; border-bottom:1px solid rgba(255,255,255,0.06); color:var(--gray-300); }
   .dep-table td a { color:var(--gray-400); text-decoration:none; }
   .dep-table td a:hover { color:var(--white); }
 
   .history { margin-bottom:48px; }
-  .h-row { display:grid; grid-template-columns:200px 1fr 120px; gap:16px; padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-family:var(--mono); font-size:15px; color:var(--gray-400); }
+  .h-row { display:grid; grid-template-columns:160px 120px 1fr 120px; gap:16px; padding:18px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-family:var(--mono); font-size:16px; color:var(--gray-400); }
   @media (max-width:640px) { .h-row { grid-template-columns:1fr; gap:4px; } }
-  .h-header { color:var(--gray-600); font-size:11px; text-transform:uppercase; letter-spacing:0.06em; }
+  .h-header { color:var(--gray-500); font-size:13px; text-transform:uppercase; letter-spacing:0.06em; }
 
   .refresh-btn { font-family:var(--mono); font-size:13px; color:var(--gray-500); background:none; border:1px solid rgba(255,255,255,0.08); padding:10px 24px; cursor:pointer; transition:all 150ms; margin-bottom:48px; }
   .refresh-btn:hover { color:var(--white); border-color:rgba(255,255,255,0.2); }
@@ -207,9 +208,9 @@
 </div>
 
 <!-- RECENT EVENTS -->
-<div class="section-label">최근 이벤트</div>
+<div class="section-label">입출금 내역</div>
 <div class="history" id="eventHistory">
-  <div class="h-row h-header"><span>시간</span><span>이벤트</span><span>금액</span></div>
+  <div class="h-row h-header"><span>블록</span><span>유형</span><span>주소</span><span>금액</span></div>
 </div>
 
 <!-- LINKS -->
@@ -324,7 +325,7 @@ async function loadAll() {
       // LP 상태
       const lpDot = document.getElementById('lpDot');
       lpDot.className = 'lp-dot ' + (lpActive ? 'on' : 'off');
-      document.getElementById('lpText').textContent = lpActive ? 'LP 활성 — 수수료 수입 중' : 'LP 제거됨 — 자본 보호 중';
+      document.getElementById('lpText').textContent = lpActive ? '볼트 전체 LP 활성 — 풀에서 수수료 수입 중' : '볼트 전체 LP 제거 — 전액 USDC 대기 (자본 보호)';
       document.getElementById('lpDetail').textContent = '유휴: $' + fmt(idleVal) + ' / 배치: $' + fmt(deployedVal);
 
       // --- 2. 예치자 스캔 ---
@@ -372,23 +373,26 @@ async function loadAll() {
         try { rebalances = await hookC.queryFilter(hookC.filters.Rebalanced(), fromBlock); } catch(e2) {}
       }
 
+      // 입출금만 표시 (리밸런스 제외), TX 해시로 중복 제거
+      const seen = new Set();
       const events = [
-        ...deposits.map(e => ({ type:'입금', assets:Number(e.args[3])/1e6, block:e.blockNumber, tx:e.transactionHash })),
-        ...withdrawals.map(e => ({ type:'출금', assets:Number(e.args[3])/1e6, block:e.blockNumber, tx:e.transactionHash })),
-        ...rebalances.map(e => ({ type: e.args[0] ? 'LP 진입' : 'LP 제거', assets:Number(e.args[2])/1e6, block:e.blockNumber, tx:e.transactionHash }))
-      ].sort((a,b) => b.block - a.block).slice(0, 30);
+        ...deposits.map(e => ({ type:'입금', who:e.args[1], assets:Number(e.args[3])/1e6, block:e.blockNumber, tx:e.transactionHash })),
+        ...withdrawals.map(e => ({ type:'출금', who:e.args[1], assets:Number(e.args[3])/1e6, block:e.blockNumber, tx:e.transactionHash }))
+      ].filter(e => { if (seen.has(e.tx)) return false; seen.add(e.tx); return true; })
+       .sort((a,b) => b.block - a.block).slice(0, 20);
 
       const histEl = document.getElementById('eventHistory');
       if (events.length === 0) {
-        histEl.innerHTML += '<div class="h-row" style="color:var(--gray-600);">이벤트 없음</div>';
+        histEl.innerHTML += '<div class="h-row" style="color:var(--gray-600);">입출금 내역 없음</div>';
       } else {
         events.forEach(ev => {
-          const color = ev.type === '입금' ? 'green' : ev.type === '출금' ? 'red' : 'yellow';
-          const val = ev.assets > 0 ? '$' + fmt(ev.assets) : '—';
+          const color = ev.type === '입금' ? 'green' : 'red';
+          const who = ev.who.slice(0,6) + '···' + ev.who.slice(-4);
           histEl.innerHTML += `<div class="h-row">
-            <span>블록 ${ev.block}</span>
-            <span>${ev.type} <a href="${EXPLORER}/tx/${ev.tx}" target="_blank" style="color:var(--gray-500);">↗</a></span>
-            <span class="${color}">${val}</span>
+            <span>${ev.block}</span>
+            <span class="${color}">${ev.type}</span>
+            <span><a href="${EXPLORER}/address/${ev.who}" target="_blank" style="color:var(--gray-400);">${who}</a></span>
+            <span class="${color}">$${fmt(ev.assets)}</span>
           </div>`;
         });
       }

@@ -6,7 +6,8 @@ import {IPoolManager} from "v4-core/src/interfaces/IPoolManager.sol";
 import {SwapHelper} from "../src/SwapHelper.sol";
 
 contract DeploySwapHelper is Script {
-    address constant POOL_MANAGER = 0x53Bb7B0C806dC304F55b911A5A7A09b1817E794F;
+    // Arbitrum mainnet V4 PoolManager
+    address constant POOL_MANAGER = 0x360E68faCcca8cA495c1B759Fd9EEe466db9FB32;
 
     function run() public {
         uint256 pk = vm.envUint("PRIVATE_KEY");

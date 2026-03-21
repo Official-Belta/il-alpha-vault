@@ -415,8 +415,15 @@ contract ILAlphaHook is IHooks {
 
         PoolState storage ps = poolStates[poolId];
 
+        // H-1 FIX: 2x rate limit (pushVolEstimate와 동일 패턴)
+        uint256 currentVol = uint256(ps.ewmaVolume);
+        uint256 maxExtVol = currentVol == 0 ? uint256(1e18) : currentVol * 2;
+        if (uint256(externalVolume) > maxExtVol) {
+            externalVolume = uint128(maxExtVol);
+        }
+
         // Blend: 50% on-chain EWMA + 50% external
-        uint256 blended = (uint256(ps.ewmaVolume) + uint256(externalVolume)) / 2;
+        uint256 blended = (currentVol + uint256(externalVolume)) / 2;
         ps.ewmaVolume = blended > type(uint128).max ? type(uint128).max : uint128(blended);
 
         emit KeeperVolumePushed(poolId, externalVolume);

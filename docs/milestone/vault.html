@@ -24,7 +24,7 @@
   .gate-text { font-size:19px; color:var(--gray-400); line-height:1.75; margin-bottom:48px; max-width:480px; }
   .gate-list { list-style:none; padding:0; margin-bottom:56px; border-top:1px solid rgba(255,255,255,0.06); }
   .gate-list li { font-family:var(--mono); font-size:15px; color:var(--gray-500); padding:18px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
-  .gate-actions { display:flex; align-items:center; gap:32px; }
+  .gate-actions { display:flex; align-items:center; gap:32px; flex-wrap:wrap; }
   .gate-accept { font-family:var(--mono); font-size:14px; font-weight:500; letter-spacing:0.06em; text-transform:uppercase; background:var(--white); color:var(--black); border:none; padding:18px 48px; cursor:pointer; transition:opacity 150ms var(--ease); }
   .gate-accept:hover { opacity:0.85; }
   .gate-decline { font-family:var(--mono); font-size:14px; letter-spacing:0.04em; color:var(--gray-600); text-decoration:none; transition:color 200ms var(--ease); }
@@ -83,8 +83,8 @@
   /* --- METRICS --- */
   .metrics-section { padding:0 48px 64px; }
   @media (max-width:640px) { .metrics-section { padding:0 24px 48px; } }
-  .metrics-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0; border-top:1px solid var(--gray-200); border-bottom:1px solid var(--gray-200); }
-  @media (max-width:768px) { .metrics-grid { grid-template-columns:1fr 1fr; } }
+  .metrics-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:0; border-top:1px solid var(--gray-200); border-bottom:1px solid var(--gray-200); }
+  @media (max-width:640px) { .metrics-grid { grid-template-columns:1fr; } .m-cell { border-right:none; } }
   .m-cell { padding:32px 32px 32px 0; border-right:1px solid var(--gray-200); }
   .m-cell:last-child { border-right:none; }
   .m-cell:nth-child(n+2) { padding-left:32px; }
@@ -152,6 +152,39 @@
 
   footer { padding:24px 48px; border-top:1px solid var(--gray-200); }
   footer span { font-family:var(--mono); font-size:11px; color:var(--gray-500); }
+
+  /* --- MOBILE OVERRIDES --- */
+  @media (max-width:640px) {
+    .gate-inner { padding:0 24px; }
+    .gate h1 { font-size:36px; }
+    .gate-text { font-size:17px; }
+    .gate-list li { font-size:14px; padding:14px 0; }
+    .gate-accept { width:100%; text-align:center; padding:18px; font-size:15px; }
+    .gate-decline { display:block; text-align:center; margin-top:16px; }
+    .gate-actions { flex-direction:column; gap:0; }
+
+    .vault-hero h1 { font-size:32px; }
+    .vault-hero .desc { font-size:17px; }
+
+    .connect-section { flex-direction:column; align-items:flex-start; }
+    .connect-prompt { font-size:24px; margin-bottom:16px; }
+    .connect-btn { width:100%; text-align:center; }
+
+    .m-cell { padding:24px; }
+    .m-value { font-size:36px; }
+
+    .s-title { font-size:28px; }
+    .s-body { font-size:17px; }
+    .f-name { font-size:18px; }
+    .f-desc { font-size:15px; }
+
+    .act-eyebrow { font-size:18px; }
+    .bal-label { font-size:15px; }
+    .amt-input { font-size:28px; padding:20px; }
+    .act-btn { width:100%; text-align:center; padding:20px; font-size:16px; }
+
+    .fee-table td { font-size:17px; }
+  }
 </style>
 </head>
 <body>

@@ -286,18 +286,36 @@ async function loadAll() {
       setDot('vaultDot', 'dead');
       document.getElementById('vaultStatus').textContent = '컨트랙트 미배포 또는 주소 오류';
     } else {
-      const metrics = await vaultC.getVaultMetrics();
-      const totalAssets = Number(metrics[0]) / 1e6;
-      const idleVal = Number(metrics[1]) / 1e6;
-      const deployedVal = Number(metrics[2]) / 1e6;
-      const sharePrice = Number(metrics[4]) / 1e18;
-      const lpActive = metrics[5];
-      const isPaused = metrics[6];
+      // 개별 함수로 조회 (getVaultMetrics가 revert될 수 있음)
+      const [totalAssetsRaw, isPaused, capRaw, maxDepRaw, supplyRaw] = await Promise.all([
+        vaultC.totalAssets(),
+        vaultC.paused(),
+        vaultC.depositCap(),
+        vaultC.maxDeposit(VAULT),
+        vaultC.totalSupply()
+      ]);
+      const totalAssets = Number(totalAssetsRaw) / 1e6;
+
+      // Share price: convertToAssets(1e6) / 1e6 (shares = 6 decimals like USDC)
+      let sharePrice = 1.0;
+      if (supplyRaw > 0n) {
+        const spRaw = await vaultC.convertToAssets(1000000n);
+        sharePrice = Number(spRaw) / 1e6;
+      }
+
+      // USDC balance of vault = idle capital
+      const usdcContract = new ethers.Contract(USDC_ADDR, ['function balanceOf(address) view returns (uint256)'], provider);
+      const idleRaw = await usdcContract.balanceOf(VAULT);
+      const idleVal = Number(idleRaw) / 1e6;
+      const deployedVal = totalAssets - idleVal;
+
+      // LP active = deployed > 0
+      const lpActive = deployedVal > 0;
 
       setDot('vaultDot', isPaused ? 'warn' : 'live');
       document.getElementById('vaultStatus').textContent = isPaused
         ? '⚠️ 볼트 일시정지 상태\n입금 차단 중, 출금은 가능'
-        : '정상 운영 중\ngetVaultMetrics() 응답 확인';
+        : '정상 운영 중\ntotalAssets: $' + fmt(totalAssets);
 
       document.getElementById('tvl').textContent = '$' + fmt(totalAssets);
       document.getElementById('sharePrice').textContent = '$' + sharePrice.toFixed(6);
@@ -314,10 +332,8 @@ async function loadAll() {
       yieldEl.textContent = (yieldPct >= 0 ? '+' : '') + yieldPct.toFixed(4) + '%';
       yieldEl.className = 'm-val ' + (yieldPct >= 0 ? 'green' : 'red');
 
-      const cap = await vaultC.depositCap();
-      const maxDep = await vaultC.maxDeposit(VAULT);
-      document.getElementById('cap').textContent = '$' + fmt(Number(cap) / 1e6);
-      document.getElementById('remaining').textContent = '$' + fmt(Number(maxDep) / 1e6);
+      document.getElementById('cap').textContent = '$' + fmt(Number(capRaw) / 1e6);
+      document.getElementById('remaining').textContent = '$' + fmt(Number(maxDepRaw) / 1e6);
 
       document.getElementById('paused').textContent = isPaused ? '예 ⚠️' : '아니오';
       document.getElementById('paused').className = 'm-val ' + (isPaused ? 'red' : 'green');

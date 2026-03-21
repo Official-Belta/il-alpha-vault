@@ -365,7 +365,7 @@ const VAULT_ABI = [
   'function maxDeposit(address) external view returns (uint256)',
   'function depositCap() external view returns (uint256)',
   'function paused() external view returns (bool)',
-  'function getVaultMetrics() external view returns (uint256,uint256,uint256,uint128,uint256,bool,bool)',
+  'function totalSupply() external view returns (uint256)',
   'function UNAUDITED() external view returns (bool)'
 ];
 const HOOK_ADDRESS = '0xfae907196801ed77119b7f288c05d1df475f9040';
@@ -408,11 +408,25 @@ async function initPublicRead() {
 async function refreshPublicData() {
   if (!vaultRead) return;
   try {
-    const metrics = await vaultRead.getVaultMetrics();
-    const totalAssetsVal = Number(metrics[0]) / 1e6;
-    const sharePrice = Number(metrics[4]) / 1e18;
-    const lpActive = metrics[5];
-    const isPaused = metrics[6];
+    // 개별 함수 조회 (getVaultMetrics revert 방지)
+    const [totalAssetsRaw, isPaused, maxDepRaw, supplyRaw] = await Promise.all([
+      vaultRead.totalAssets(),
+      vaultRead.paused(),
+      vaultRead.maxDeposit(VAULT_ADDRESS),
+      vaultRead.totalSupply()
+    ]);
+    const totalAssetsVal = Number(totalAssetsRaw) / 1e6;
+    let sharePrice = 1.0;
+    if (supplyRaw > 0n) {
+      const spRaw = await vaultRead.convertToAssets(1000000n);
+      sharePrice = Number(spRaw) / 1e6;
+    }
+
+    // Idle = USDC balance of vault
+    const usdcReadContract = new ethers.Contract(USDC_ADDRESS, ['function balanceOf(address) view returns (uint256)'], readProvider);
+    const idleRaw = await usdcReadContract.balanceOf(VAULT_ADDRESS);
+    const idleVal = Number(idleRaw) / 1e6;
+    const lpActive = (totalAssetsVal - idleVal) > 0;
 
     document.getElementById('totalAssets').textContent = '$' + formatUSDC(totalAssetsVal);
     document.getElementById('sharePrice').textContent = '$' + sharePrice.toFixed(4);
@@ -421,11 +435,11 @@ async function refreshPublicData() {
     statusEl.textContent = lpActive ? 'Active' : 'Removed';
     statusEl.style.color = lpActive ? 'var(--accent)' : 'var(--gray-500)';
 
-    const maxDep = await vaultRead.maxDeposit(VAULT_ADDRESS);
-    document.getElementById('depositCap').textContent = '$' + formatUSDC(Number(maxDep) / 1e6);
+    document.getElementById('depositCap').textContent = '$' + formatUSDC(Number(maxDepRaw) / 1e6);
 
     if (isPaused) {
-      document.getElementById('depositBtn').disabled = true;
+      const depBtn = document.getElementById('depositBtn');
+      if (depBtn) depBtn.disabled = true;
       document.getElementById('depositInfo').textContent = 'Vault paused — deposits disabled.';
     }
 

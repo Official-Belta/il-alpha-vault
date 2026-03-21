@@ -435,8 +435,9 @@ async function refreshPublicData() {
         const poolId = '0x51bc40c9fcc3fe4ab474ea85249074e973dbd264a3244e902d363256d1c951ba';
         const oracle = await hookRead.volOracles(poolId);
         const ewmaVar = Number(oracle[0]);
-        const annualVol = Math.sqrt(ewmaVar / 1e18 * 8760) * 100;
-        document.getElementById('hourlyVar').textContent = (ewmaVar / 1e18).toExponential(2);
+        const hourlyVar = ewmaVar / 1e18;
+        const annualVol = Math.sqrt(hourlyVar * 8760) * 0.00009999 * 100;
+        document.getElementById('hourlyVar').textContent = hourlyVar.toFixed(2) + ' tick²/h';
         document.getElementById('annualVol').textContent = annualVol.toFixed(2) + '%';
       } catch(e) { /* vol data optional */ }
     }
